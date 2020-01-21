@@ -2,6 +2,8 @@
 
 #pragma once // indicates that this file is to be included only once
 
+#include <stdio.h>
+
 /**
  * @brief Object class. _Some of_ this code was produced by following along with Prof. Vesely in class on Friday, January 10th, 2019.
  * The rest is original -- including print()

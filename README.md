@@ -3,4 +3,4 @@ Group Project(s) for CS4500
 
 Includes:
 
-Assignment 1
+Assignment-1/part1
