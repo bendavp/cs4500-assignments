@@ -17,6 +17,14 @@ public:
     virtual ~Column()
     {
     }
+<<<<<<< HEAD
+=======
+
+    size_t getSize()
+    {
+        return Column::size_;
+    }
+>>>>>>> ben
 };
 
 class BoolColumn : public Column
@@ -39,6 +47,10 @@ public:
     void add(bool other)
     {
         arr->push_back(other);
+<<<<<<< HEAD
+=======
+        Column::size_++;
+>>>>>>> ben
     }
 };
 
@@ -62,6 +74,10 @@ public:
     void add(int other)
     {
         arr->push_back(other);
+<<<<<<< HEAD
+=======
+        Column::size_++;
+>>>>>>> ben
     }
 };
 
@@ -85,6 +101,10 @@ public:
     void add(float other)
     {
         arr->push_back(other);
+<<<<<<< HEAD
+=======
+        Column::size_++;
+>>>>>>> ben
     }
 };
 
@@ -108,5 +128,9 @@ public:
     void add(String *other)
     {
         arr->push_back(other);
+<<<<<<< HEAD
+=======
+        Column::size_++;
+>>>>>>> ben
     }
 };

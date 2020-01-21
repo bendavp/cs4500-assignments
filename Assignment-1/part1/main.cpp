@@ -45,26 +45,22 @@ int main(int argh, char **argv)
         {
             i++;
             file = new String(argv[i]);
-            println("file found");
         }
         else if (checkflag(i, argv[i], argh, "-from", 1) && from == -1)
         {
             i++;
             from = convertParamToInt(argv[i]);
-            println("from found");
         }
         else if (checkflag(i, argv[i], argh, "-len", 1) && len == -1)
         {
             i++;
             len = convertParamToInt(argv[i]);
-            println("len found");
         }
         else if (checkflag(i, argv[i], argh, "-print_col_type", 1) && !ftype)
         {
             i++;
             typeuint = convertParamToInt(argv[i]);
             ftype = true;
-            println("col type found");
         }
         else if (checkflag(i, argv[i], argh, "-print_col_idx", 2) && !fidx)
         {
@@ -73,7 +69,6 @@ int main(int argh, char **argv)
             i++;
             idxoff = convertParamToInt(argv[i]);
             fidx = true;
-            println("print col and row found");
         }
         else if (checkflag(i, argv[i], argh, "-is_missing_idx", 2) && !fmissing)
         {
@@ -82,7 +77,6 @@ int main(int argh, char **argv)
             i++;
             misoff = convertParamToInt(argv[i]);
             fmissing = true;
-            println("print is missing found");
         }
         else
         {
