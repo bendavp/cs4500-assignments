@@ -1,5 +1,6 @@
 #include "string.h"
 #include "helper.h"
+#include "column.h"
 
 // checks if: 1) flag is matched, 2) num of params following flag could be found
 bool checkflag(int i, char *arg, int argh, const char *flag, int param)
@@ -43,41 +44,72 @@ char *copySubArray(int i, int j, char *array)
     return temp;
 }
 
+// checks to see if the element follows the specs
+bool isInvalidElement(char* element) {
+
+}
+
 // parses through line to determine the num of cols
 size_t checkCols(char *line)
 {
-    size_t charnum = strlen(line);
-    bool fstart = false;
-    bool fcanend = false;
-    size_t cols = 0;
-    for (int i = 0; i < charnum; i++)
+    bool open = false;                                  // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+    bool readingString = false;                         // whether we are currently reading inside quotes i.e. inside a multi-word String
+    size_t charNum = strlen(line);                      // the number of characters in the line we are reading
+    size_t colNum = 0;                                  // the current number of columns seen
+    size_t startOfElement = 0;                          // the index of the first character of the element we are currently reading
+    size_t endOfElement = 0;                            // the index of the closing bracket of the element we are currently reading
+    // Column** columns = new Column*[columns->getSize()]
+
+    // for each character in the line
+    for (int i = 0; i < charNum; i++)
     {
-        if (!fstart && !fcanend && line[i] == '<')
+        // if we are not currently reading an element and the current character is an opening bracket
+        if (!open && line[i] == '<')
         {
-            fstart = true;
+            open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
+            startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
         }
-        // end of a col, checks for > char
-        // also checks that next char is either ' ', '<' or nothing (ie reached true end of col)
-        else if (fstart && fcanend && line[i] == '>' && (i + 1 < charnum && (line[i + 1] == '<' || line[i + 1] == ' ') || i == charnum - 1))
+
+        // if we are not currently reading an element and the next character is not an open bracket
+        // then throw out the line, as this is a misformed schema
+        // i.e. return the given coltypes
+        else if (!open && line[i] != ' ')
         {
-            cols++;
-            fstart = false;
-            fcanend = false;
+            return 0;
         }
-        else if (fstart && !fcanend && line[i] != ' ')
+
+        // if we are currently reading an element that is not a string and we're not at the end of the element
+        // if we run into an open bracket outside a string, we throw out the whole line, so we return the coltypes we were given
+        else if (open && !readingString && line[i] == '<')
         {
-            if (line[i] != '>')
-            {
-                fcanend = true;
+            return 0;
+        }
+
+        // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
+        else if (open && !readingString && line[i] == '>')
+        {
+            open = false;     // we set open to false since we are done reading the element
+            endOfElement = i; // we set the end of the element to the index of the closing bracket
+            // set the current column type to whatever the element type is, if that is appropriate based on the spec
+            if (isInvalidElement(copySubArray(startOfElement, endOfElement, line))) {
+                return 0;
             }
-            // checking for a special case of <>>>
-            else if (line[i] == '>' && i + 1 < charnum && (line[i] != '<' || line[i] != ' '))
-            {
-                fcanend = true;
-            }
+            colNum++; // now we're on the next column
+        }
+
+        // we see "" and we are currently not reading a string so this is the start of our string element 
+        // (allows for '>' and '<' included)
+        else if (open && !readingString && line[i] == '"')
+        {
+            readingString = true;
+        }
+        // we see "" and we are currently reading a string so this is the end of our string element
+        else if (open && readingString && line[i] == '"')
+        {
+            readingString = false;
         }
     }
-    return cols;
+    return colNum;
 }
 
 // processes what is found in between < > and determines if it is a bool, int, float, or string
