@@ -32,11 +32,11 @@ size_t file_length(FILE *file)
     return fileLength;               // return the length of the file
 }
 
-// returns portion of array from index j to index i, not including index i
+// returns portion of array from index i to index j, not including index j
 char* copySubArray(int i, int j, char* array) {
-    char *temp = new char[i -j];
-    for (int n = j; n < i; n++) {
-        temp[n-j] = array[n];
+    char *temp = new char[j-i];
+    for (int n = i; n < j; n++) {
+        temp[n-i] = array[n];
     }
     return temp;
 }
@@ -71,23 +71,58 @@ size_t checkCols(char* line) {
     return cols;
 }
 
-// use this to further define the schema
-char* defineSchema(char* coltypes, char* line){
+// processes what is found in between < > and determines if it is a bool, int, float, or string
+// if it is not processable (i.e. 1 . 2, then just return the current type)
+char processType(char* insides, char curtype) {
 
 }
 
+// use this to further define the schema
+char* defineSchema(const char* coltypes, char* line){
+    bool fopen = false;
+    bool fclose = true;
+    bool freading = false;
+    size_t charnum = strlen(line);
+    size_t currentcol = 0;
+    int j = 0; int k = 0;
+    char* currentcoltypes = new char[strlen(coltypes)];
+    for (int i = 0; i < charnum; i++) {
+        // find the first opening <
+        if (!fopen && fclose && line[i] == '<') {
+            fopen = true;
+            fclose = false;
+            j = i;
+        }
+        // finds closing >
+        else if (fopen && !fclose && line[i] == '>') {
+            if (i == charnum - 1 || i+1 < charnum && (line[i+1] == '<' || line[i+1] == ' ')) {
+                fclose = true;
+                fopen = false;
+                k = i;
+                // processes what is inside the brackets
+                currentcoltypes[currentcol] = processType(copySubArray(j, k, line), coltypes[currentcol]); 
+                currentcol++;
+            }
+        } 
+    }
+    return currentcoltypes;
+}
+
 void findSchema(char *fileContents) {
-    // finds the largest row; stored in colnum
+    // finds the row with max number of columns; stored in colnum
     int lines = 0; int i = 0; int j = 0; size_t colnum = 0; size_t currentcolnum = 0;
     while (fileContents[i]!='\0' && lines <= 500) {
-        if(fileContents[i]!='\n') {
+        if(fileContents[i]=='\n') {
             char * line = new char[i-j];
-            line = copySubArray(i, j, fileContents);
+            line = copySubArray(j, i, fileContents);
             currentcolnum = checkCols(line);
             if (colnum < currentcolnum) { 
                 colnum = currentcolnum;
             }
+            j = i+1;
+            line++;
         }
+        i++;
     }
     // for storing the coltypes as a char before initializing the columns
     // b = bool, i = int, f = float, s = string
