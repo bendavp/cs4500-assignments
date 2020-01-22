@@ -125,13 +125,10 @@ char *defineSchema(char *coltypes, char *line)
         }
 
         // if we are currently reading an element that is not a string and we're not at the end of the element
-        else if (open && !readingString && !line[i] != '>')
+        // if we run into an open bracket outside a string, we throw out the whole line, so we return the coltypes we were given
+        else if (open && !readingString && line[i] == '<')
         {
-            // if we run into an open bracket outside a string, we throw out the whole line, so we return the coltypes we were given
-            if (line[i] == '<')
-            {
-                return coltypes;
-            }
+            return coltypes;
         }
 
         // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
@@ -144,14 +141,16 @@ char *defineSchema(char *coltypes, char *line)
             currentcol++; // now we're on the next column
         }
 
-        //
-        else if (fopen && !fclose && !freading && line[i] == '"')
+        // we see "" and we are currently not reading a string so this is the start of our string element 
+        // (allows for '>' and '<' included)
+        else if (open && !readingString && line[i] == '"')
         {
-            freading = true;
+            readingString = true;
         }
-        else if (fopen && !fclose && freading && line[i] == '"')
+        // we see "" and we are currently reading a string so this is the end of our string element
+        else if (open && readingString && line[i] == '"')
         {
-            freading = false;
+            readingString = false;
         }
     }
     return currentcoltypes;
