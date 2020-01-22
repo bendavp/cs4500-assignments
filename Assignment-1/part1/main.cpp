@@ -45,8 +45,9 @@ char *copySubArray(int i, int j, char *array)
 }
 
 // checks to see if the element follows the specs
-bool isInvalidElement(char* element) {
-
+bool isInvalidElement(char* element) 
+{
+    
 }
 
 // parses through line to determine the num of cols
@@ -112,10 +113,144 @@ size_t checkCols(char *line)
     return colNum;
 }
 
+bool isTypeString(char* element) {
+    bool hasDot = false;
+    bool hasSign = false;
+    bool hasDigit = false;
+    for (int i = 0; i < strlen(element); i++) {
+        // any char with these ASCII val would make it automatically a string
+        if ((int) element[i] >= 33 && (int) element[i] <= 42)
+        {
+            return true;
+        }
+        // any char with this ASCII val would make it automatically a string
+        else if ((int) element[i] <= 44) 
+        {
+            return true;
+        }
+        // any char with these ASCII val would make it automatically a string
+        else if ((int) element[i] >= 58 && (int) element[i] <= 126)
+        {
+            return true;
+        }
+        // has double quotes
+        else if (element[i] == '"') {
+            return true;
+        }
+        else if (isdigit(element[i])) {
+            hasDigit = true;
+        }
+        // see a digit and then see a +/- sign
+        else if (hasDigit && ((int) element[i] == 43 || (int) element[i] == 45)) {
+            return true;
+        }
+        else if ((int) element[i] == 43 || (int) element[i] == 45)
+        {
+            hasSign = true;
+        }
+        // saw a +/- sign and we see a second one
+        else if (hasSign && ((int) element[i] == 43 || (int) element[i] == 45)) {
+            return true;
+        }
+        else if ((int) element[i] == 46) 
+        {
+            hasDot = true;
+        }
+        // see two dots 
+        else if (hasDot && (int) element[i] == 46) 
+        {
+            return true;
+        }
+        // see a dot and there is nothing after it
+        else if ((int) element[i] == 46 && i == strlen(element) - 1) 
+        {
+            return true;
+        }
+        // see a dot and then see +/- sign
+        else if (hasDot && ((int) element[i] == 43 || (int) element[i] == 45)) 
+        {
+            return true;
+        }
+    }
+    // if there is a sign and no digit, should be string OR if there is a dot and there is no digit, should be a string
+    return  hasSign && !hasDigit || hasDot && !hasDigit;
+}
+
+bool isTypeFloat(char* element) {
+    bool hasdot = false;
+    for (int i = 0; i < strlen(element); i++) 
+    {
+        // checking to see if there is a dot
+        if ((int) element[i] == 46 && !hasdot) 
+        {
+            hasdot == true;
+        }
+        // ensuring that there is a digit behind the dot
+        else if (isdigit(element[i]) && hasdot)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isTypeInt(char* element) {
+    bool sign = false;
+    for (int i = 0; i < strlen(element); i++) 
+    {
+        // has a negative sign
+        if ((int) element[i] == 45 && !sign) 
+        {
+            sign = true;
+        }
+        // has a positive sign
+        else if ((int) element[i] == 43 && !sign) 
+        {
+            sign = true;
+        }
+        else if (isdigit(element[i]) && sign)
+        {
+            return true;
+        }
+        else if ((int) element[i] >= 50 || (int) element[i] <= 59 ) 
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 // processes what is found in between < > and determines if it is a bool, int, float, or string
 // if it is not processable (i.e. 1 . 2, then just return the current type)
-char processType(char *insides, char curtype)
+// returns null if its wrong
+char processType(char *element, char curtype)
 {
+    char temp = '\0';
+    if (isInvalidElement(element)) 
+    {
+        return NULL;
+    }
+    else if (curtype == 's') {
+        return curtype;
+    }
+    else {
+        if (isTypeString(element)) {
+            return 's';
+        }
+        else if (isTypeFloat(element)) {
+            return 'f';
+        }
+        else if (isTypeInt(element) && curtype != 'f') 
+        {
+            return 'i';
+        }
+        else if (curtype != 'i') 
+        {
+            return 'b';
+        }
+    }
 }
 
 /**
