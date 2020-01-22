@@ -86,95 +86,154 @@ char processType(char *insides, char curtype)
 {
 }
 
-// use this to further define the schema
-char *defineSchema(const char *coltypes, char *line)
+/**
+ * @brief defines all the column types in the schema based on the spec of the assignment
+ * 
+ * @param coltypes the current types of the columns
+ * @param columns the columns in our current understanding of the schema
+ * @param line one row in the schema
+ * @return char* the column types, represented in array form
+ * @return an array of Columns, representing the columns in the file
+ */
+char *defineSchema(char *coltypes, char *line)
 {
-    bool fopen = false;
-    bool fclose = true;
-    bool freading = false;
-    size_t charnum = strlen(line);
-    size_t currentcol = 0;
-    int j = 0;
-    int k = 0;
-    char *currentcoltypes = new char[strlen(coltypes)];
-    for (int i = 0; i < charnum; i++)
+    bool open = false;                                  // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+    bool readingString = false;                         // whether we are currently reading inside quotes i.e. inside a multi-word String
+    size_t charNum = strlen(line);                      // the number of characters in the line we are reading
+    size_t currentcol = 0;                              // the current column in the line that we are reading
+    size_t startOfElement = 0;                          // the index of the first character of the element we are currently reading
+    size_t endOfElement = 0;                            // the index of the closing bracket of the element we are currently reading
+    char *currentcoltypes = new char[strlen(coltypes)]; // the column types found based on reading this line
+    // Column** columns = new Column*[columns->getSize()]
+
+    // for each character in the line
+    for (int i = 0; i < charNum; i++)
     {
-        // find the first opening <
-        if (!fopen && fclose && !freading && line[i] == '<')
+        // if we are not currently reading an element and the current character is an opening bracket
+        if (!open && line[i] == '<')
         {
-            fopen = true;
-            fclose = false;
-            j = i+1;
+            open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
+            startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
         }
-        // finds closing >
-        else if (fopen && !fclose && !freading && line[i] == '>')
+
+        // if we are not currently reading an element and the next character is not an open bracket
+        // then throw out the line, as this is a misformed schema
+        // i.e. return the given coltypes
+        else if (!open && line[i] != ' ')
         {
-            if (i == charnum - 1 || i + 1 < charnum && (line[i + 1] == '<' || line[i + 1] == ' '))
+            return coltypes;
+        }
+
+        // if we are currently reading an element that is not a string and we're not at the end of the element
+        else if (open && !readingString && !line[i] != '>')
+        {
+            // if we run into an open bracket outside a string, we throw out the whole line, so we return the coltypes we were given
+            if (line[i] == '<')
             {
-                fclose = true;
-                fopen = false;
-                k = i;
-                // processes what is inside the brackets
-                currentcoltypes[currentcol] = processType(copySubArray(j, k, line), coltypes[currentcol]);
-                currentcol++;
+                return coltypes;
             }
         }
-        else if (fopen && !fclose && !freading && line[i] == '"') 
+
+        // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
+        else if (open && !readingString && line[i] == '>')
+        {
+            open = false;     // we set open to false since we are done reading the element
+            endOfElement = i; // we set the end of the element to the index of the closing bracket
+            // set the current column type to whatever the element type is, if that is appropriate based on the spec
+            currentcoltypes[currentcol] = processType(copySubArray(startOfElement, endOfElement, line), coltypes[currentcol]);
+            currentcol++; // now we're on the next column
+        }
+
+        //
+        else if (fopen && !fclose && !freading && line[i] == '"')
         {
             freading = true;
         }
-        else if (fopen && !fclose && freading && line[i] == '"') {
+        else if (fopen && !fclose && freading && line[i] == '"')
+        {
             freading = false;
         }
     }
     return currentcoltypes;
 }
 
-void findSchema(char *fileContents)
+/**
+ * @brief Determines the number of columns in the schema and their type
+ * 
+ * @param fileContents a char array of all the charcters in the schema file
+ * 
+ * @return an array of columns 
+ */
+Column **findSchema(char *fileContents)
 {
-    // finds the row with max number of columns; stored in colnum
-    int lines = 0;
-    int i = 0;
-    int j = 0;
-    size_t colnum = 0;
-    size_t currentcolnum = 0;
-    while (fileContents[i] != '\0' && lines <= 500)
+    int lines = 0;            // the number of lines in the schema that have been parsed
+    int numParsedChars = 0;   // the number of characters that have been parsed
+    int startOfLine = 0;      // the index in the fileContents char array that represents the start of a line
+    size_t maxColNum = 0;     // the maximum number of columns found in the schema
+    size_t currentColNum = 0; // the number of columns in the line that was just parsed
+    // iterates through the fileContents until the end, or until 500 lines have been parsed
+    while (fileContents[numParsedChars] != '\0' && lines <= 500)
     {
-        if (fileContents[i] == '\n')
+        // if we're at the end of the current line
+        if (fileContents[numParsedChars] == '\n')
         {
-            char *line = new char[i - j];
-            line = copySubArray(j, i, fileContents);
-            currentcolnum = checkCols(line);
-            if (colnum < currentcolnum)
+
+            char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
+            currentColNum = checkCols(line);                                // sets the number of columns in the line just parsed
+
+            // if the max column number so far is less than the number of columns in this line,
+            // then set the max column number to the numnber of columns in the line just parsed
+            if (maxColNum < currentColNum)
             {
-                colnum = currentcolnum;
+                maxColNum = currentColNum;
             }
-            j = i + 1;
+
+            // set the start of the next line to the number of already parsed characters, plus 1
+            // because the number of parsed characters is at the index in the fileContents
+            // that represents the end of the current line, so we need to set it to the beginning of the
+            // next line, rather than the end of the just parsed line
+            startOfLine = numParsedChars + 1;
+
+            // increments the numnber of lines already parsed, as we just finished parsing the current line
             line++;
         }
-        i++;
+        // increments the number of already parsed characters, as we just finished parsing one
+        numParsedChars++;
     }
     // for storing the coltypes as a char before initializing the columns
     // b = bool, i = int, f = float, s = string
-    char *coltypes = new char[colnum];
+    char *coltypes = new char[maxColNum];
+
+    // Column** columns = new Column*[maxColNum];
+
     // assume everything is a bool initially
-    for (int i = 0; i < colnum; i++)
+    // sets all the columns to bool type initally
+    for (int i = 0; i < maxColNum; i++)
     {
         coltypes[i] = 'b';
     }
     // using the file to start identifying the schema now
+    // set lines back to 0, as this now represents the number of lines that have been
+    // used to define the schema
     lines = 0;
-    i = 0;
-    j = 0;
-    while (fileContents[i] != '\0' && lines <= 500)
+
+    numParsedChars = 0; // reset num parsed chars back to 0, as we need to parse the file again to define the schema
+    startOfLine = 0;    // set start of line to 0, as we are at the start of the first line in the file to be parsed to define the schema
+    // iterates through the fileContents until the end, or until 500 lines have been parsed
+    while (fileContents[numParsedChars] != '\0' && lines <= 500)
     {
-        if (fileContents[i] != '\n')
+        // if we're at the end of the current line
+        if (fileContents[numParsedChars] != '\n')
         {
-            char *line = new char[i - j];
-            line = copySubArray(i, j, fileContents);
-            coltypes = defineSchema(coltypes, line);
+            char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
+            coltypes = defineSchema(coltypes, line);                        // sets the column types found in the schema based on the given line
+            // columns = defineSchema(columns, line);
         }
     }
+
+    // return columns;
 }
 
 int main(int argh, char **argv)
