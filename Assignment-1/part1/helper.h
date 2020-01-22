@@ -24,3 +24,23 @@ void println(Object *o, size_t num)
 {
     std::cout << o->print() << " " << num << "\n";
 }
+
+void print_(const char *m)
+{
+    std::cout << m;
+}
+
+void print_(float f)
+{
+    std::cout << f;
+}
+
+void print_(bool b)
+{
+    std::cout << b;
+}
+
+void print_(int i)
+{
+    std::cout << i;
+}

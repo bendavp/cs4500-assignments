@@ -46,6 +46,20 @@ public:
         arr->push_back(other);
         Column::size_++;
     }
+
+    const char *print()
+    {
+        print_("[");
+        for (int i = 0; i < Column::size_; i++)
+        {
+            print_(arr->at(i));
+            if (i != Column::size_ - 1)
+            {
+                print_(", ");
+            }
+        }
+        print_("]");
+    }
 };
 
 class IntColumn : public Column
@@ -69,6 +83,20 @@ public:
     {
         arr->push_back(other);
         Column::size_++;
+    }
+
+    const char *print()
+    {
+        print_("[");
+        for (int i = 0; i < Column::size_; i++)
+        {
+            print_(arr->at(i));
+            if (i != Column::size_ - 1)
+            {
+                print_(", ");
+            }
+        }
+        print_("]");
     }
 };
 
@@ -94,6 +122,20 @@ public:
         arr->push_back(other);
         Column::size_++;
     }
+
+    const char *print()
+    {
+        print_("[");
+        for (int i = 0; i < Column::size_; i++)
+        {
+            print_(arr->at(i));
+            if (i != Column::size_ - 1)
+            {
+                print_(", ");
+            }
+        }
+        print_("]");
+    }
 };
 
 class StringColumn : public Column
@@ -117,5 +159,19 @@ public:
     {
         arr->push_back(other);
         Column::size_++;
+    }
+
+    const char *print()
+    {
+        print_("[");
+        for (int i = 0; i < Column::size_; i++)
+        {
+            print_(arr->at(i)->str_);
+            if (i != Column::size_ - 1)
+            {
+                print_(", ");
+            }
+        }
+        print_("]");
     }
 };

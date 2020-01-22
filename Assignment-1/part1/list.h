@@ -256,16 +256,16 @@ public:
     // returns what to print
     const char *print()
     {
-        String *res = new String("[");
+        print_("[");
         for (int i = 0; i < size_; i++)
         {
-            res = res->concat(list_[i]);
-            if (i < size_ - 1)
+            print_(list_[i]->str_);
+            if (i != size_ - 1)
             {
-                res = res->concat(new String(", "));
+                print_(", ");
             }
         }
-        return res->concat(new String("]"))->str_;
+        print_("]");
     }
 
     // checks if the current StrList is sorted alphabetically

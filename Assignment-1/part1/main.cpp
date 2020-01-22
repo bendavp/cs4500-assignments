@@ -45,19 +45,84 @@ char *copySubArray(int i, int j, char *array)
 }
 
 // checks to see if the element follows the specs
-bool isInvalidElement(char* element) {
-
+bool isInvalidElement(char *element)
+{
+    // start at the beginning of the element
+    size_t index = 0;
+    // skip all the whitespace before the start of the element
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+    // if the first character is a quote
+    if (element[index] == '"')
+    {
+        // go to the character after the quote
+        index++;
+        // go to the next character until the next quote
+        while (element[index] != '"')
+        {
+            index++;
+        }
+        // go to the character after the close quote
+        index++;
+        // there should only be whitespace starting at this character until the end, so skip to the end
+        while (element[index] == ' ')
+        {
+            index++;
+        }
+        // if we're at the end, then the element is valid
+        if (element[index] == '\0')
+        {
+            return false;
+        }
+        // otherwise, if we're not at the end, the element is invalid
+        // as it should not have spaces between the characters
+        else
+        {
+            return true;
+        }
+    }
+    // otherwise, if the first character is something other than a quote
+    else
+    {
+        // go to the next character
+        index++;
+        // go to the next space, as that should be the end of the element
+        while (element[index] != ' ')
+        {
+            index++;
+        }
+        // go to the character after the space
+        index++;
+        // there should only be whitespace starting at this character until the end, so skip to the end
+        while (element[index] == ' ')
+        {
+            index++;
+        }
+        // if we're at the end, then the element is valid
+        if (element[index] == '\0')
+        {
+            return false;
+        }
+        // otherwise, if we're not at the end, the element is invalid
+        // as it should not have spaces between the characters
+        else
+        {
+            return true;
+        }
+    }
 }
 
 // parses through line to determine the num of cols
 size_t checkCols(char *line)
 {
-    bool open = false;                                  // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
-    bool readingString = false;                         // whether we are currently reading inside quotes i.e. inside a multi-word String
-    size_t charNum = strlen(line);                      // the number of characters in the line we are reading
-    size_t colNum = 0;                                  // the current number of columns seen
-    size_t startOfElement = 0;                          // the index of the first character of the element we are currently reading
-    size_t endOfElement = 0;                            // the index of the closing bracket of the element we are currently reading
+    bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+    bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
+    size_t charNum = strlen(line); // the number of characters in the line we are reading
+    size_t colNum = 0;             // the current number of columns seen
+    size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
+    size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
     // Column** columns = new Column*[columns->getSize()]
 
     // for each character in the line
@@ -91,13 +156,14 @@ size_t checkCols(char *line)
             open = false;     // we set open to false since we are done reading the element
             endOfElement = i; // we set the end of the element to the index of the closing bracket
             // set the current column type to whatever the element type is, if that is appropriate based on the spec
-            if (isInvalidElement(copySubArray(startOfElement, endOfElement, line))) {
+            if (isInvalidElement(copySubArray(startOfElement, endOfElement, line)))
+            {
                 return 0;
             }
             colNum++; // now we're on the next column
         }
 
-        // we see "" and we are currently not reading a string so this is the start of our string element 
+        // we see "" and we are currently not reading a string so this is the start of our string element
         // (allows for '>' and '<' included)
         else if (open && !readingString && line[i] == '"')
         {
@@ -173,7 +239,7 @@ char *defineSchema(char *coltypes, char *line)
             currentcol++; // now we're on the next column
         }
 
-        // we see "" and we are currently not reading a string so this is the start of our string element 
+        // we see "" and we are currently not reading a string so this is the start of our string element
         // (allows for '>' and '<' included)
         else if (open && !readingString && line[i] == '"')
         {
