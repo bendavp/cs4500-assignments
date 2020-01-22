@@ -100,14 +100,14 @@ char *defineSchema(const char *coltypes, char *line)
     for (int i = 0; i < charnum; i++)
     {
         // find the first opening <
-        if (!fopen && fclose && line[i] == '<')
+        if (!fopen && fclose && !freading && line[i] == '<')
         {
             fopen = true;
             fclose = false;
-            j = i;
+            j = i+1;
         }
         // finds closing >
-        else if (fopen && !fclose && line[i] == '>')
+        else if (fopen && !fclose && !freading && line[i] == '>')
         {
             if (i == charnum - 1 || i + 1 < charnum && (line[i + 1] == '<' || line[i + 1] == ' '))
             {
@@ -118,6 +118,13 @@ char *defineSchema(const char *coltypes, char *line)
                 currentcoltypes[currentcol] = processType(copySubArray(j, k, line), coltypes[currentcol]);
                 currentcol++;
             }
+        }
+        else if (fopen && !fclose && !freading && line[i] == '"') 
+        {
+            freading = true;
+        }
+        else if (fopen && !fclose && freading && line[i] == '"') {
+            freading = false;
         }
     }
     return currentcoltypes;
