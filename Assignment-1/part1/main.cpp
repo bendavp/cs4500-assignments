@@ -77,7 +77,7 @@ char *copySubArray(int start, int end, char *array)
      * @note now that we are have the size of the array, make sure @param start and @param end are within 
      * 0 - givenSize, and that @param start comes before @param end. Otherwise terminate the program
      */
-    if (!(start >= 0 && start < givenSize && end > 0 && end <= givenSize && start < end))
+    if (!(start >= 0 && start < givenSize && end > 0 && end <= givenSize && start <= end))
     {
         println("Cannot copy sub-array: make sure the start and end index are within the array, and that the start index is before the end index!");
         exit(1);
@@ -115,6 +115,13 @@ bool isInvalidElement(char *element)
     {
         index++;
     }
+
+    // if we are at the end, then return false, as the element is missing, but not invalid
+    if (element[index] == '\0')
+    {
+        return false;
+    }
+
     // if the first character is a quote
     if (element[index] == '"')
     {
@@ -199,7 +206,6 @@ size_t numCols(char *line)
     size_t colNum = 0;             // the current number of columns seen
     size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
     size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
-    // Column** columns = new Column*[columns->getSize()]
 
     // for each character in the line
     for (int i = 0; i < charNum; i++)
@@ -420,9 +426,32 @@ bool isTypeBool(char *element)
     }
 }
 
-// processes what is found in between < > and determines if it is a bool, int, float, or string
-// if it is not processable (i.e. 1 . 2, then just return the current type)
-// returns null if its wrong
+/**
+ * @brief checks if the given element is missing (i.e. it is blank or only spaces)
+ * 
+ * @param element the given element to check if it is missing
+ * @return true if the given element is missing
+ * @return false if the given element is NOT missing
+ */
+bool isMissing(char *element)
+{
+    size_t index = 0; // index of where we are in the element
+    // skip all the spaces
+    while (element[index] = ' ')
+    {
+        index++;
+    }
+    // if we are at the end, then the element _is_ missing
+    if (element[index] == '\0')
+    {
+        return true;
+    }
+    // otherwise, if after skipping all the spaces we are _not_ at the end, then the element is not missing
+    else
+    {
+        return false;
+    }
+}
 
 /**
  * @brief Determines the type of the element, and returns that type in a char representation
@@ -479,7 +508,6 @@ char *defineLine(char *coltypes, char *line)
     size_t startOfElement = 0;                          // the index of the first character of the element we are currently reading
     size_t endOfElement = 0;                            // the index of the closing bracket of the element we are currently reading
     char *currentcoltypes = new char[strlen(coltypes)]; // the column types found based on reading this line
-    // Column** columns = new Column*[columns->getSize()]
 
     // for each character in the line
     for (int i = 0; i < charNum; i++)
@@ -566,20 +594,19 @@ char *defineLine(char *coltypes, char *line)
 Column **defineSchema(char *fileContents)
 {
     int lines = 0;            // the number of lines in the schema that have been parsed
-    int numParsedChars = 0;   // the number of characters that have been parsed
+    int index = 0;            // the current index in the file
     int startOfLine = 0;      // the index in the fileContents char array that represents the start of a line
     size_t maxColNum = 0;     // the maximum number of columns found in the schema
     size_t currentColNum = 0; // the number of columns in the line that was just parsed
     // iterates through the fileContents until the end, or until 500 lines have been parsed
-    while (fileContents[numParsedChars] != '\0' && lines <= 500)
+    while (fileContents[index] != '\0' && lines < 500)
     {
         // if we're at the end of the current line
-        if (fileContents[numParsedChars] == '\n')
+        if (fileContents[index] == '\n')
         {
-
-            char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
-            line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
-            currentColNum = numCols(line);                                  // sets the number of columns in the line just parsed
+            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
+            currentColNum = numCols(line);                         // sets the number of columns in the line just parsed
 
             // if the max column number so far is less than the number of columns in this line,
             // then set the max column number to the numnber of columns in the line just parsed
@@ -588,23 +615,20 @@ Column **defineSchema(char *fileContents)
                 maxColNum = currentColNum;
             }
 
-            // set the start of the next line to the number of already parsed characters, plus 1
-            // because the number of parsed characters is at the index in the fileContents
-            // that represents the end of the current line, so we need to set it to the beginning of the
-            // next line, rather than the end of the just parsed line
-            startOfLine = numParsedChars + 1;
+            // set the start of the next line to the current index of the file, plus 1
+            // because the index represents the end of the current line, so we need to
+            // set it to the beginning of the next line, rather than the end of the just parsed line
+            startOfLine = index + 1;
 
             // increments the numnber of lines already parsed, as we just finished parsing the current line
             line++;
         }
-        // increments the number of already parsed characters, as we just finished parsing one
-        numParsedChars++;
+        // increments the current index to move on in the file
+        index++;
     }
     // for storing the coltypes as a char before initializing the columns
     // b = bool, i = int, f = float, s = string
     char *coltypes = new char[maxColNum];
-
-    // Column** columns = new Column*[maxColNum];
 
     // assume everything is a bool initially
     // sets all the columns to bool type initally
@@ -612,27 +636,50 @@ Column **defineSchema(char *fileContents)
     {
         coltypes[i] = 'b';
     }
+
     // using the file to start identifying the schema now
     // set lines back to 0, as this now represents the number of lines that have been
     // used to define the schema
     lines = 0;
 
-    numParsedChars = 0; // reset num parsed chars back to 0, as we need to parse the file again to define the schema
-    startOfLine = 0;    // set start of line to 0, as we are at the start of the first line in the file to be parsed to define the schema
+    index = 0;       // reset index back to 0, as we need to parse the file again to define the schema
+    startOfLine = 0; // set start of line to 0, as we are at the start of the first line in the file to be parsed to define the schema
     // iterates through the fileContents until the end, or until 500 lines have been parsed
-    while (fileContents[numParsedChars] != '\0' && lines <= 500)
+    while (fileContents[index] != '\0' && lines < 500)
     {
         // if we're at the end of the current line
-        if (fileContents[numParsedChars] != '\n')
+        if (fileContents[index] != '\n')
         {
-            char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
-            line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
-            coltypes = defineLine(coltypes, line);                          // sets the column types found in the schema based on the given line
-            // columns = defineSchema(columns, line);
+            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
+            coltypes = defineLine(coltypes, line);                 // sets the column types found in the schema based on the given line
         }
     }
 
-    // return columns;
+    // now we create the actual column objects to return
+    Column **columns = new Column *[maxColNum];
+
+    for (int i = 0; i < maxColNum; i++)
+    {
+        if (coltypes[i] == 'b')
+        {
+            columns[i] = new BoolColumn();
+        }
+        else if (coltypes[i] == 'i')
+        {
+            columns[i] = new IntColumn();
+        }
+        else if (coltypes[i] == 'f')
+        {
+            columns[i] = new FloatColumn();
+        }
+        else
+        {
+            columns[i] = new BoolColumn();
+        }
+    }
+
+    return columns;
 }
 
 int main(int argh, char **argv)
@@ -712,5 +759,7 @@ int main(int argh, char **argv)
         char *fileContents = new char[fileLength];
         // read the file into fileContents
         fread(fileContents, 1, fileLength, file);
+
+        Column **columns = defineSchema(fileContents);
     }
 }
