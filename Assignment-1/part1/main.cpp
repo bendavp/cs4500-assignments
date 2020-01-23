@@ -2,14 +2,31 @@
 #include "helper.h"
 #include "column.h"
 
-// checks if: 1) flag is matched, 2) num of params following flag could be found
+/**
+ * @brief Checks that a flag in the command line matches one of the acceptable flags, and that the number of 
+ * parameters given for the flag matches the appropriate number of parameters expected for the given flag
+ * 
+ * @param i the index in the char array of arguments corresponding to where the flag was found
+ * @param arg the text of the argument given in the command line
+ * @param argh the total number of strings in the command line
+ * @param flag the string literal of the flag that is expected
+ * @param param the number of parameters given for the flag
+ * 
+ * @return true if the flag matches one of the accepted flags, and the number of arguments matches the accepted number
+ * of arguments for that flag
+ * @return false if one of the conditions listed above is false
+ */
 bool checkflag(int i, char *arg, int argh, const char *flag, int param)
 {
     return strcmp(arg, flag) == 0 && i + param < argh;
 }
 
-// converts the char[] into an int if chars are digits; else exit(1)
-// by only allowing digits, force everything to be 0+
+/**
+ * @brief Converts the given char array into an integer
+ * 
+ * @param param the char array to be converted into an integer
+ * @return int the integer that was once a char array
+ */
 int convertParamToInt(char *param)
 {
     for (int i = 0; i < strlen(param); i++)
@@ -23,7 +40,14 @@ int convertParamToInt(char *param)
     return atoi(param);
 }
 
-// from Ben's Warmup Exercise 3 code
+/**
+ * @brief Determines the number of characters in a given file
+ * 
+ * @param file the file whose length is to be counted
+ * @return size_t the length (number of characters) of the file
+ * 
+ * @cite Taken from Benjamin Kosiborod's warmup3
+ */
 size_t file_length(FILE *file)
 {
     size_t initPos = ftell(file);    // Current position, which is the beginning of the file, before the first character
@@ -33,18 +57,60 @@ size_t file_length(FILE *file)
     return fileLength;               // return the length of the file
 }
 
-// returns portion of array from index i to index j, not including index j
-char *copySubArray(int i, int j, char *array)
+/**
+ * @brief Extracts a portion of a given char array and returns that portion
+ * Includes the character at index @param start, but excludes the character at index @param end
+ * 
+ * @invariant assumes the given char array has a null character ('\0') at the end
+ * 
+ * @param start the index from which to start the copy (inclusive)
+ * @param end the index at which to end the copy (exclusive)
+ * @param array the char array from which to extract a subset/sub-array
+ * @return char* a subset/sub-array of the given array
+ */
+char *copySubArray(int start, int end, char *array)
 {
-    char *temp = new char[j - i];
-    for (int n = i; n < j; n++)
+    // first, check that start and end are within the min/max indices of the given char array
+    // so first, determine the size of the given array
+    size_t givenSize = 0; // to keep track of the size of the given array, and the current position within the while loop below
+    // while we aren't at the end of the array, increment our current position/size in the array
+    while (array[givenSize] != '\0')
     {
-        temp[n - i] = array[n];
+        givenSize++;
     }
+
+    /**
+     * @note now that we are have the size of the array, make sure @param start and @param end are within 
+     * 0 - givenSize, and that @param start comes before @param end. Otherwise terminate the program
+     */
+    if (!(start >= 0 && start < givenSize && end > 0 && end <= givenSize && start < end))
+    {
+        println("Cannot copy sub-array: make sure the start and end index are within the array, and that the start index is before the end index!");
+        exit(1);
+    }
+
+    // now we are ready to process the sub-array. First create a new array of appropriate size
+    char *temp = new char[end - start + 1];
+
+    // next, populate the new array with the values of the given array at the appropriate indices
+    for (int i = start; i < end; i++)
+    {
+        temp[i - start] = array[i];
+    }
+    temp[end] = '\0';
+
+    // return the newly created array
     return temp;
 }
 
 // checks to see if the element follows the specs
+/**
+ * @brief Recognizes if a given element is invalid or not
+ * 
+ * @param element the element to be tested for validity
+ * @return true if the element _is_ invalid
+ * @return false if the element is NOT invalid
+ */
 bool isInvalidElement(char *element)
 {
     // start at the beginning of the element
@@ -64,7 +130,12 @@ bool isInvalidElement(char *element)
         {
             index++;
         }
-        // go to the character after the close quote
+        // check that we are not at the end, and if we are return false
+        if (element[index] == '\0')
+        {
+            return false;
+        }
+        // otherwise, go to the character after the close quote
         index++;
         // there should only be whitespace starting at this character until the end, so skip to the end
         while (element[index] == ' ')
@@ -88,12 +159,17 @@ bool isInvalidElement(char *element)
     {
         // go to the next character
         index++;
-        // go to the next space, as that should be the end of the element
-        while (element[index] != ' ')
+        // go to the next space or the end of the element
+        while (element[index] != ' ' && element[index] != '\0')
         {
             index++;
         }
-        // go to the character after the space
+        // if we're at the end, then the element is valid
+        if (element[index] == '\0')
+        {
+            return false;
+        }
+        // go to the character after the space, if we are not at the end
         index++;
         // there should only be whitespace starting at this character until the end, so skip to the end
         while (element[index] == ' ')
@@ -298,7 +374,6 @@ bool isTypeInt(char *element)
 // returns null if its wrong
 char processType(char *element, char curtype)
 {
-    char temp = '\0';
     if (isInvalidElement(element))
     {
         return NULL;
