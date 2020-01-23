@@ -591,7 +591,7 @@ char *defineLine(char *coltypes, char *line)
  * 
  * @return an array of columns 
  */
-Column **defineSchema(char *fileContents)
+std::vector<Column *> *defineSchema(char *fileContents)
 {
     int lines = 0;            // the number of lines in the schema that have been parsed
     int index = 0;            // the current index in the file
@@ -657,73 +657,110 @@ Column **defineSchema(char *fileContents)
     }
 
     // now we create the actual column objects to return
-    Column **columns = new Column *[maxColNum];
+    std::vector<Column *> *columns;
 
     for (int i = 0; i < maxColNum; i++)
     {
         if (coltypes[i] == 'b')
         {
-            columns[i] = new BoolColumn();
+            columns->push_back(new BoolColumn());
         }
         else if (coltypes[i] == 'i')
         {
-            columns[i] = new IntColumn();
+            columns->push_back(new IntColumn());
         }
         else if (coltypes[i] == 'f')
         {
-            columns[i] = new FloatColumn();
+            columns->push_back(new FloatColumn());
         }
         else
         {
-            columns[i] = new BoolColumn();
+            columns->push_back(new StringColumn());
         }
     }
 
     return columns;
 }
 
-int main(int argh, char **argv)
+/**
+ * @brief trims the contents of the file based on user input
+ * 
+ * @param fileContents the contents of the file to be trimmed
+ * @param from the index to trim the front of the file to (i.e. trim the file from index 0 to @param from)
+ * @param len the index to trim the back of the file from (i.e. trim the file from @param len to end of file)
+ * @return char* the trimmed fileContents
+ */
+char *trimFile(char *fileContents, size_t from, size_t len)
+{
+    // if from is not at the beginning of the file
+    if (from != 0)
+    {
+        // if the character before from is not a newline, then from is in the middle of a line,
+        // so increment from until it is the first character of a new line
+        if (fileContents[from - 1] != '\n')
+        {
+            while (fileContents[from] != '\n')
+            {
+                from++;
+            }
+            from++;
+        }
+    }
+
+    // if from + len is not at the end of the file, or at the end of a line, then from + len is in the middle of a line,
+    // so decrement from until it is at the end of a line, or the beginning of the file
+    if (fileContents[from + len] != '\0' || fileContents[from + len] != '\n')
+    {
+        while (fileContents[from + len] != '\n' && from + len != 0)
+        {
+            len--;
+        }
+    }
+
+    return copySubArray(from, from + len, fileContents);
+}
+
+int main(int argc, char **argv)
 {
     // file and flags to keep track of for later outputting
     char *filename = '\0';
-    int from = -1;
-    int len = -1;
+    size_t from = 0;
+    size_t len = NULL;
     bool ftype = false;
-    int typeuint = -1;
+    size_t typeuint = NULL;
     bool fidx = false;
-    int idxcol = -1;
-    int idxoff = -1;
+    size_t idxcol = NULL;
+    size_t idxoff = NULL;
     bool fmissing = false;
-    int miscol = -1;
-    int misoff = -1;
+    size_t miscol = NULL;
+    size_t misoff = NULL;
 
     // parsing the command line arguments:
     // checks if validity of flag and if flag has been seen
-    for (int i = 1; i < argh; i++)
+    for (int i = 1; i < argc; i++)
     {
-        if (checkflag(i, argv[i], argh, "-f", 1) && filename == '\0')
+        if (checkflag(i, argv[i], argc, "-f", 1) && filename == '\0')
         {
             i++;
             filename = argv[i];
-            println("file found");
         }
-        else if (checkflag(i, argv[i], argh, "-from", 1) && from == -1)
+        else if (checkflag(i, argv[i], argc, "-from", 1) && from == -1)
         {
             i++;
             from = convertParamToInt(argv[i]);
         }
-        else if (checkflag(i, argv[i], argh, "-len", 1) && len == -1)
+        else if (checkflag(i, argv[i], argc, "-len", 1) && len == -1)
         {
             i++;
             len = convertParamToInt(argv[i]);
         }
-        else if (checkflag(i, argv[i], argh, "-print_col_type", 1) && !ftype)
+        else if (checkflag(i, argv[i], argc, "-print_col_type", 1) && !ftype)
         {
             i++;
             typeuint = convertParamToInt(argv[i]);
             ftype = true;
         }
-        else if (checkflag(i, argv[i], argh, "-print_col_idx", 2) && !fidx)
+        else if (checkflag(i, argv[i], argc, "-print_col_idx", 2) && !fidx)
         {
             i++;
             idxcol = convertParamToInt(argv[i]);
@@ -731,7 +768,7 @@ int main(int argh, char **argv)
             idxoff = convertParamToInt(argv[i]);
             fidx = true;
         }
-        else if (checkflag(i, argv[i], argh, "-is_missing_idx", 2) && !fmissing)
+        else if (checkflag(i, argv[i], argc, "-is_missing_idx", 2) && !fmissing)
         {
             i++;
             miscol = convertParamToInt(argv[i]);
@@ -744,22 +781,89 @@ int main(int argh, char **argv)
             println("Too many or too few arguments!");
             exit(1);
         }
+    }
+    if (filename == '\0')
+    {
+        println("No file found among arguments. \"-f\" is a required argument!");
+        exit(1);
+    }
 
-        // parsing the file to find schema
-        // open file
-        FILE *file = fopen(filename, "r");
-        if (file == nullptr)
+    // parsing the file to find schema
+    // open file
+    FILE *file = fopen(filename, "r");
+    if (file == nullptr)
+    {
+        println("There was a problem opening the file. Make sure you typed the name of the file correctly, with the file extension!");
+        exit(1);
+    }
+    // find the total length of the file
+    size_t fileLength = file_length(file);
+    if (fileLength == 0)
+    {
+        println("Given file is empty! Cannot process an empty file into a schema.");
+        exit(1);
+    }
+    if (len == NULL || len > fileLength)
+    {
+        len = fileLength;
+    }
+    // initialize where the file will go
+    char *fileContents = new char[fileLength];
+    // read the file into fileContents
+    fread(fileContents, 1, fileLength, file);
+
+    std::vector<Column *> *columns = defineSchema(fileContents);
+
+    // first, trim the file based on the command line arguments
+    char *trimmedFileContents = trimFile(fileContents, from, len);
+
+    // if the trimmed file is empty, then there is nothing to process into a schema
+    if (trimmedFileContents == '\0')
+    {
+        println("Arguments shrunk the file to empty. Nothing to process. Make sure the file and your arguments include at least one row!");
+        exit(1);
+    }
+
+    // then, read line by line: void readSchema(fileContents, columns), void readLine(line, columns), bool isInvalidLine(line)
+
+    // print appropriate command line arguments
+    if (typeuint != NULL)
+    {
+        // first, confirm parameter falls into constraint
+        if (typeuint > columns->size)
         {
-            println("There was a problem opening the file. Make sure you typed the name of the file correctly, with the file extension!");
+            println("Parameter of -print_col_type out of bounds!");
             exit(1);
         }
-        // find the total length of the file
-        size_t fileLength = file_length(file);
-        // initialize where the file will go
-        char *fileContents = new char[fileLength];
-        // read the file into fileContents
-        fread(fileContents, 1, fileLength, file);
+        print_(columns->at(typeuint)->getType());
+    }
 
-        Column **columns = defineSchema(fileContents);
+    if (idxcol != NULL && idxoff != NULL)
+    {
+        // first, confirm parameters fall into constraint
+        if (idxcol > columns->size || idxoff > columns->at(0)->getSize())
+        {
+            println("One or more parameters of -print_col_idx out of bounds!");
+            exit(1);
+        }
+        print_(columns->at(idxcol)->get(idxoff)->print());
+    }
+
+    if (miscol != NULL && misoff != NULL)
+    {
+        // first, confirm parameters fall into constraint
+        if (miscol > columns->size || misoff > columns->at(0)->getSize())
+        {
+            println("One or more parameters of -is_missing_idx out of bounds!");
+            exit(1);
+        }
+        if (columns->at(miscol)->get(misoff) == NULL)
+        {
+            println(true);
+        }
+        else
+        {
+            println(false);
+        }
     }
 }

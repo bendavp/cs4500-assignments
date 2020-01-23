@@ -54,7 +54,7 @@ public:
         // String *other1 = static_cast<String *>(other);
         // use dynamic cast b/c if it cannot cast to string, then it will return a nullptr
         String *other1 = dynamic_cast<String *>(other);
-        if (other == nullptr)
+        if (other1 == nullptr)
             return false;
         return !strcmp(this->str_, other1->str_);
     }

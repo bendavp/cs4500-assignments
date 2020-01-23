@@ -44,3 +44,8 @@ void print_(int i)
 {
     std::cout << i;
 }
+
+void print_(size_t i)
+{
+    std::cout << i;
+}

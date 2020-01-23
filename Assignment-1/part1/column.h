@@ -3,12 +3,14 @@
 #pragma once
 
 #include "string.h"
+#include "types.h"
 #include <vector>
 
 class Column : public Object
 {
 public:
     size_t size_;
+    std::vector<Object *> *arr;
     Column() : Object()
     {
         size_ = 0;
@@ -22,156 +24,145 @@ public:
     {
         return Column::size_;
     }
+
+    Object *get(size_t idx)
+    {
+        return arr->at(idx);
+    }
+
+    virtual void add(Object *other)
+    {
+        arr->push_back(other);
+        size_++;
+    }
+
+    const char *print()
+    {
+        String *res = new String("[");
+        for (int i = 0; i < Column::size_; i++)
+        {
+            res->concat(new String(arr->at(i)->print()));
+            if (i != Column::size_ - 1)
+            {
+                res->concat(new String(", "));
+            }
+        }
+        return res->concat(new String("]"))->str_;
+    }
+
+    virtual const char *getType()
+    {
+    }
 };
 
 class BoolColumn : public Column
 {
 public:
-    std::vector<bool> *arr;
     BoolColumn() : Column()
     {
     }
     ~BoolColumn()
     {
-        delete arr;
     }
 
-    bool get(size_t idx)
+    void add(Object *other)
     {
-        return arr->at(idx);
-    }
-
-    void add(bool other)
-    {
-        arr->push_back(other);
-        Column::size_++;
-    }
-
-    const char *print()
-    {
-        print_("[");
-        for (int i = 0; i < Column::size_; i++)
+        Boolean *other1 = dynamic_cast<Boolean *>(other);
+        if (other1 != nullptr)
+            Column::add(other);
+        else
         {
-            print_(arr->at(i));
-            if (i != Column::size_ - 1)
-            {
-                print_(", ");
-            }
+            println("Cannot add non-bool to BoolColumn!");
+            exit(1);
         }
-        print_("]");
+    }
+
+    const char *getType()
+    {
+        return "BOOL";
     }
 };
 
 class IntColumn : public Column
 {
 public:
-    std::vector<int> *arr;
     IntColumn() : Column()
     {
     }
     ~IntColumn()
     {
-        delete arr;
     }
 
-    int get(size_t idx)
+    void add(Object *other)
     {
-        return arr->at(idx);
-    }
-
-    void add(int other)
-    {
-        arr->push_back(other);
-        Column::size_++;
-    }
-
-    const char *print()
-    {
-        print_("[");
-        for (int i = 0; i < Column::size_; i++)
+        Integer *other1 = dynamic_cast<Integer *>(other);
+        if (other1 != nullptr)
+            Column::add(other);
+        else
         {
-            print_(arr->at(i));
-            if (i != Column::size_ - 1)
-            {
-                print_(", ");
-            }
+            println("Cannot add non-int to IntColumn!");
+            exit(1);
         }
-        print_("]");
+    }
+
+    const char *getType()
+    {
+        return "INT";
     }
 };
 
 class FloatColumn : public Column
 {
 public:
-    std::vector<float> *arr;
     FloatColumn() : Column()
     {
     }
     ~FloatColumn()
     {
-        delete arr;
     }
 
-    float get(size_t idx)
+    void add(Object *other)
     {
-        return arr->at(idx);
-    }
-
-    void add(float other)
-    {
-        arr->push_back(other);
-        Column::size_++;
-    }
-
-    const char *print()
-    {
-        print_("[");
-        for (int i = 0; i < Column::size_; i++)
+        Float *other1 = dynamic_cast<Float *>(other);
+        if (other1 != nullptr)
+            Column::add(other);
+        else
         {
-            print_(arr->at(i));
-            if (i != Column::size_ - 1)
-            {
-                print_(", ");
-            }
+            println("Cannot add non-float to FloatColumn!");
+            exit(1);
         }
-        print_("]");
+    }
+
+    const char *getType()
+    {
+        return "FLOAT";
     }
 };
 
 class StringColumn : public Column
 {
 public:
-    std::vector<String *> *arr;
     StringColumn() : Column()
     {
     }
     ~StringColumn()
     {
-        delete arr;
     }
 
-    String *get(size_t idx)
+    void add(Object *other)
     {
-        return arr->at(idx);
-    }
-
-    void add(String *other)
-    {
-        arr->push_back(other);
-        Column::size_++;
-    }
-
-    const char *print()
-    {
-        print_("[");
-        for (int i = 0; i < Column::size_; i++)
+        String *other1 = dynamic_cast<String *>(other);
+        if (other1 != nullptr)
+            Column::add(other);
+        else
         {
-            print_(arr->at(i)->str_);
-            if (i != Column::size_ - 1)
-            {
-                print_(", ");
-            }
+            println("Cannot add non-String to StringColumn!");
+            exit(1);
         }
-        print_("]");
+    }
+
+    const char *getType()
+    {
+        return "STRING";
     }
 };
