@@ -1,6 +1,7 @@
 #include "string.h"
 #include "helper.h"
 #include "column.h"
+#include <stdlib.h>
 
 /**
  * @brief Checks that a flag in the command line matches one of the acceptable flags, and that the number of 
@@ -718,6 +719,234 @@ char *trimFile(char *fileContents, size_t from, size_t len)
     }
 
     return copySubArray(from, from + len, fileContents);
+}
+
+/**
+ * @brief Reads the schema into the columns line by line
+ * 
+ * @param fileContents the contents of the schema
+ * @param columns the columns to be populated with the schema
+ */
+void readSchema(char *fileContents, std::vector<Column *> *columns)
+{
+    int index = 0;       // the current index in the file
+    int startOfLine = 0; // the index in the fileContents char array that represents the start of a line
+    // iterates through the fileContents
+    while (fileContents[index] != '\0')
+    {
+        // if we're at the end of the current line
+        if (fileContents[index] == '\n')
+        {
+            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
+            readLine(line, columns);                               // read the line and add it to the schema
+
+            // set the start of the next line to the current index of the file, plus 1
+            // because the index represents the end of the current line, so we need to
+            // set it to the beginning of the next line, rather than the end of the just parsed line
+            startOfLine = index + 1;
+        }
+        // increments the current index to move on in the file
+        index++;
+    }
+}
+
+/**
+ * @brief Reads the elements in the line into the columns
+ * 
+ * @param line the line to be read into the columns
+ * @param columns the columns to be populated with the line
+ */
+void readLine(char *line, std::vector<Column *> *columns)
+{
+    if (!isInvalidLine(line))
+    {
+        bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+        bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
+        size_t charNum = strlen(line); // the number of characters in the line we are reading
+        size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
+        size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
+        size_t currCol = 0;
+
+        // for each character in the line
+        for (int i = 0; i < charNum; i++)
+        {
+            // if we are not currently reading an element and the current character is an opening bracket
+            if (!open && line[i] == '<')
+            {
+                open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
+                startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
+            }
+
+            // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
+            else if (open && !readingString && line[i] == '>')
+            {
+                open = false;     // we set open to false since we are done reading the element
+                endOfElement = i; // we set the end of the element to the index of the closing bracket
+
+                char *element = trimSpaces(copySubArray(startOfElement, endOfElement, line));
+
+                // check if the current element is missing. If it is, then add NULL to the column
+                if (isMissing(element))
+                {
+                    columns->at(currCol)->add(NULL);
+                }
+                else
+                {
+                    char type = processType(element);
+                    if (type == 's')
+                    {
+                        columns->at(currCol)->add(new String(element));
+                    }
+                    else if (type == 'f')
+                    {
+                        columns->at(currCol)->add(new Float(atof(element)));
+                    }
+                    else if (type == 'i')
+                    {
+                        columns->at(currCol)->add(new Integer(atoi(element)));
+                    }
+                    else
+                    {
+                        if (element[0] == '1')
+                        {
+                            columns->at(currCol)->add(new Boolean(true));
+                        }
+                        else
+                        {
+                            columns->at(currCol)->add(new Boolean(false));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief Trims whitespace around elements, and the '+' sign around floats/ints
+ * 
+ * @param element the element to be trimmed
+ * @return char* the trimmed element
+ */
+char *trimSpaces(char *element)
+{
+    size_t index = 0;  // to keep track of what index of the element we are at
+    size_t newLen = 0; // to store the length of the trimmed element
+
+    // first, skip through all leading whitespace in element
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // if there is a plus as the first character, skip it
+    if (element[index] == '+')
+    {
+        index++;
+    }
+
+    // incremenet newLen while non-whitespace characters are present
+    while (element[index] != ' ')
+    {
+        index++;
+        newLen++;
+    }
+
+    // create new char* to store the trimmed element
+    char *trimmed = new char[newLen + 1];
+
+    // go back to the character before the whitespace
+    index--;
+
+    // keep going back until the last leading whitespace or to the '+'
+    while (element[index] != ' ' || element[index] != '+')
+    {
+        index--;
+    }
+
+    // go forward to the first non-whilespace
+    index++;
+
+    // copy only the element into trimmed
+    for (int i = 0; i < newLen; i++)
+    {
+        trimmed[i] = element[index];
+        index++;
+    }
+
+    // add the null character to trimmed
+    trimmed[newLen] = '\0';
+
+    return trimmed;
+}
+
+/**
+ * @brief Reads the line to make sure that all elements are valid
+ * 
+ * @param line the line to be determined if valid
+ * @return true if the line is invalid
+ * @return false if the line is valid
+ */
+bool isInvalidLine(char *line)
+{
+    bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+    bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
+    size_t charNum = strlen(line); // the number of characters in the line we are reading
+    size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
+    size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
+
+    // for each character in the line
+    for (int i = 0; i < charNum; i++)
+    {
+        // if we are not currently reading an element and the current character is an opening bracket
+        if (!open && line[i] == '<')
+        {
+            open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
+            startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
+        }
+
+        // if we are not currently reading an element and the next character is not an open bracket
+        // then throw out the line, as this is a misformed schema
+        // i.e. return true
+        else if (!open && line[i] != ' ')
+        {
+            return true;
+        }
+
+        // if we are currently reading an element that is not a string and we're not at the end of the element
+        // if we run into an open bracket outside a string, we throw out the whole line, so we return true
+        else if (open && !readingString && line[i] == '<')
+        {
+            return true;
+        }
+
+        // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
+        else if (open && !readingString && line[i] == '>')
+        {
+            open = false;     // we set open to false since we are done reading the element
+            endOfElement = i; // we set the end of the element to the index of the closing bracket
+
+            // check if the current element is invalid. If it is, then the line is invalid
+            if (isInvalidElement(copySubArray(startOfElement, endOfElement, line)))
+            {
+                return true;
+            }
+        }
+
+        // we see "" and we are currently not reading a string so this is the start of our string element
+        // (allows for '>' and '<' included)
+        else if (open && !readingString && line[i] == '"')
+        {
+            readingString = true;
+        }
+        // we see "" and we are currently reading a string so this is the end of our string element
+        else if (open && readingString && line[i] == '"')
+        {
+            readingString = false;
+        }
+    }
+    return false;
 }
 
 int main(int argc, char **argv)
