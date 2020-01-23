@@ -100,6 +100,8 @@ char *copySubArray(int start, int end, char *array)
 /**
  * @brief Recognizes if a given element is invalid or not
  * 
+ * @invariant assumes the given char array has a null character ('\0') at the end
+ * 
  * @param element the element to be tested for validity
  * @return true if the element _is_ invalid
  * @return false if the element is NOT invalid
@@ -189,7 +191,7 @@ bool isInvalidElement(char *element)
  * @param line a char array that represents a line in the schema
  * @return size_t the number of columns in the given line
  */
-size_t checkCols(char *line)
+size_t numCols(char *line)
 {
     bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
     bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
@@ -210,15 +212,14 @@ size_t checkCols(char *line)
         }
 
         // if we are not currently reading an element and the next character is not an open bracket
-        // then throw out the line, as this is a misformed schema
-        // i.e. return the given coltypes
+        // then return 0 columns, as this is a misformed schema
         else if (!open && line[i] != ' ')
         {
             return 0;
         }
 
         // if we are currently reading an element that is not a string and we're not at the end of the element
-        // if we run into an open bracket outside a string, we throw out the whole line, so we return the coltypes we were given
+        // if we run into an open bracket outside a string, we throw out the whole line, so we return 0 columns
         else if (open && !readingString && line[i] == '<')
         {
             return 0;
@@ -229,12 +230,12 @@ size_t checkCols(char *line)
         {
             open = false;     // we set open to false since we are done reading the element
             endOfElement = i; // we set the end of the element to the index of the closing bracket
-            // set the current column type to whatever the element type is, if that is appropriate based on the spec
+            // if the element is invalid, then the whole row is invalid, so return 0 columns
             if (isInvalidElement(copySubArray(startOfElement, endOfElement, line)))
             {
                 return 0;
             }
-            colNum++; // now we're on the next column
+            colNum++; // this column is fine, so add 1 to the number of columns in this row
         }
 
         // we see "" and we are currently not reading a string so this is the start of our string element
@@ -252,6 +253,15 @@ size_t checkCols(char *line)
     return colNum;
 }
 
+/**
+ * @brief checks if the given element is of type float
+ * 
+ * @invariant assumes the given char array has a null character ('\0') at the end
+ * 
+ * @param element the element to be checked for type float
+ * @return true if the element is a float
+ * @return false if the element is NOT a float
+ */
 bool isTypeFloat(char *element)
 {
     bool foundDot = false; // once the dot has been found, set flag to true to make sure there aren't 2 dots
@@ -452,7 +462,7 @@ char processType(char *element)
 }
 
 /**
- * @brief defines all the column types in the schema based on the spec of the assignment
+ * @brief defines all the column types in the given line based on the spec of the assignment
  * 
  * @param coltypes the current types of the columns
  * @param columns the columns in our current understanding of the schema
@@ -460,7 +470,7 @@ char processType(char *element)
  * @return char* the column types, represented in array form
  * @return an array of Columns, representing the columns in the file
  */
-char *defineSchema(char *coltypes, char *line)
+char *defineLine(char *coltypes, char *line)
 {
     bool open = false;                                  // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
     bool readingString = false;                         // whether we are currently reading inside quotes i.e. inside a multi-word String
@@ -528,7 +538,7 @@ char *defineSchema(char *coltypes, char *line)
  * 
  * @return an array of columns 
  */
-Column **findSchema(char *fileContents)
+Column **defineSchema(char *fileContents)
 {
     int lines = 0;            // the number of lines in the schema that have been parsed
     int numParsedChars = 0;   // the number of characters that have been parsed
@@ -544,7 +554,7 @@ Column **findSchema(char *fileContents)
 
             char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
             line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
-            currentColNum = checkCols(line);                                // sets the number of columns in the line just parsed
+            currentColNum = numCols(line);                                  // sets the number of columns in the line just parsed
 
             // if the max column number so far is less than the number of columns in this line,
             // then set the max column number to the numnber of columns in the line just parsed
@@ -592,7 +602,7 @@ Column **findSchema(char *fileContents)
         {
             char *line = new char[numParsedChars - startOfLine];            // create a new char array of the same size as the length of the current line
             line = copySubArray(startOfLine, numParsedChars, fileContents); // sets line to a char array that contains all the chars in the line
-            coltypes = defineSchema(coltypes, line);                        // sets the column types found in the schema based on the given line
+            coltypes = defineLine(coltypes, line);                          // sets the column types found in the schema based on the given line
             // columns = defineSchema(columns, line);
         }
     }
