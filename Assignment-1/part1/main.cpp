@@ -70,14 +70,8 @@ size_t file_length(FILE *file)
  */
 char *copySubArray(int start, int end, char *array)
 {
-    // first, check that start and end are within the min/max indices of the given char array
-    // so first, determine the size of the given array
-    size_t givenSize = 0; // to keep track of the size of the given array, and the current position within the while loop below
-    // while we aren't at the end of the array, increment our current position/size in the array
-    while (array[givenSize] != '\0')
-    {
-        givenSize++;
-    }
+    // first, determine the size of the given array
+    size_t givenSize = strlen(array);
 
     /**
      * @note now that we are have the size of the array, make sure @param start and @param end are within 
@@ -103,7 +97,6 @@ char *copySubArray(int start, int end, char *array)
     return temp;
 }
 
-// checks to see if the element follows the specs
 /**
  * @brief Recognizes if a given element is invalid or not
  * 
@@ -190,7 +183,12 @@ bool isInvalidElement(char *element)
     }
 }
 
-// parses through line to determine the num of cols
+/**
+ * @brief Determines the number of columns in a given line
+ * 
+ * @param line a char array that represents a line in the schema
+ * @return size_t the number of columns in the given line
+ */
 size_t checkCols(char *line)
 {
     bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
@@ -254,151 +252,201 @@ size_t checkCols(char *line)
     return colNum;
 }
 
-bool isTypeString(char *element)
-{
-    bool hasDot = false;
-    bool hasSign = false;
-    bool hasDigit = false;
-    for (int i = 0; i < strlen(element); i++)
-    {
-        // any char with these ASCII val would make it automatically a string
-        if ((int)element[i] >= 33 && (int)element[i] <= 42)
-        {
-            return true;
-        }
-        // any char with this ASCII val would make it automatically a string
-        else if ((int)element[i] <= 44)
-        {
-            return true;
-        }
-        // any char with these ASCII val would make it automatically a string
-        else if ((int)element[i] >= 58 && (int)element[i] <= 126)
-        {
-            return true;
-        }
-        // has double quotes
-        else if (element[i] == '"')
-        {
-            return true;
-        }
-        else if (isdigit(element[i]))
-        {
-            hasDigit = true;
-        }
-        // see a digit and then see a +/- sign
-        else if (hasDigit && ((int)element[i] == 43 || (int)element[i] == 45))
-        {
-            return true;
-        }
-        else if ((int)element[i] == 43 || (int)element[i] == 45)
-        {
-            hasSign = true;
-        }
-        // saw a +/- sign and we see a second one
-        else if (hasSign && ((int)element[i] == 43 || (int)element[i] == 45))
-        {
-            return true;
-        }
-        else if ((int)element[i] == 46)
-        {
-            hasDot = true;
-        }
-        // see two dots
-        else if (hasDot && (int)element[i] == 46)
-        {
-            return true;
-        }
-        // see a dot and there is nothing after it
-        else if ((int)element[i] == 46 && i == strlen(element) - 1)
-        {
-            return true;
-        }
-        // see a dot and then see +/- sign
-        else if (hasDot && ((int)element[i] == 43 || (int)element[i] == 45))
-        {
-            return true;
-        }
-    }
-    // if there is a sign and no digit, should be string OR if there is a dot and there is no digit, should be a string
-    return hasSign && !hasDigit || hasDot && !hasDigit;
-}
-
 bool isTypeFloat(char *element)
 {
-    bool hasdot = false;
-    for (int i = 0; i < strlen(element); i++)
+    bool foundDot = false; // once the dot has been found, set flag to true to make sure there aren't 2 dots
+
+    // skip to the first non-space character
+    size_t index = 0;
+    while (element[index] == ' ')
     {
-        // checking to see if there is a dot
-        if ((int)element[i] == 46 && !hasdot)
+        index++;
+    }
+
+    // now we are at the first non-space index, so check if there is a sign
+    // and if there is, then go to the next character
+    if (element[index] == '+' || element[index] == '-')
+    {
+        index++;
+    }
+
+    // this character can be a dot, so if it is go to the next one
+    if (element[index] == '.')
+    {
+        index++;
+        foundDot = true;
+    }
+
+    // this character and any number of next characters must be digits, so keep
+    // going to the next character until it is not a digit
+    while (isdigit(element[index]))
+    {
+        index++;
+    }
+
+    // this character is either a dot, or a whitespace
+    // if it is a dot, then keep going until we get to the next whitespace
+    if (element[index] == '.' && !foundDot)
+    {
+        index++;
+        while (isdigit(element[index]))
         {
-            hasdot == true;
-        }
-        // ensuring that there is a digit behind the dot
-        else if (isdigit(element[i]) && hasdot)
-        {
-            return true;
+            index++;
         }
     }
-    return false;
+
+    // now the current index should be a whitespace, so keep going until the end of the element
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // now, we should be at the end. If we are not at the end,
+    // then this element is not a float and return false.
+    // otherwise, if we are at the end, return true
+    if (element[index] == '\0')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
+/**
+ * @brief checks if the given element is of type int
+ * 
+ * @param element the element, represented as a char array, to check for int type
+ * @return true if the type of the element is int
+ * @return false if the type of the element is NOT int
+ */
 bool isTypeInt(char *element)
 {
-    bool sign = false;
-    for (int i = 0; i < strlen(element); i++)
+    // skip to the first non-space character
+    size_t index = 0;
+    while (element[index] == ' ')
     {
-        // has a negative sign
-        if ((int)element[i] == 45 && !sign)
-        {
-            sign = true;
-        }
-        // has a positive sign
-        else if ((int)element[i] == 43 && !sign)
-        {
-            sign = true;
-        }
-        else if (isdigit(element[i]) && sign)
-        {
-            return true;
-        }
-        else if ((int)element[i] >= 50 || (int)element[i] <= 59)
-        {
-            return true;
-        }
+        index++;
     }
-    return false;
+
+    // now we are at the first non-space index, so check if there is a sign
+    // and if there is, then go to the next character
+    if (element[index] == '+' || element[index] == '-')
+    {
+        index++;
+    }
+
+    // make sure that the character is a digit, and if it is,
+    // then keep going to the next character until the first
+    // non-digit
+    while (isdigit(element[index]))
+    {
+        index++;
+    }
+
+    // now, this character and the rest should all be whitespace
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // now, we should be at the end. If we are not at the end,
+    // then this element is not an int and return false.
+    // otherwise, if we are at the end, return true
+    if (element[index] == '\0')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/**
+ * @brief Determines if the given element is of type bool i.e. if it is a 0 or a 1
+ * 
+ * @param element the element to be determined if bool
+ * @return true if the element is a bool
+ * @return false if the element is NOT a bool
+ */
+bool isTypeBool(char *element)
+{
+    size_t index = 0; // we start at the beginning of the element
+
+    // first skip to the first non-space character
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // now we are at the first non-space character, so check that it is either 0 or 1
+    // otherwise, return false
+    if (!(element[index] == '0' || element[index] == '1'))
+    {
+        return false;
+    }
+
+    // go to the next character
+    index++;
+
+    // make sure all characters after the 0/1 are spaces
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // if we are at the end, then it is a valid bool, otherwise
+    // if there is another character other than the null character,
+    // then this is not a bool, so return false
+    if (element[index] == '\0')
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 // processes what is found in between < > and determines if it is a bool, int, float, or string
 // if it is not processable (i.e. 1 . 2, then just return the current type)
 // returns null if its wrong
-char processType(char *element, char curtype)
+
+/**
+ * @brief Determines the type of the element, and returns that type in a char representation
+ * with 's' meaning String, 'f' meaning Float, 'i' meaning Int, and 'b' meaning Bool. 
+ * 
+ * @param element the given element whose type we want to determine
+ * @return char a char representation of the element's type
+ * @return NULL if the element is invalid/poorly formed
+ */
+char processType(char *element)
 {
+    // if the element is invalid, return null
     if (isInvalidElement(element))
     {
         return NULL;
     }
-    else if (curtype == 's')
-    {
-        return curtype;
-    }
+    // if the element is not invalid, return what type it is based on the helper functions
     else
     {
-        if (isTypeString(element))
+        if (isTypeBool(element))
         {
-            return 's';
+            return 'b';
+        }
+        else if (isTypeInt(element))
+        {
+            return 'i';
         }
         else if (isTypeFloat(element))
         {
             return 'f';
         }
-        else if (isTypeInt(element) && curtype != 'f')
+        else
         {
-            return 'i';
-        }
-        else if (curtype != 'i')
-        {
-            return 'b';
+            return 's';
         }
     }
 }
@@ -454,7 +502,7 @@ char *defineSchema(char *coltypes, char *line)
             open = false;     // we set open to false since we are done reading the element
             endOfElement = i; // we set the end of the element to the index of the closing bracket
             // set the current column type to whatever the element type is, if that is appropriate based on the spec
-            currentcoltypes[currentcol] = processType(copySubArray(startOfElement, endOfElement, line), coltypes[currentcol]);
+            currentcoltypes[currentcol] = processType(copySubArray(startOfElement, endOfElement, line));
             currentcol++; // now we're on the next column
         }
 
