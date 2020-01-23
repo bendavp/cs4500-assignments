@@ -512,6 +512,25 @@ char *defineLine(char *coltypes, char *line)
             open = false;     // we set open to false since we are done reading the element
             endOfElement = i; // we set the end of the element to the index of the closing bracket
             // set the current column type to whatever the element type is, if that is appropriate based on the spec
+            char tempType = processType(copySubArray(startOfElement, endOfElement, line));
+            if (currentcoltypes[currentcol] != 's')
+            {
+                if (tempType == 's')
+                {
+                    currentcoltypes[currentcol] = 's';
+                }
+                else if (tempType == 'f')
+                {
+                    currentcoltypes[currentcol] = 'f';
+                }
+                else if (tempType == 'i')
+                {
+                    if (currentcoltypes[currentcol] == 'f')
+                    {
+                        currentcoltypes[currentcol] == 'i';
+                    }
+                }
+            }
             currentcoltypes[currentcol] = processType(copySubArray(startOfElement, endOfElement, line));
             currentcol++; // now we're on the next column
         }
