@@ -511,27 +511,33 @@ char *defineLine(char *coltypes, char *line)
         {
             open = false;     // we set open to false since we are done reading the element
             endOfElement = i; // we set the end of the element to the index of the closing bracket
+
             // set the current column type to whatever the element type is, if that is appropriate based on the spec
             char tempType = processType(copySubArray(startOfElement, endOfElement, line));
+
+            // if the current column is not a string
             if (currentcoltypes[currentcol] != 's')
             {
-                if (tempType == 's')
+                // if the current column is a float, and the current element is a string,
+                // then set current column to the current element type
+                if (currentcoltypes[currentcol] == 'f' && tempType == 's')
                 {
-                    currentcoltypes[currentcol] = 's';
+                    currentcoltypes[currentcol] = tempType;
                 }
-                else if (tempType == 'f')
+                // otherwise, if the current column is an int, and the current element is a float or string,
+                // then set the current column to the current element type
+                else if (currentcoltypes[currentcol] == 'i' && (tempType == 'f' || tempType == 's'))
                 {
-                    currentcoltypes[currentcol] = 'f';
+                    currentcoltypes[currentcol] = tempType;
                 }
-                else if (tempType == 'i')
+                // otherwise, if the current column is a bool, and the current element is a int or float or string,
+                // then set the current column to the current element type
+                else if (currentcoltypes[currentcol] == 'b' && (tempType == 'i' || tempType == 'f' || tempType == 's'))
                 {
-                    if (currentcoltypes[currentcol] == 'f')
-                    {
-                        currentcoltypes[currentcol] == 'i';
-                    }
+                    currentcoltypes[currentcol] = tempType;
                 }
             }
-            currentcoltypes[currentcol] = processType(copySubArray(startOfElement, endOfElement, line));
+
             currentcol++; // now we're on the next column
         }
 
