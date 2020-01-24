@@ -76,9 +76,9 @@ char *copySubArray(int start, int end, char *array)
 
     /**
      * @note now that we are have the size of the array, make sure @param start and @param end are within 
-     * 0 - givenSize, and that @param start comes before @param end. Otherwise terminate the program
+     * 0 - givenSize, and that start is less than or equal to end. Otherwise terminate the program
      */
-    if (!(start >= 0 && start < givenSize && end > 0 && end <= givenSize && start <= end))
+    if (!(start >= 0 && start < givenSize && end >= 0 && end <= givenSize && start <= end))
     {
         println("Cannot copy sub-array: make sure the start and end index are within the array, and that the start index is before the end index!");
         exit(1);
@@ -92,7 +92,7 @@ char *copySubArray(int start, int end, char *array)
     {
         temp[i - start] = array[i];
     }
-    temp[end] = '\0';
+    temp[end - start] = '\0';
 
     // return the newly created array
     return temp;
@@ -133,13 +133,15 @@ bool isInvalidElement(char *element)
         {
             index++;
         }
+
+        index++; // go to the character after the end quote
+
         // check that we are not at the end, and if we are return false
         if (element[index] == '\0')
         {
             return false;
         }
-        // otherwise, go to the character after the close quote
-        index++;
+
         // there should only be whitespace starting at this character until the end, so skip to the end
         while (element[index] == ' ')
         {
@@ -174,6 +176,7 @@ bool isInvalidElement(char *element)
         }
         // go to the character after the space, if we are not at the end
         index++;
+
         // there should only be whitespace starting at this character until the end, so skip to the end
         while (element[index] == ' ')
         {
@@ -400,7 +403,7 @@ bool isTypeBool(char *element)
 
     // now we are at the first non-space character, so check that it is either 0 or 1
     // otherwise, return false
-    if (!(element[index] == '0' || element[index] == '1'))
+    if (element[index] != '0' && element[index] != '1')
     {
         return false;
     }
@@ -438,7 +441,7 @@ bool isMissing(char *element)
 {
     size_t index = 0; // index of where we are in the element
     // skip all the spaces
-    while (element[index] = ' ')
+    while (element[index] == ' ')
     {
         index++;
     }
@@ -464,10 +467,10 @@ bool isMissing(char *element)
  */
 char processType(char *element)
 {
-    // if the element is invalid, return null
-    if (isInvalidElement(element))
+    // if the element is invalid or missing, return null
+    if (isInvalidElement(element) || isMissing(element))
     {
-        return NULL;
+        return '\0';
     }
     // if the element is not invalid, return what type it is based on the helper functions
     else
@@ -502,13 +505,12 @@ char processType(char *element)
  */
 char *defineLine(char *coltypes, char *line)
 {
-    bool open = false;                                  // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
-    bool readingString = false;                         // whether we are currently reading inside quotes i.e. inside a multi-word String
-    size_t charNum = strlen(line);                      // the number of characters in the line we are reading
-    size_t currentcol = 0;                              // the current column in the line that we are reading
-    size_t startOfElement = 0;                          // the index of the first character of the element we are currently reading
-    size_t endOfElement = 0;                            // the index of the closing bracket of the element we are currently reading
-    char *currentcoltypes = new char[strlen(coltypes)]; // the column types found based on reading this line
+    bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+    bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
+    size_t charNum = strlen(line); // the number of characters in the line we are reading
+    size_t currentcol = 0;         // the current column in the line that we are reading
+    size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
+    size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
 
     // for each character in the line
     for (int i = 0; i < charNum; i++)
@@ -545,25 +547,25 @@ char *defineLine(char *coltypes, char *line)
             char tempType = processType(copySubArray(startOfElement, endOfElement, line));
 
             // if the current column is not a string
-            if (currentcoltypes[currentcol] != 's')
+            if (coltypes[currentcol] != 's')
             {
                 // if the current column is a float, and the current element is a string,
                 // then set current column to the current element type
-                if (currentcoltypes[currentcol] == 'f' && tempType == 's')
+                if (coltypes[currentcol] == 'f' && tempType == 's')
                 {
-                    currentcoltypes[currentcol] = tempType;
+                    coltypes[currentcol] = tempType;
                 }
                 // otherwise, if the current column is an int, and the current element is a float or string,
                 // then set the current column to the current element type
-                else if (currentcoltypes[currentcol] == 'i' && (tempType == 'f' || tempType == 's'))
+                else if (coltypes[currentcol] == 'i' && (tempType == 'f' || tempType == 's'))
                 {
-                    currentcoltypes[currentcol] = tempType;
+                    coltypes[currentcol] = tempType;
                 }
                 // otherwise, if the current column is a bool, and the current element is a int or float or string,
                 // then set the current column to the current element type
-                else if (currentcoltypes[currentcol] == 'b' && (tempType == 'i' || tempType == 'f' || tempType == 's'))
+                else if (coltypes[currentcol] == 'b' && (tempType == 'i' || tempType == 'f' || tempType == 's'))
                 {
-                    currentcoltypes[currentcol] = tempType;
+                    coltypes[currentcol] = tempType;
                 }
             }
 
@@ -582,7 +584,7 @@ char *defineLine(char *coltypes, char *line)
             readingString = false;
         }
     }
-    return currentcoltypes;
+    return coltypes;
 }
 
 /**
@@ -592,22 +594,24 @@ char *defineLine(char *coltypes, char *line)
  * 
  * @return an array of columns 
  */
-std::vector<Column *> *defineSchema(char *fileContents)
+std::vector<Column *> defineSchema(char *fileContents)
 {
     int lines = 0;            // the number of lines in the schema that have been parsed
     int index = 0;            // the current index in the file
     int startOfLine = 0;      // the index in the fileContents char array that represents the start of a line
     size_t maxColNum = 0;     // the maximum number of columns found in the schema
     size_t currentColNum = 0; // the number of columns in the line that was just parsed
+    char *line = nullptr;
+
     // iterates through the fileContents until the end, or until 500 lines have been parsed
-    while (fileContents[index] != '\0' && lines < 500)
+    for (int i = 0; i <= strlen(fileContents) && lines < 500; i++)
     {
         // if we're at the end of the current line
-        if (fileContents[index] == '\n')
+        if (fileContents[i] == '\n' || fileContents[i] == '\0')
         {
-            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
-            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
-            currentColNum = numCols(line);                         // sets the number of columns in the line just parsed
+            delete[] line;
+            line = copySubArray(startOfLine, i, fileContents); // sets line to a char array that contains all the chars in the line
+            currentColNum = numCols(line);                     // sets the number of columns in the line just parsed
 
             // if the max column number so far is less than the number of columns in this line,
             // then set the max column number to the numnber of columns in the line just parsed
@@ -619,14 +623,22 @@ std::vector<Column *> *defineSchema(char *fileContents)
             // set the start of the next line to the current index of the file, plus 1
             // because the index represents the end of the current line, so we need to
             // set it to the beginning of the next line, rather than the end of the just parsed line
-            startOfLine = index + 1;
+            startOfLine = i + 1;
 
             // increments the numnber of lines already parsed, as we just finished parsing the current line
-            line++;
+            lines++;
         }
-        // increments the current index to move on in the file
-        index++;
     }
+
+    // if the max column number so far is less than the number of columns in this line,
+    // then set the max column number to the numnber of columns in the line just parsed
+    if (maxColNum < currentColNum)
+    {
+        maxColNum = currentColNum;
+    }
+
+    lines++;
+
     // for storing the coltypes as a char before initializing the columns
     // b = bool, i = int, f = float, s = string
     char *coltypes = new char[maxColNum];
@@ -637,6 +649,7 @@ std::vector<Column *> *defineSchema(char *fileContents)
     {
         coltypes[i] = 'b';
     }
+    coltypes[maxColNum] = '\0'; // set the null character
 
     // using the file to start identifying the schema now
     // set lines back to 0, as this now represents the number of lines that have been
@@ -645,38 +658,39 @@ std::vector<Column *> *defineSchema(char *fileContents)
 
     index = 0;       // reset index back to 0, as we need to parse the file again to define the schema
     startOfLine = 0; // set start of line to 0, as we are at the start of the first line in the file to be parsed to define the schema
+
     // iterates through the fileContents until the end, or until 500 lines have been parsed
-    while (fileContents[index] != '\0' && lines < 500)
+    for (int i = 0; i <= strlen(fileContents) && lines < 500; i++)
     {
         // if we're at the end of the current line
-        if (fileContents[index] != '\n')
+        if (fileContents[i] == '\n' || fileContents[i] == '\0')
         {
-            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
-            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
-            coltypes = defineLine(coltypes, line);                 // sets the column types found in the schema based on the given line
+            delete[] line;
+            line = copySubArray(startOfLine, i, fileContents); // sets line to a char array that contains all the chars in the line
+            coltypes = defineLine(coltypes, line);             // sets the column types found in the schema based on the given line
         }
     }
 
     // now we create the actual column objects to return
-    std::vector<Column *> *columns;
+    std::vector<Column *> columns;
 
     for (int i = 0; i < maxColNum; i++)
     {
         if (coltypes[i] == 'b')
         {
-            columns->push_back(new BoolColumn());
+            columns.push_back(new BoolColumn());
         }
         else if (coltypes[i] == 'i')
         {
-            columns->push_back(new IntColumn());
+            columns.push_back(new IntColumn());
         }
         else if (coltypes[i] == 'f')
         {
-            columns->push_back(new FloatColumn());
+            columns.push_back(new FloatColumn());
         }
         else
         {
-            columns->push_back(new StringColumn());
+            columns.push_back(new StringColumn());
         }
     }
 
@@ -710,7 +724,7 @@ char *trimFile(char *fileContents, size_t from, size_t len)
 
     // if from + len is not at the end of the file, or at the end of a line, then from + len is in the middle of a line,
     // so decrement from until it is at the end of a line, or the beginning of the file
-    if (fileContents[from + len] != '\0' || fileContents[from + len] != '\n')
+    if (fileContents[from + len] != '\0' && fileContents[from + len] != '\n')
     {
         while (fileContents[from + len] != '\n' && from + len != 0)
         {
@@ -719,166 +733,6 @@ char *trimFile(char *fileContents, size_t from, size_t len)
     }
 
     return copySubArray(from, from + len, fileContents);
-}
-
-/**
- * @brief Reads the schema into the columns line by line
- * 
- * @param fileContents the contents of the schema
- * @param columns the columns to be populated with the schema
- */
-void readSchema(char *fileContents, std::vector<Column *> *columns)
-{
-    int index = 0;       // the current index in the file
-    int startOfLine = 0; // the index in the fileContents char array that represents the start of a line
-    // iterates through the fileContents
-    while (fileContents[index] != '\0')
-    {
-        // if we're at the end of the current line
-        if (fileContents[index] == '\n')
-        {
-            char *line = new char[index - startOfLine];            // create a new char array of the same size as the length of the current line
-            line = copySubArray(startOfLine, index, fileContents); // sets line to a char array that contains all the chars in the line
-            readLine(line, columns);                               // read the line and add it to the schema
-
-            // set the start of the next line to the current index of the file, plus 1
-            // because the index represents the end of the current line, so we need to
-            // set it to the beginning of the next line, rather than the end of the just parsed line
-            startOfLine = index + 1;
-        }
-        // increments the current index to move on in the file
-        index++;
-    }
-}
-
-/**
- * @brief Reads the elements in the line into the columns
- * 
- * @param line the line to be read into the columns
- * @param columns the columns to be populated with the line
- */
-void readLine(char *line, std::vector<Column *> *columns)
-{
-    if (!isInvalidLine(line))
-    {
-        bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
-        bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
-        size_t charNum = strlen(line); // the number of characters in the line we are reading
-        size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
-        size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
-        size_t currCol = 0;
-
-        // for each character in the line
-        for (int i = 0; i < charNum; i++)
-        {
-            // if we are not currently reading an element and the current character is an opening bracket
-            if (!open && line[i] == '<')
-            {
-                open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
-                startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
-            }
-
-            // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
-            else if (open && !readingString && line[i] == '>')
-            {
-                open = false;     // we set open to false since we are done reading the element
-                endOfElement = i; // we set the end of the element to the index of the closing bracket
-
-                char *element = trimSpaces(copySubArray(startOfElement, endOfElement, line));
-
-                // check if the current element is missing. If it is, then add NULL to the column
-                if (isMissing(element))
-                {
-                    columns->at(currCol)->add(NULL);
-                }
-                else
-                {
-                    char type = processType(element);
-                    if (type == 's')
-                    {
-                        columns->at(currCol)->add(new String(element));
-                    }
-                    else if (type == 'f')
-                    {
-                        columns->at(currCol)->add(new Float(atof(element)));
-                    }
-                    else if (type == 'i')
-                    {
-                        columns->at(currCol)->add(new Integer(atoi(element)));
-                    }
-                    else
-                    {
-                        if (element[0] == '1')
-                        {
-                            columns->at(currCol)->add(new Boolean(true));
-                        }
-                        else
-                        {
-                            columns->at(currCol)->add(new Boolean(false));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * @brief Trims whitespace around elements, and the '+' sign around floats/ints
- * 
- * @param element the element to be trimmed
- * @return char* the trimmed element
- */
-char *trimSpaces(char *element)
-{
-    size_t index = 0;  // to keep track of what index of the element we are at
-    size_t newLen = 0; // to store the length of the trimmed element
-
-    // first, skip through all leading whitespace in element
-    while (element[index] == ' ')
-    {
-        index++;
-    }
-
-    // if there is a plus as the first character, skip it
-    if (element[index] == '+')
-    {
-        index++;
-    }
-
-    // incremenet newLen while non-whitespace characters are present
-    while (element[index] != ' ')
-    {
-        index++;
-        newLen++;
-    }
-
-    // create new char* to store the trimmed element
-    char *trimmed = new char[newLen + 1];
-
-    // go back to the character before the whitespace
-    index--;
-
-    // keep going back until the last leading whitespace or to the '+'
-    while (element[index] != ' ' || element[index] != '+')
-    {
-        index--;
-    }
-
-    // go forward to the first non-whilespace
-    index++;
-
-    // copy only the element into trimmed
-    for (int i = 0; i < newLen; i++)
-    {
-        trimmed[i] = element[index];
-        index++;
-    }
-
-    // add the null character to trimmed
-    trimmed[newLen] = '\0';
-
-    return trimmed;
 }
 
 /**
@@ -949,26 +803,204 @@ bool isInvalidLine(char *line)
     return false;
 }
 
+/**
+ * @brief Trims whitespace around elements, and the '+' sign around floats/ints
+ * 
+ * @param element the element to be trimmed
+ * @return char* the trimmed element
+ */
+char *trimSpaces(char *element)
+{
+    size_t index = 0;  // to keep track of what index of the element we are at
+    size_t newLen = 0; // to store the length of the trimmed element
+
+    // first, skip through all leading whitespace in element
+    while (element[index] == ' ')
+    {
+        index++;
+    }
+
+    // if there is a plus as the first character, skip it
+    if (element[index] == '+')
+    {
+        index++;
+    }
+
+    // incremenet newLen while non-whitespace characters are present
+    // or until the end of the element if there are no trailing spaces
+    while (element[index] != ' ' && element[index] != '\0')
+    {
+        index++;
+        newLen++;
+    }
+
+    // create new char* to store the trimmed element
+    char *trimmed = new char[newLen + 1];
+
+    // go back to the character before the whitespace/end
+    index--;
+
+    // keep going back until the last leading whitespace, or to the '+',
+    // or until the beginning of the element, if there are no leading whitespaces or plus
+    while (element[index] != ' ' && element[index] != '+' && index != 0)
+    {
+        index--;
+    }
+
+    // go forward to the first character if we are not at the beginning
+    if (index != 0)
+    {
+        index++;
+    }
+
+    // copy only the element into trimmed
+    for (int i = 0; i < newLen; i++)
+    {
+        trimmed[i] = element[index];
+        index++;
+    }
+
+    // add the null character to trimmed
+    trimmed[newLen] = '\0';
+
+    return trimmed;
+}
+
+/**
+ * @brief Reads the elements in the line into the columns
+ * 
+ * @param line the line to be read into the columns
+ * @param columns the columns to be populated with the line
+ */
+void readLine(char *line, std::vector<Column *> columns)
+{
+    if (!isInvalidLine(line))
+    {
+        bool open = false;             // whether there is a currently open bracket, meaning  we are currently reading an element in the schema
+        bool readingString = false;    // whether we are currently reading inside quotes i.e. inside a multi-word String
+        size_t charNum = strlen(line); // the number of characters in the line we are reading
+        size_t startOfElement = 0;     // the index of the first character of the element we are currently reading
+        size_t endOfElement = 0;       // the index of the closing bracket of the element we are currently reading
+        size_t currCol = 0;
+
+        // for each character in the line
+        for (int i = 0; i < charNum; i++)
+        {
+            // if we are not currently reading an element and the current character is an opening bracket
+            if (!open && line[i] == '<')
+            {
+                open = true;            // since we found an opening bracket, set open to true, as we are currently reading an element
+                startOfElement = i + 1; // set the startOfElement to the next character, as that is the index of the first character in the element we are reading
+            }
+
+            // otherwise, if we are currently reading an element, and that element is not a string, and we find a closing bracket
+            else if (open && !readingString && line[i] == '>')
+            {
+                open = false;     // we set open to false since we are done reading the element
+                endOfElement = i; // we set the end of the element to the index of the closing bracket
+
+                char *element = trimSpaces(copySubArray(startOfElement, endOfElement, line));
+
+                // check if the current element is missing. If it is, then add NULL to the column
+                if (isMissing(element))
+                {
+                    if (strcmp(columns.at(currCol)->getType(), "STRING") == 0)
+                    {
+                        columns.at(currCol)->add(nullptr);
+                    }
+                    else if (strcmp(columns.at(currCol)->getType(), "FLOAT") == 0)
+                    {
+                        columns.at(currCol)->add(nullptr);
+                    }
+                    else if (strcmp(columns.at(currCol)->getType(), "INT") == 0)
+                    {
+                        columns.at(currCol)->add(nullptr);
+                    }
+                    else
+                    {
+                        columns.at(currCol)->add(nullptr);
+                    }
+                }
+                else
+                {
+                    if (strcmp(columns.at(currCol)->getType(), "STRING") == 0)
+                    {
+                        columns.at(currCol)->add(new String(element));
+                    }
+                    else if (strcmp(columns.at(currCol)->getType(), "FLOAT") == 0)
+                    {
+                        columns.at(currCol)->add(new Float(atof(element)));
+                    }
+                    else if (strcmp(columns.at(currCol)->getType(), "INT") == 0)
+                    {
+                        columns.at(currCol)->add(new Integer(atoi(element)));
+                    }
+                    else
+                    {
+                        if (element[0] == '1')
+                        {
+                            columns.at(currCol)->add(new Boolean(true));
+                        }
+                        else
+                        {
+                            columns.at(currCol)->add(new Boolean(false));
+                        }
+                    }
+                }
+
+                currCol++; // go to the next column
+            }
+        }
+    }
+}
+
+/**
+ * @brief Reads the schema into the columns line by line
+ * 
+ * @param fileContents the contents of the schema
+ * @param columns the columns to be populated with the schema
+ */
+void readSchema(char *fileContents, std::vector<Column *> columns)
+{
+    int startOfLine = 0; // the index in the fileContents char array that represents the start of a line
+    // iterates through the fileContents
+    for (int i = 0; i <= strlen(fileContents); i++)
+    {
+        // if we're at the end of the current line
+        if (fileContents[i] == '\n' || fileContents[i] == '\0')
+        {
+            char *line = new char[i - startOfLine];            // create a new char array of the same size as the length of the current line
+            line = copySubArray(startOfLine, i, fileContents); // sets line to a char array that contains all the chars in the line
+            readLine(line, columns);                           // read the line and add it to the schema
+
+            // set the start of the next line to the current index of the file, plus 1
+            // because the index represents the end of the current line, so we need to
+            // set it to the beginning of the next line, rather than the end of the just parsed line
+            startOfLine = i + 1;
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     // file and flags to keep track of for later outputting
-    char *filename = '\0';
-    size_t from = 0;
-    size_t len = NULL;
+    char *filename = nullptr;
+    int from = -1;
+    int len = -1;
     bool ftype = false;
-    size_t typeuint = NULL;
+    int typeuint = -1;
     bool fidx = false;
-    size_t idxcol = NULL;
-    size_t idxoff = NULL;
+    int idxcol = -1;
+    int idxoff = -1;
     bool fmissing = false;
-    size_t miscol = NULL;
-    size_t misoff = NULL;
+    int miscol = -1;
+    int misoff = -1;
 
     // parsing the command line arguments:
     // checks if validity of flag and if flag has been seen
     for (int i = 1; i < argc; i++)
     {
-        if (checkflag(i, argv[i], argc, "-f", 1) && filename == '\0')
+        if (checkflag(i, argv[i], argc, "-f", 1) && filename == nullptr)
         {
             i++;
             filename = argv[i];
@@ -1011,7 +1043,8 @@ int main(int argc, char **argv)
             exit(1);
         }
     }
-    if (filename == '\0')
+
+    if (filename == nullptr)
     {
         println("No file found among arguments. \"-f\" is a required argument!");
         exit(1);
@@ -1027,66 +1060,73 @@ int main(int argc, char **argv)
     }
     // find the total length of the file
     size_t fileLength = file_length(file);
+
     if (fileLength == 0)
     {
         println("Given file is empty! Cannot process an empty file into a schema.");
         exit(1);
     }
-    if (len == NULL || len > fileLength)
+    if (len == -1 || len > fileLength)
     {
         len = fileLength;
     }
+    if (from == -1)
+    {
+        from = 0;
+    }
+
     // initialize where the file will go
     char *fileContents = new char[fileLength];
+
     // read the file into fileContents
     fread(fileContents, 1, fileLength, file);
 
-    std::vector<Column *> *columns = defineSchema(fileContents);
+    std::vector<Column *> columns = defineSchema(fileContents);
 
     // first, trim the file based on the command line arguments
     char *trimmedFileContents = trimFile(fileContents, from, len);
 
     // if the trimmed file is empty, then there is nothing to process into a schema
-    if (trimmedFileContents == '\0')
+    if (strlen(trimmedFileContents) == 0)
     {
         println("Arguments shrunk the file to empty. Nothing to process. Make sure the file and your arguments include at least one row!");
         exit(1);
     }
 
-    // then, read line by line: void readSchema(fileContents, columns), void readLine(line, columns), bool isInvalidLine(line)
+    readSchema(trimmedFileContents, columns);
 
     // print appropriate command line arguments
-    if (typeuint != NULL)
+    if (ftype)
     {
         // first, confirm parameter falls into constraint
-        if (typeuint > columns->size)
+        if (typeuint > columns.size())
         {
             println("Parameter of -print_col_type out of bounds!");
             exit(1);
         }
-        print_(columns->at(typeuint)->getType());
+        print_(columns.at(typeuint)->getType());
     }
 
-    if (idxcol != NULL && idxoff != NULL)
+    if (fidx)
     {
         // first, confirm parameters fall into constraint
-        if (idxcol > columns->size || idxoff > columns->at(0)->getSize())
+        if (idxcol > columns.size() || idxoff > columns.at(0)->getSize())
         {
             println("One or more parameters of -print_col_idx out of bounds!");
             exit(1);
         }
-        print_(columns->at(idxcol)->get(idxoff)->print());
+        print_(columns.at(idxcol)->get(idxoff)->print());
     }
 
-    if (miscol != NULL && misoff != NULL)
+    if (fmissing)
     {
         // first, confirm parameters fall into constraint
-        if (miscol > columns->size || misoff > columns->at(0)->getSize())
+        if (miscol > columns.size() || misoff > columns.at(0)->getSize())
         {
             println("One or more parameters of -is_missing_idx out of bounds!");
             exit(1);
         }
-        if (columns->at(miscol)->get(misoff) == NULL)
+        if (columns.at(miscol)->get(misoff) == nullptr)
         {
             println(true);
         }

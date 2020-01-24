@@ -10,7 +10,7 @@ class Column : public Object
 {
 public:
     size_t size_;
-    std::vector<Object *> *arr;
+    std::vector<Object *> arr;
     Column() : Object()
     {
         size_ = 0;
@@ -27,12 +27,12 @@ public:
 
     Object *get(size_t idx)
     {
-        return arr->at(idx);
+        return arr.at(idx);
     }
 
     virtual void add(Object *other)
     {
-        arr->push_back(other);
+        arr.push_back(other);
         size_++;
     }
 
@@ -41,7 +41,7 @@ public:
         String *res = new String("[");
         for (int i = 0; i < Column::size_; i++)
         {
-            res->concat(new String(arr->at(i)->print()));
+            res->concat(new String(arr.at(i)->print()));
             if (i != Column::size_ - 1)
             {
                 res->concat(new String(", "));
@@ -52,6 +52,7 @@ public:
 
     virtual const char *getType()
     {
+        return NULL;
     }
 };
 
@@ -67,13 +68,22 @@ public:
 
     void add(Object *other)
     {
-        Boolean *other1 = dynamic_cast<Boolean *>(other);
-        if (other1 != nullptr)
-            Column::add(other);
-        else
+        if (other == nullptr)
         {
-            println("Cannot add non-bool to BoolColumn!");
-            exit(1);
+            Column::add(other);
+        } 
+        else 
+        {
+            Boolean *other1 = dynamic_cast<Boolean *>(other);
+            if (other1 != nullptr)
+            {
+                Column::add(other);
+            }
+            else
+            {
+                println("Cannot add non-bool to BoolColumn!");
+                exit(1);
+            }
         }
     }
 
@@ -95,13 +105,20 @@ public:
 
     void add(Object *other)
     {
-        Integer *other1 = dynamic_cast<Integer *>(other);
-        if (other1 != nullptr)
-            Column::add(other);
-        else
+        if (other == nullptr)
         {
-            println("Cannot add non-int to IntColumn!");
-            exit(1);
+            Column::add(other);
+        } 
+        else 
+        {
+            Integer *other1 = dynamic_cast<Integer *>(other);
+            if (other1 != nullptr)
+                Column::add(other);
+            else
+            {
+                println("Cannot add non-int to IntColumn!");
+                exit(1);
+            }
         }
     }
 
@@ -123,13 +140,20 @@ public:
 
     void add(Object *other)
     {
-        Float *other1 = dynamic_cast<Float *>(other);
-        if (other1 != nullptr)
+        if (other == nullptr)
+        {
             Column::add(other);
+        }
         else
         {
-            println("Cannot add non-float to FloatColumn!");
-            exit(1);
+            Float *other1 = dynamic_cast<Float *>(other);
+            if (other1 != nullptr)
+                Column::add(other);
+            else
+            {
+                println("Cannot add non-float to FloatColumn!");
+                exit(1);
+            }
         }
     }
 
@@ -151,13 +175,20 @@ public:
 
     void add(Object *other)
     {
-        String *other1 = dynamic_cast<String *>(other);
-        if (other1 != nullptr)
+        if (other == nullptr)
+        {
             Column::add(other);
+        }
         else
         {
-            println("Cannot add non-String to StringColumn!");
-            exit(1);
+            String *other1 = dynamic_cast<String *>(other);
+            if (other1 != nullptr)
+                Column::add(other);
+            else
+            {
+                println("Cannot add non-String to StringColumn!");
+                exit(1);
+            }
         }
     }
 

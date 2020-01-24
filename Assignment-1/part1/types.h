@@ -2,6 +2,7 @@
 
 #include "object.h"
 #include "helper.h"
+#include <stdlib.h>
 
 class Boolean : public Object
 {
@@ -53,7 +54,9 @@ public:
 
     const char *print()
     {
-        return (char *)integer_;
+        std::string s = std::to_string(integer_);
+        char const *res = s.c_str();
+        return res;
     }
 };
 
@@ -77,19 +80,12 @@ public:
         return other1->float_ == float_;
     }
 
-    // I learned how to convert floats to char* with the asprintf function here:
-    // https://stackoverflow.com/questions/2988791/converting-float-to-char and here:
-    // http://crasseux.com/books/ctutorial/asprintf.html
+    // I learned how to convert floats to char* using C++ strings here:
+    // https://stackoverflow.com/questions/10847237/how-to-convert-from-int-to-char
     const char *print()
     {
-        char *res = NULL;
-        int len = asprintf(&res, "%g", float_);
-        if (len == -1)
-        {
-            print_("Error converting float: ");
-            print_(float_);
-            exit(1);
-        }
+        std::string s = std::to_string(float_);
+        char const *res = s.c_str();
         return res;
     }
 };
