@@ -637,8 +637,6 @@ std::vector<Column *> defineSchema(char *fileContents)
         maxColNum = currentColNum;
     }
 
-    lines++;
-
     // for storing the coltypes as a char before initializing the columns
     // b = bool, i = int, f = float, s = string
     char *coltypes = new char[maxColNum];
