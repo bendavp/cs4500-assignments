@@ -71,8 +71,8 @@ public:
         if (other == nullptr)
         {
             Column::add(other);
-        } 
-        else 
+        }
+        else
         {
             Boolean *other1 = dynamic_cast<Boolean *>(other);
             if (other1 != nullptr)
@@ -108,8 +108,8 @@ public:
         if (other == nullptr)
         {
             Column::add(other);
-        } 
-        else 
+        }
+        else
         {
             Integer *other1 = dynamic_cast<Integer *>(other);
             if (other1 != nullptr)
