@@ -3,3 +3,6 @@ build: main.cpp
 
 test:
 	./sorer -f sample.sor -print_col_type 1
+
+clean:
+	rm sorer
