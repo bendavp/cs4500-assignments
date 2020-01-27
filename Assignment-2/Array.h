@@ -75,39 +75,38 @@ public:
     }
 
     /**
-     * @brief doubles the memory allocated for the array
+     * @brief changes the memory allocated for the array
      * 
      */
-    void doubleMemSize()
+    void changeMemSize(bool half)
     {
-        size_t newMem = memory_size_ * 2;
-        void **temp = new void *[newMem];
-        for (size_t i = 0; i < size_; i++)
+        if (memory_size_ == MIN_MEMORY_SIZE)
+        {
+            return;
+        }
+
+        if (half)
+        {
+            memory_size_ /= 2;
+        }
+        else
+        {
+            memory_size_ *= 2;
+        }
+
+        void **temp = new void *[memory_size_];
+        for (int i = 0; i < size_; i++)
         {
             temp[i] = arr_[i];
         }
-        memory_size_ = newMem;
         delete[] arr_;
         arr_ = temp;
     }
 
-    /**
-     * @brief halves the memory allocated for the array
-     * 
-     */
-    void halfMemSize()
+    int indexOf(void *val)
     {
-        size_t newMem = memory_size_ / 2;
-        if (newMem > MIN_MEMORY_SIZE)
+        for (int i = 0; i < size_; i++)
         {
-            void **temp = new void *[newMem];
-            for (size_t i = 0; i < size_; i++)
-            {
-                temp[i] = arr_[i];
-            }
-            memory_size_ = newMem;
-            delete[] arr_;
-            arr_ = temp;
         }
     }
 };
