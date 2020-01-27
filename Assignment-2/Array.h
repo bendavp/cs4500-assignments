@@ -29,8 +29,8 @@ public:
     void insert(void *val, size_t index);
 
     //insert element at end of array
-    void insertAtEnd(void *val){
-        
+    void insertAtEnd(void *val)
+    {
     }
 
     //insert multiple elements at index
@@ -40,16 +40,16 @@ public:
     void *set(void *val, size_t index);
 
     //clear Array
-    void clear(){
-
+    void clear()
+    {
     }
 
     //remove object at given index and return that object
     void *remove(size_t index);
 
     //return element at given index and error if out-of-bounds
-    void *getElementAt(size_t index){
-        
+    void *getElementAt(size_t index)
+    {
     }
 
     //return size of Array
@@ -65,8 +65,10 @@ public:
      * @return true if the index is within the bounds (# of elements)
      * @return false if the index is without the bounds
      */
-    bool isOutOfBounds(size_t index) {
-        if (index > size_ - 1) {
+    bool isOutOfBounds(size_t index)
+    {
+        if (index > size_ - 1)
+        {
             return true;
         }
         return false;
@@ -76,10 +78,12 @@ public:
      * @brief doubles the memory allocated for the array
      * 
      */
-    void doubleMemSize() {
+    void doubleMemSize()
+    {
         size_t newMem = memory_size_ * 2;
-        void** temp = new void *[newMem];
-        for (size_t i = 0; i < size_; i++) {
+        void **temp = new void *[newMem];
+        for (size_t i = 0; i < size_; i++)
+        {
             temp[i] = arr_[i];
         }
         memory_size_ = newMem;
@@ -91,12 +95,15 @@ public:
      * @brief halves the memory allocated for the array
      * 
      */
-    void halfMemSize() {
+    void halfMemSize()
+    {
         size_t newMem = memory_size_ / 2;
-        if (newMem > MIN_MEMORY_SIZE) {
-            void** temp = new void *[newMem];
-            for (size_t i = 0; i < size_; i++) {
-            temp[i] = arr_[i];
+        if (newMem > MIN_MEMORY_SIZE)
+        {
+            void **temp = new void *[newMem];
+            for (size_t i = 0; i < size_; i++)
+            {
+                temp[i] = arr_[i];
             }
             memory_size_ = newMem;
             delete[] arr_;
