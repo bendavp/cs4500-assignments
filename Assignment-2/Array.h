@@ -5,11 +5,25 @@
 class Array : public Object
 {
 public:
+    const static size_t MIN_MEMORY_SIZE = 16;
+
+    void **arr_;
+    size_t size_;
+    size_t memory_size_;
+
     //constructor
-    Array();
+    Array()
+    {
+        memory_size_ = MIN_MEMORY_SIZE;
+        size_ = 0;
+        arr_ = new void *[memory_size_];
+    }
 
     //destructor
-    ~Array();
+    ~Array()
+    {
+        delete[] arr_;
+    }
 
     //insert element at given index and push back rest of elements
     void insert(void *val, size_t index);
