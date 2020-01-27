@@ -50,5 +50,10 @@ public:
     size_t getSize();
 
     //first index of that element and -1 if doesn't exist
-    int indexOf(void *val);
+    int indexOf(void *val)
+    {
+        for (int i = 0; i < size_; i++)
+        {
+        }
+    }
 };
