@@ -39,7 +39,7 @@ public:
         return size_;
     }
 
-    size_t hash_me()
+    size_t hash()
     {
         size_t res = 0;
         for (int i = 0; i < size_; i++)
@@ -56,7 +56,14 @@ public:
         String *other1 = dynamic_cast<String *>(other);
         if (other1 == nullptr)
             return false;
-        return !strcmp(this->str_, other1->str_);
+        if (strcmp(this->str_, other1->str_) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     String *concat(String *other)

@@ -1,26 +1,28 @@
 #include "queue.h"
+#include <assert.h>
 
-void string_queue_normal_usage() {
+void string_queue_normal_usage()
+{
   /* Tests the normal usage of a StringQueue - adding, removing, peeking, and checking the size of the queue */
-  StringQueue* string_queue = new StringQueue();
+  StringQueue *string_queue = new StringQueue();
 
   // empty queue size
   assert(string_queue->size() == 0);
 
   // add one item
-  String* item = new String("foobar");
+  String *item = new String("foobar");
   string_queue->add(item);
   assert(string_queue->size() == 1);
   assert(string_queue->peek()->equals(item));
 
   // add another item
-  String* item2 = new String("tube");
+  String *item2 = new String("tube");
   string_queue->add(item2);
   assert(string_queue->size() == 2);
   assert(string_queue->peek()->equals(item));
 
   // remove an item
-  String* popped = string_queue->remove();
+  String *popped = string_queue->remove();
   assert(popped->equals(item));
   assert(string_queue->size() == 1);
   assert(string_queue->peek()->equals(item2));
@@ -33,13 +35,14 @@ void string_queue_normal_usage() {
   delete string_queue;
 }
 
-void string_queue_advanced_usage() {
+void string_queue_advanced_usage()
+{
   /* Tests more advanced / nicheusage of a StringQueue - concating StringQueues, equality, clearing, etc. */
-  StringQueue* string_queue = new StringQueue();
-  StringQueue* another_string_queue = new StringQueue();
-  String* string1 = new String("software_dev");
-  String* string2 = new String("is very fun");
-  String* string3 = new String("seriously!");
+  StringQueue *string_queue = new StringQueue();
+  StringQueue *another_string_queue = new StringQueue();
+  String *string1 = new String("software_dev");
+  String *string2 = new String("is very fun");
+  String *string3 = new String("seriously!");
 
   // adding empty self to empty self
   assert(string_queue->size() == 0);
@@ -79,35 +82,33 @@ void string_queue_advanced_usage() {
   // add non-empty self to self
   another_string_queue->add_all(another_string_queue);
   assert(another_string_queue->size() == 6);
-  String* popped = another_string_queue->remove();
+  String *popped = another_string_queue->remove();
   assert(popped->equals(string1));
-  String* popped = another_string_queue->remove();
+  popped = another_string_queue->remove();
   assert(popped->equals(string2));
-  String* popped = another_string_queue->remove();
+  popped = another_string_queue->remove();
   assert(popped->equals(string3));
-  String* popped = another_string_queue->remove();
+  popped = another_string_queue->remove();
   assert(popped->equals(string1));
-  String* popped = another_string_queue->remove();
+  popped = another_string_queue->remove();
   assert(popped->equals(string2));
-  String* popped = another_string_queue->remove();
+  popped = another_string_queue->remove();
   assert(popped->equals(string3));
   assert(another_string_queue->size() == 0);
 
   delete string_queue;
   delete another_string_queue;
-  delete string1;
   delete popped;
-  delete string2;
-  delete string3;
 }
 
-void string_queue_hashing_and_equality() {
+void string_queue_hashing_and_equality()
+{
   /* Testing hashing and equality of StringQueues */
-  StringQueue* string_queue = new StringQueue();
-  StringQueue* another_string_queue = new StringQueue();
-  String* string1 = new String("hofamnn");
-  String* string2 = new String("banana");
-  String* string3 = new String("foobar");
+  StringQueue *string_queue = new StringQueue();
+  StringQueue *another_string_queue = new StringQueue();
+  String *string1 = new String("hofamnn");
+  String *string2 = new String("banana");
+  String *string3 = new String("foobar");
 
   // empty
   assert(string_queue->equals(another_string_queue));
@@ -139,27 +140,28 @@ void string_queue_hashing_and_equality() {
   assert(string_queue->hash() == another_string_queue->hash());
 }
 
-void object_queue_normal_usage() {
+void object_queue_normal_usage()
+{
   /* Tests the normal usage of a StringQueue - adding, removing, peeking, and checking the size of the queue */
-  ObjectQueue* object_queue = new ObjectQueue();
+  ObjectQueue *object_queue = new ObjectQueue();
 
   // empty queue size
   assert(object_queue->size() == 0);
 
   // add one item
-  String* item = new String("foobar");
+  String *item = new String("foobar");
   object_queue->add(item);
   assert(object_queue->size() == 1);
   assert(object_queue->peek()->equals(item));
 
   // add another item
-  String* item2 = new String("tube");
+  String *item2 = new String("tube");
   object_queue->add(item2);
   assert(object_queue->size() == 2);
   assert(object_queue->peek()->equals(item));
 
   // remove an item
-  String* popped = object_queue->remove();
+  Object *popped = object_queue->remove();
   assert(popped->equals(item));
   assert(object_queue->size() == 1);
   assert(object_queue->peek()->equals(item2));
@@ -172,13 +174,14 @@ void object_queue_normal_usage() {
   delete object_queue;
 }
 
-void object_queue_advanced_usage() {
+void object_queue_advanced_usage()
+{
   /* Tests more advanced / niche usage of a StringQueue - concating ObjectQueue, equality, clearing, etc. */
-  ObjectQueue* p_object_queue =   new ObjectQueue();
-  ObjectQueue* another_object_queue = new ObjectQueue();
-  String* string1 = new String("software_dev");
-  String* string2 = new String("is very fun");
-  String* string3 = new String("seriously!");
+  ObjectQueue *p_object_queue = new ObjectQueue();
+  ObjectQueue *another_object_queue = new ObjectQueue();
+  String *string1 = new String("software_dev");
+  String *string2 = new String("is very fun");
+  String *string3 = new String("seriously!");
 
   // adding empty self to empty self
   assert(p_object_queue->size() == 0);
@@ -218,7 +221,7 @@ void object_queue_advanced_usage() {
   // add non-empty self to self
   another_object_queue->add_all(another_object_queue);
   assert(another_object_queue->size() == 6);
-  String* popped = another_object_queue->remove();
+  Object *popped = another_object_queue->remove();
   assert(popped->equals(string1));
   popped = another_object_queue->remove();
   assert(popped->equals(string2));
@@ -234,19 +237,17 @@ void object_queue_advanced_usage() {
 
   delete p_object_queue;
   delete another_object_queue;
-  delete string1;
   delete popped;
-  delete string2;
-  delete string3;
 }
 
-void object_queue_hashing_and_equality() {
+void object_queue_hashing_and_equality()
+{
   /* Testing hashing and equality of StringQueues */
-  ObjectQueue* object_queue = new ObjectQueue();
-  ObjectQueue* another_object_queue = new ObjectQueue();
-  String* string1 = new String("hofamnn");
-  String* string2 = new String("banana");
-  String* string3 = new String("foobar");
+  ObjectQueue *object_queue = new ObjectQueue();
+  ObjectQueue *another_object_queue = new ObjectQueue();
+  String *string1 = new String("hofamnn");
+  String *string2 = new String("banana");
+  String *string3 = new String("foobar");
 
   // empty
   assert(object_queue->equals(another_object_queue));
@@ -281,7 +282,8 @@ void object_queue_hashing_and_equality() {
   delete another_object_queue;
 }
 
-int main() {
+int main()
+{
   string_queue_normal_usage();
   string_queue_advanced_usage();
   string_queue_hashing_and_equality();

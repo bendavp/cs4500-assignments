@@ -24,7 +24,7 @@ public:
     }
 
     // returns the hash code value for this object
-    size_t hash()
+    virtual size_t hash()
     {
         if (hash_ == 0)
         {
@@ -35,7 +35,7 @@ public:
     }
 
     // virtual is to indicate that this method may be overridden
-    virtual size_t hash_me()
+    size_t hash_me()
     {
         return reinterpret_cast<size_t>(this);
     }
