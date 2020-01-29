@@ -2,111 +2,192 @@
 
 #include "Object.h"
 
+// general purpose array that stores Objects
 class Array : public Object
 {
 public:
-    const static size_t MIN_MEMORY_SIZE = 16;
-
-    void **arr_;
-    size_t size_;
-    size_t memory_size_;
-
     //constructor
-    Array()
-    {
-        memory_size_ = MIN_MEMORY_SIZE;
-        size_ = 0;
-        arr_ = new void *[memory_size_];
-    }
+    Array();
 
     //destructor
-    ~Array()
-    {
-        delete[] arr_;
-    }
+    ~Array();
 
     //insert element at given index and push back rest of elements
-    void insert(void *val, size_t index);
+    void insert(Object *val, size_t index);
 
     //insert element at end of array
-    void insertAtEnd(void *val)
-    {
-    }
+    void insertAtEnd(Object *val);
 
     //insert multiple elements at index
     void insertMultiple(Array *vals, size_t index);
 
     //set element at index to given value
-    void *set(void *val, size_t index);
+    Object *set(Object *val, size_t index);
 
     //clear Array
-    void clear()
-    {
-    }
+    void clear();
 
     //remove object at given index and return that object
-    void *remove(size_t index);
+    Object *remove(size_t index);
 
     //return element at given index and error if out-of-bounds
-    void *getElementAt(size_t index)
-    {
-    }
+    Object *getElementAt(size_t index);
 
     //return size of Array
     size_t getSize();
 
     //first index of that element and -1 if doesn't exist
-    int indexOf(void *val);
+    int indexOf(Object *val);
+};
 
-    /**
-     * @brief helper function for determining if the given index is within bounds of the array
-     * 
-     * @param index 
-     * @return true if the index is within the bounds (# of elements)
-     * @return false if the index is without the bounds
-     */
-    bool isOutOfBounds(size_t index)
-    {
-        if (index > size_ - 1)
-        {
-            return true;
-        }
-        return false;
-    }
+// type strict array that stores Strings
+class StringArray : public Object
+{
+public:
+    //constructor
+    StringArray();
 
-    /**
-     * @brief changes the memory allocated for the array
-     * 
-     */
-    void changeMemSize(bool half)
-    {
-        if (memory_size_ == MIN_MEMORY_SIZE)
-        {
-            return;
-        }
+    //destructor
+    ~StringArray();
 
-        if (half)
-        {
-            memory_size_ /= 2;
-        }
-        else
-        {
-            memory_size_ *= 2;
-        }
+    //insert element at given index and push back rest of elements
+    void insert(String *val, size_t index);
 
-        void **temp = new void *[memory_size_];
-        for (int i = 0; i < size_; i++)
-        {
-            temp[i] = arr_[i];
-        }
-        delete[] arr_;
-        arr_ = temp;
-    }
+    //insert element at end of array
+    void insertAtEnd(String *val);
 
-    int indexOf(void *val)
-    {
-        for (int i = 0; i < size_; i++)
-        {
-        }
-    }
+    //insert multiple elements at index
+    void insertMultiple(StringArray *vals, size_t index);
+
+    //set element at index to given value
+    String *set(String *val, size_t index);
+
+    //clear Array
+    void clear();
+
+    //remove object at given index and return that object
+    String *remove(size_t index);
+
+    //return element at given index and error if out-of-bounds
+    String *getElementAt(size_t index);
+
+    //return size of Array
+    size_t getSize();
+
+    //first index of that element and -1 if doesn't exist
+    int indexOf(String *val);
+};
+
+// type strict array that stores floats
+class FloatArray : public Object
+{
+public:
+    //constructor
+    FloatArray();
+
+    //destructor
+    ~FloatArray();
+
+    //insert element at given index and push back rest of elements
+    void insert(float val, size_t index);
+
+    //insert element at end of array
+    void insertAtEnd(float val);
+
+    //insert multiple elements at index
+    void insertMultiple(FloatArray *vals, size_t index);
+
+    //set element at index to given value
+    float set(float val, size_t index);
+
+    //clear Array
+    void clear();
+
+    //remove object at given index and return that object
+    float remove(size_t index);
+
+    //return element at given index and error if out-of-bounds
+    float getElementAt(size_t index);
+
+    //return size of Array
+    size_t getSize();
+
+    //first index of that element and -1 if doesn't exist
+    int indexOf(float val);
+};
+
+// type strict array that stores ints
+class IntArray : public Object
+{
+public:
+    //constructor
+    IntArray();
+
+    //destructor
+    ~IntArray();
+
+    //insert element at given index and push back rest of elements
+    void insert(int val, size_t index);
+
+    //insert element at end of array
+    void insertAtEnd(int val);
+
+    //insert multiple elements at index
+    void insertMultiple(IntArray *vals, size_t index);
+
+    //set element at index to given value
+    int set(int val, size_t index);
+
+    //clear Array
+    void clear();
+
+    //remove object at given index and return that object
+    int remove(size_t index);
+
+    //return element at given index and error if out-of-bounds
+    int getElementAt(size_t index);
+
+    //return size of Array
+    size_t getSize();
+
+    //first index of that element and -1 if doesn't exist
+    int indexOf(int val);
+};
+
+// type strict array that stores booleans
+class BoolArray : public Object
+{
+public:
+    //constructor
+    BoolArray();
+
+    //destructor
+    ~BoolArray();
+
+    //insert element at given index and push back rest of elements
+    void insert(bool val, size_t index);
+
+    //insert element at end of array
+    void insertAtEnd(bool val);
+
+    //insert multiple elements at index
+    void insertMultiple(BoolArray *vals, size_t index);
+
+    //set element at index to given value
+    bool set(bool val, size_t index);
+
+    //clear Array
+    void clear();
+
+    //remove object at given index and return that object
+    bool remove(size_t index);
+
+    //return element at given index and error if out-of-bounds
+    bool getElementAt(size_t index);
+
+    //return size of Array
+    size_t getSize();
+
+    //first index of that element and -1 if doesn't exist
+    int indexOf(bool val);
 };
