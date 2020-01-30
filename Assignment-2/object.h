@@ -43,6 +43,8 @@ public:
     // returns what to print
     virtual const char *print()
     {
-        return (char *)hash_;
+        char *res = new char[sizeof(hash_)];
+        res = (char *)&hash_;
+        return res;
     }
 };

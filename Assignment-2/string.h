@@ -29,6 +29,15 @@ public:
         strcpy(str_, str);
     }
 
+    String()
+    {
+        size_ = 0;
+
+        str_ = new char[1];
+
+        str_[0] = '\0';
+    }
+
     ~String()
     {
         delete[] str_;
@@ -78,7 +87,7 @@ public:
         {
             new_str_[i] = other->str_[i - size_];
         }
-        return new String(const_cast<char *>(new_str_));
+        return new String(new_str_);
     }
 
     // returns what to print
@@ -103,7 +112,7 @@ public:
 
         if (other == nullptr)
         {
-            return -1;
+            return 1;
         }
 
         if (this->equals(other))
@@ -119,24 +128,17 @@ public:
             }
             else
             {
-                if (str_[i] < other->str_[i])
-                {
-                    return 1;
-                }
-                else
-                {
-                    return -1;
-                }
+                return str_[i] - other->str_[i];
             }
         }
 
         if (size_ < other->size_)
         {
-            return 1;
+            return -1;
         }
         else
         {
-            return -1;
+            return 1;
         }
     }
 

@@ -1,8 +1,8 @@
 //lang:cwc
 
 #include <stdio.h>
-#include "Object.h"
-#include "String.h"
+#include "object.h"
+#include "string.h"
 #include "Array.h"
 
 //will be called when a test fails
@@ -30,9 +30,9 @@ void checkFalse(bool b)
 
 void objectTest()
 {
-    Object* o1 = new Object();
-    Object* o2 = o1;
-    Object* o3 = new Object();
+    Object *o1 = new Object();
+    Object *o2 = o1;
+    Object *o3 = new Object();
 
     //Objects o1 and o2 equal
     //if equal, then same hash
@@ -48,41 +48,39 @@ void objectTest()
 
 void stringTest()
 {
-    String* empty = new String();
-    String* hello = new String("hello");
-    String* world = new String("world");
-    String* helloWorld = new String("helloworld");
+    String *empty = new String();
+    String *hello = new String("hello");
+    String *world = new String("world");
+    String *helloWorld = new String("helloworld");
 
     //should be "helloworld"
     //equals means they should also have same hashes
-    String* catRes = hello->concat(world);
+    String *catRes = hello->concat(world);
     checkTrue(catRes->equals(helloWorld));
     checkTrue(catRes->hash() == helloWorld->hash());
     checkFalse(catRes->hash() == hello->hash());
 
     //should be "hello"
-    String* catWithEmpty = hello->concat(empty);
+    String *catWithEmpty = hello->concat(empty);
     checkTrue(catWithEmpty->equals(hello));
     checkFalse(catWithEmpty->equals(helloWorld));
     checkTrue(catWithEmpty->hash() == hello->hash());
 
-    //comparing strings lexicographically 
+    //comparing strings lexicographically
     checkTrue(hello->compareTo(world) < 0);
     checkTrue(hello->compareTo(empty) > 0);
     checkTrue(hello->compareTo(helloWorld) < 0);
     checkTrue(world->compareTo(empty) > 0);
     checkTrue(world->compareTo(world) == 0);
-
-
 }
 
 void arrayTest1()
 {
-    Object* o1 = new Object();
-    Object* o2 = new Object();
-    Object* o3 = new Object();
+    Object *o1 = new Object();
+    Object *o2 = new Object();
+    Object *o3 = new Object();
 
-    Array* arr1 = new Array();
+    Array *arr1 = new Array();
 
     //insert elements
     arr1->insertAtEnd(o1);
@@ -107,9 +105,9 @@ void arrayTest1()
     checkTrue(arr1->indexOf(o3) == -1);
 
     //Create new array
-    Array* arr2 = new Array();
-    Object* o4 = new Object();
-    Object* o5 = new Object();
+    Array *arr2 = new Array();
+    Object *o4 = new Object();
+    Object *o5 = new Object();
 
     arr2->insertAtEnd(o4);
     arr2->insert(o5, 0);
@@ -130,11 +128,11 @@ void arrayTest1()
 
 void arrayTest2()
 {
-    Object* o1 = new Object();
-    Object* o2 = new Object();
-    Object* o3 = new Object();
+    Object *o1 = new Object();
+    Object *o2 = new Object();
+    Object *o3 = new Object();
 
-    Array* arr1 = new Array();
+    Array *arr1 = new Array();
 
     //insert elements into array
     arr1->insert(o2, 0);

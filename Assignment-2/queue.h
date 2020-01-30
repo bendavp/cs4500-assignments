@@ -26,7 +26,7 @@ public:
 
   ~ObjectQueue()
   {
-    delete[] arr_;
+    delete arr_;
   }
 
   void incrementSize()
@@ -130,7 +130,7 @@ public:
   /* Clears this Queue of all elements */
   void clear()
   {
-    delete[] arr_;
+    delete arr_;
     memory_size_ = 16;
     arr_ = new Object *[memory_size_];
     size_ = 0;
@@ -186,7 +186,7 @@ public:
 
   ~StringQueue()
   {
-    delete[] arr_;
+    delete arr_;
   }
 
   void incrementSize()
@@ -290,7 +290,7 @@ public:
   /* Clears this Queue of all elements */
   void clear()
   {
-    delete[] arr_;
+    delete arr_;
     memory_size_ = 16;
     arr_ = new String *[memory_size_];
     size_ = 0;

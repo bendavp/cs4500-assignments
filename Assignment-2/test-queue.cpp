@@ -33,6 +33,8 @@ void string_queue_normal_usage()
   assert(string_queue->size() == 0);
 
   delete string_queue;
+  delete item;
+  delete item2;
 }
 
 void string_queue_advanced_usage()
@@ -98,7 +100,9 @@ void string_queue_advanced_usage()
 
   delete string_queue;
   delete another_string_queue;
-  delete popped;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 void string_queue_hashing_and_equality()
@@ -138,6 +142,12 @@ void string_queue_hashing_and_equality()
   another_string_queue->clear();
   assert(string_queue->equals(another_string_queue));
   assert(string_queue->hash() == another_string_queue->hash());
+
+  delete string_queue;
+  delete another_string_queue;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 void object_queue_normal_usage()
@@ -172,6 +182,8 @@ void object_queue_normal_usage()
   assert(object_queue->size() == 0);
 
   delete object_queue;
+  delete item;
+  delete item2;
 }
 
 void object_queue_advanced_usage()
@@ -237,7 +249,9 @@ void object_queue_advanced_usage()
 
   delete p_object_queue;
   delete another_object_queue;
-  delete popped;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 void object_queue_hashing_and_equality()
@@ -280,6 +294,9 @@ void object_queue_hashing_and_equality()
 
   delete object_queue;
   delete another_object_queue;
+  delete string1;
+  delete string2;
+  delete string3;
 }
 
 int main()
