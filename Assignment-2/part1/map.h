@@ -18,6 +18,10 @@ public:
   {
     memory_size_ = 16;
     key_arr_ = new Object *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      key_arr_[i] = nullptr;
+    }
     val_arr_ = new Object *[memory_size_];
     size_ = 0;
   }
@@ -32,18 +36,20 @@ public:
   {
     memory_size_ *= 2;
     Object **tempKeys = new Object *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      tempKeys[i] = nullptr;
+    }
     Object **tempVals = new Object *[memory_size_];
 
     size_t hash_index;
     for (size_t i = 0; i < memory_size_ / 2; i++)
     {
-      println("outside");
       if (key_arr_[i] != nullptr)
       {
         hash_index = key_arr_[i]->hash() % memory_size_;
         for (size_t j = hash_index; j < memory_size_; j++)
         {
-          println("inside");
           if (tempKeys[j] == nullptr)
           {
             tempKeys[j] = key_arr_[i];
@@ -56,6 +62,12 @@ public:
         }
       }
     }
+
+    delete key_arr_;
+    delete val_arr_;
+
+    key_arr_ = tempKeys;
+    val_arr_ = tempVals;
   }
 
   /**
@@ -242,6 +254,10 @@ public:
   {
     memory_size_ = 16;
     key_arr_ = new String *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      key_arr_[i] = nullptr;
+    }
     val_arr_ = new Object *[memory_size_];
     size_ = 0;
   }
@@ -256,18 +272,20 @@ public:
   {
     memory_size_ *= 2;
     String **tempKeys = new String *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      tempKeys[i] = nullptr;
+    }
     Object **tempVals = new Object *[memory_size_];
 
     size_t hash_index;
     for (size_t i = 0; i < memory_size_ / 2; i++)
     {
-      println("outside");
       if (key_arr_[i] != nullptr)
       {
         hash_index = key_arr_[i]->hash() % memory_size_;
         for (size_t j = hash_index; j < memory_size_; j++)
         {
-          println("inside");
           if (tempKeys[j] == nullptr)
           {
             tempKeys[j] = key_arr_[i];
@@ -280,6 +298,12 @@ public:
         }
       }
     }
+
+    delete key_arr_;
+    delete val_arr_;
+
+    key_arr_ = tempKeys;
+    val_arr_ = tempVals;
   }
 
   /**
@@ -362,6 +386,7 @@ public:
   void remove(String *key)
   {
     assert(key != nullptr);
+    assert(has(key));
 
     size_t hash_index = key->hash() % memory_size_;
 
@@ -466,6 +491,10 @@ public:
   {
     memory_size_ = 16;
     key_arr_ = new String *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      key_arr_[i] = nullptr;
+    }
     val_arr_ = new String *[memory_size_];
     size_ = 0;
   }
@@ -480,18 +509,20 @@ public:
   {
     memory_size_ *= 2;
     String **tempKeys = new String *[memory_size_];
+    for (int i = 0; i < memory_size_; i++)
+    {
+      tempKeys[i] = nullptr;
+    }
     String **tempVals = new String *[memory_size_];
 
     size_t hash_index;
     for (size_t i = 0; i < memory_size_ / 2; i++)
     {
-      println("outside");
       if (key_arr_[i] != nullptr)
       {
         hash_index = key_arr_[i]->hash() % memory_size_;
         for (size_t j = hash_index; j < memory_size_; j++)
         {
-          println("inside");
           if (tempKeys[j] == nullptr)
           {
             tempKeys[j] = key_arr_[i];

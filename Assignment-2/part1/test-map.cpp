@@ -246,6 +246,64 @@ void test_overwrite()
   assert(ssMap->has(Skey));
 }
 
+void test_rehash()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
+
+  String **Skeys = new String *[9];
+  Skeys[0] = new String("1");
+  Skeys[1] = new String("2");
+  Skeys[2] = new String("3");
+  Skeys[3] = new String("4");
+  Skeys[4] = new String("5");
+  Skeys[5] = new String("6");
+  Skeys[6] = new String("7");
+  Skeys[7] = new String("8");
+  Skeys[8] = new String("9");
+
+  String *Sval = new String("val");
+
+  Object **Okeys = new Object *[9];
+  Okeys[0] = new Object();
+  Okeys[1] = new Object();
+  Okeys[2] = new Object();
+  Okeys[3] = new Object();
+  Okeys[4] = new Object();
+  Okeys[5] = new Object();
+  Okeys[6] = new Object();
+  Okeys[7] = new Object();
+  Okeys[8] = new Object();
+
+  Object *Oval = new Object();
+
+  for (int i = 0; i < 9; i++)
+  {
+    ooMap->add(Okeys[i], Oval);
+    soMap->add(Skeys[i], Oval);
+    ssMap->add(Skeys[i], Sval);
+  }
+
+  assert(ooMap->size() == 9);
+  assert(soMap->size() == 9);
+  assert(ssMap->size() == 9);
+  assert(ooMap->memory_size_ == 32);
+  assert(soMap->memory_size_ == 32);
+  assert(ssMap->memory_size_ == 32);
+
+  for (int i = 0; i < 9; i++)
+  {
+    ooMap->remove(Okeys[i]);
+    soMap->remove(Skeys[i]);
+    ssMap->remove(Skeys[i]);
+  }
+
+  assert(ooMap->size() == 0);
+  assert(soMap->size() == 0);
+  assert(ssMap->size() == 0);
+}
+
 int main()
 {
   test_get();
@@ -255,5 +313,6 @@ int main()
   test_size();
   test_keys();
   test_overwrite();
+  test_rehash();
   return 0;
 }
