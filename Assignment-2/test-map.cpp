@@ -1,282 +1,259 @@
 // lang::CwC
 
+#include "map.h"
 #include "object.h"
-#include "sample_map.h"
 #include "string.h"
+#include "helper.h"
 #include <assert.h>
-#include <stdlib.h>
 
-void test_get() {
-  Map *theMap = ...;
+void test_get()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  String *key = new String("Hello");
-  String *value = new String("World");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
 
-  theMap->set(key, value);
+  ooMap->add(Okey, Oval);
+  soMap->add(Skey, Oval);
+  ssMap->add(Skey, Sval);
 
-  String *str = theMap->get(key);
+  Object *o1 = ooMap->get(Okey);
+  Object *o2 = soMap->get(Skey);
+  String *s1 = ssMap->get(Skey);
 
-  assert(str == value);
-
-  String *wrongKey = new String("Goodbye");
-  Object *result2 = theMap->get(wrongKey);
-  assert(result == nullptr);
-  // str should not change on an invalid lookup
-  assert(str == value);
-}
-
-void test_remove() {
-  Map *theMap = ...;
-
-  String *key = new String("Hello");
-  String *value = new String("World");
-
-  String *key2 = new String("Design");
-  String *value2 = new String("Recipe");
-
-  theMap->set(key, value);
-  theMap->set(key2, value2);
-
-  theMap->remove(key);
-
-  String *str = theMap->get(key);
-  String *str2 = theMap->get(key2);
-
-  // successfully removes one entry
-  assert(str == nullptr);
-  assert(str2 == value2);
+  assert(o1->equals(Oval));
+  assert(o2->equals(Oval));
+  assert(s1->equals(Sval));
 
   String *wrongKey = new String("Goodbye");
-  theMap->remove(wrongKey); // not in map, so no-op (doesn't explode)
+  Object *wrongObj = new Object();
+
+  Object *result1 = ooMap->get(wrongObj);
+  Object *result2 = soMap->get(wrongKey);
+  Object *result3 = ssMap->get(wrongKey);
+
+  assert(result1 == nullptr);
+  assert(result2 == nullptr);
+  assert(result3 == nullptr);
 }
 
-void test_has() {
-  Map *theMap = ...;
+void test_remove()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  String *key = new String("Hello");
-  String *value = new String("World");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
 
-  theMap->set(key, value);
+  ooMap->add(Okey, Oval);
+  soMap->add(Skey, Oval);
+  ssMap->add(Skey, Sval);
 
-  assert(theMap->has(key));
+  ooMap->remove(Okey);
+  soMap->remove(Skey);
+  ssMap->remove(Skey);
 
+  assert(ooMap->size() == 0);
+  assert(soMap->size() == 0);
+  assert(ssMap->size() == 0);
+}
+
+void test_has()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
+
+  Object *Okey = new Object();
+  Object *Oval = new Object();
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
+
+  ooMap->add(Okey, Oval);
+  soMap->add(Skey, Oval);
+  ssMap->add(Skey, Sval);
+
+  assert(ooMap->has(Okey));
+  assert(soMap->has(Skey));
+  assert(ssMap->has(Skey));
+
+  Object *wrongObj = new Object();
   String *wrongKey = new String("Goodbye");
-  assert(!theMap->has(wrongKey));
+  assert(!ooMap->has(wrongObj));
+  assert(!soMap->has(wrongKey));
+  assert(!ssMap->has(wrongKey));
 }
 
-void test_has_set_null() {
-  Map *theMap = ...;
+void test_clear()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  String *key = new String("Hello");
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
+  String *Skey2 = new String("Design");
+  String *Sval2 = new String("Recipe");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
+  Object *Okey2 = new Object();
+  Object *Oval2 = new Object();
 
-  theMap->set(key, nullptr);
-  assert(theMap->has(key));
+  ooMap->add(Okey, Oval);
+  ooMap->add(Okey2, Oval2);
+  soMap->add(Skey, Oval);
+  soMap->add(Skey2, Oval2);
+  ssMap->add(Skey, Sval);
+  ssMap->add(Skey2, Sval2);
 
-  String *s = theMap->get(key);
-  assert(s == nullptr);
-}
+  ooMap->clear();
+  soMap->clear();
+  ssMap->clear();
 
-void test_clear() {
-  Map *theMap = ...;
-
-  String *key = new String("Hello");
-  String *value = new String("World");
-
-  String *key2 = new String("Design");
-  String *value2 = new String("Recipe");
-
-  theMap->set(key, value);
-  theMap->set(key2, value2);
-
-  theMap->clear();
-
-  String *str = theMap->get(key);
-  String *str2 = theMap->get(key2);
+  Object *r1 = ooMap->get(Okey);
+  Object *r2 = ooMap->get(Okey2);
+  Object *r3 = soMap->get(Skey);
+  Object *r4 = soMap->get(Skey2);
+  String *r5 = ssMap->get(Skey);
+  String *r6 = ssMap->get(Skey2);
 
   // successfully clears all entries
-  assert(str == nullptr);
-  assert(str2 == nullptr);
+  assert(r1 == nullptr);
+  assert(r2 == nullptr);
+  assert(r3 == nullptr);
+  assert(r4 == nullptr);
+  assert(r5 == nullptr);
+  assert(r6 == nullptr);
 }
 
-void test_size() {
-  Map *theMap = ...;
+void test_size()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  assert(theMap->size() == 0);
+  assert(ooMap->size() == 0);
+  assert(soMap->size() == 0);
+  assert(ssMap->size() == 0);
 
-  String *key = new String("Hello");
-  String *value = new String("World");
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
 
-  theMap->set(key, value);
-  assert(theMap->size() == 1);
+  ooMap->add(Okey, Oval);
+  soMap->add(Skey, Oval);
+  ssMap->add(Skey, Sval);
 
-  theMap->remove(key);
-  assert(theMap->size() == 0);
+  assert(ooMap->size() == 1);
+  assert(soMap->size() == 1);
+  assert(ssMap->size() == 1);
+
+  ooMap->remove(Okey);
+  soMap->remove(Skey);
+  ssMap->remove(Skey);
+
+  assert(ooMap->size() == 0);
+  assert(soMap->size() == 0);
+  assert(ssMap->size() == 0);
 }
 
-void test_keys() {
-  Map *theMap = ...;
+void test_keys()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  String *key = new String("Hello");
-  String *value = new String("World");
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
+  String *Skey2 = new String("Design");
+  String *Sval2 = new String("Recipe");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
+  Object *Okey2 = new Object();
+  Object *Oval2 = new Object();
 
-  String *key2 = new String("Design");
-  String *value2 = new String("Recipe");
+  ooMap->add(Okey, Oval);
+  ooMap->add(Okey2, Oval2);
+  soMap->add(Skey, Oval);
+  soMap->add(Skey2, Oval2);
+  ssMap->add(Skey, Sval);
+  ssMap->add(Skey2, Sval2);
 
-  theMap->set(key, value);
-  theMap->set(key2, value2);
+  Object **ookeys = new Object *[2];
+  String **sokeys = new String *[2];
+  String **sskeys = new String *[2];
 
-  String **keys = new String *[2];
-  theMap->keys(keys);
+  ooMap->keys(ookeys);
+  soMap->keys(sokeys);
+  ssMap->keys(sskeys);
 
   // the keys array contains both keys in the map, in either order
-  assert(keys[0] == key || keys[1] == key);
-  assert(keys[0] == key2 || keys[1] == key2);
-}
-
-void test_keys_size() {
-  Map *theMap = ...;
-
-  String *s[5] = {
-      new String("1"), new String("2"), new String("3"),
-      new String("4"), new String("5"),
-  };
-
-  for (int i = 0; i < 5; i++) {
-    theMap->set(s[i], nullptr);
-  }
-
-  String *keys[10];
-  for (int i = 0; i < 10; i++)
-    keys[i] = nullptr;
-
-  theMap->keys(keys);
-
-  for (int i = 0; i < 5; i++)
-    assert(keys[i] == s[i]);
-  for (int i = 5; i < 10; i++)
-    assert(keys[i] == nullptr);
+  assert(ookeys[0] == Okey && ookeys[1] == Okey2);
+  assert(sokeys[0] == Skey && sokeys[1] == Skey2);
+  assert(sskeys[0] == Skey && sskeys[1] == Skey2);
 }
 
 // make sure setting a key which was already in the map behaves properly
-void test_overwrite() {
-  Map *theMap = ...;
+void test_overwrite()
+{
+  ObjectObjectMap *ooMap = new ObjectObjectMap();
+  StringObjectMap *soMap = new StringObjectMap();
+  StringStringMap *ssMap = new StringStringMap();
 
-  String *key = new String("Hello");
-  String *value = new String("World");
+  String *Skey = new String("Hello");
+  String *Sval = new String("World");
+  Object *Okey = new Object();
+  Object *Oval = new Object();
 
-  theMap->set(key, value);
+  ooMap->add(Okey, Oval);
+  soMap->add(Skey, Oval);
+  ssMap->add(Skey, Sval);
 
-  String *str = theMap->get(key);
-  assert(str == value);
+  Object *o1 = ooMap->get(Okey);
+  Object *o2 = soMap->get(Skey);
+  String *s1 = ssMap->get(Skey);
 
-  String *value2 = new String("Darkness");
+  assert(o1->equals(Oval));
+  assert(o2->equals(Oval));
+  assert(s1->equals(Sval));
 
-  theMap->set(key, value2);
+  String *Sval2 = new String("Darkness");
+  Object *Oval2 = new Object();
 
-  String *str2 = theMap->get(key);
+  ooMap->set(Okey, Oval2);
+  soMap->set(Skey, Oval2);
+  ssMap->set(Skey, Sval2);
+
+  o1 = ooMap->get(Okey);
+  o2 = soMap->get(Skey);
+  s1 = ssMap->get(Skey);
 
   // the map successfully overwrites values
-  assert(str2 == value2);
+  assert(o1->equals(Oval2));
+  assert(o2->equals(Oval2));
+  assert(s1->equals(Sval2));
   // the map does not delete the old value
-  assert(value);
+  assert(ooMap->has(Okey));
+  assert(soMap->has(Skey));
+  assert(ssMap->has(Skey));
 }
 
-void test_equals_and_hash() {
-  Map *theMap1 = ...;
-  Map *theMap2 = ...;
-
-  assert(theMap1.equals(&theMap2) && theMap2.equals(&theMap1));
-
-  String *key1 = new String("Hello");
-  String *key2 = new String("Hello");
-
-  String *value1 = new String("World");
-  String *value2 = new String("World");
-
-  String *key3 = new String("Design");
-  String *key4 = new String("Design");
-
-  String *value3 = new String("Recipe");
-  String *value4 = new String("Recipe");
-
-  theMap1.set(key1, value1);
-  theMap2.set(key2, value2);
-
-  theMap1.set(key3, value3);
-  theMap2.set(key4, value4);
-
-  // equal maps are equal
-  assert(theMap1.equals(&theMap2) && theMap2.equals(&theMap1));
-
-  theMap1.remove(key1);
-  theMap2.remove(key4);
-  // unequal maps are unequal
-  assert(!theMap1.equals(&theMap2) && !theMap2.equals(&theMap1));
-  // unequal maps have unequal hashes
-  assert(theMap1.hash() != theMap2.hash());
-}
-
-// make sure keys that are .equals equivalent are treated the same,
-// for has, get, set, remove
-void test_keys_extensional() {
-  Map *theMap = ...;
-
-  String *key = new String("Hello");
-  String *value = new String("World");
-
-  String *key2 = new String("Design");
-  String *value2 = new String("Recipe");
-
-  theMap->set(key, value);
-  theMap->set(key2, value2);
-
-  String *sameKey = new String("Hello");
-  String *value3 = new String("Darkness");
-
-  // testing has
-  // make sure the map has both keys
-  assert(theMap->has(key));
-  assert(theMap->has(sameKey));
-
-  // set the value at sameKey, which is extensionally equivalent to key
-  theMap->set(sameKey, value3);
-
-  // make sure the map STILL has both keys
-  assert(theMap->has(key));
-  assert(theMap->has(sameKey));
-
-  String *str = theMap->get(key);
-  String *str2 = theMap->get(sameKey);
-
-  // testing get and set
-  // the values corresponding to the .equals keys are both reference
-  // equivalent strings
-  assert(str == value3);
-  assert(str == str2);
-
-  String *sameKey2 = new String("World");
-  theMap->remove(sameKey2);
-
-  String *str3 = theMap->get(key2);
-  String *str4 = theMap->get(sameKey2);
-
-  // testing remove
-  // both .equals keys are no longer in the map
-  assert(str3 == nullptr);
-  assert(str4 == nullptr);
-}
-
-int main(int argc, char **argv) {
+int main()
+{
   test_get();
   test_remove();
   test_has();
-  test_has_set_null();
   test_clear();
   test_size();
   test_keys();
-  test_keys_size();
   test_overwrite();
-  test_equals_and_hash();
-  test_keys_extensional();
   return 0;
 }
