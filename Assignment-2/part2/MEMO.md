@@ -1,4 +1,4 @@
-<h3> Notes about interactions/working with implementation teams<</h3>
+<h3> Notes about interactions/working with implementation teams</h3>
 
 <p> 
 On Jan. 30, both of the implementation teams reached out to use on Github via submitting an issue. As we had previously worked on implementating Array and through talking to our Array spec teams, we had some ideas about how to incorporate changes to our API which better matched the given specs and were easiest to implement for the implementation teams. 
