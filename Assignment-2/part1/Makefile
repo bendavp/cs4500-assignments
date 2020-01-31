@@ -9,3 +9,6 @@ testQueue:
 testMap:
 	g++ -std=c++11 test-map.cpp
 	./a.out
+
+clean: 
+	rm a.out
