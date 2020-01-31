@@ -2,18 +2,18 @@
 
 </n></n>
 <h2>Array</h2>
-<h4>General overview</h4>
+<h3>General overview</h3>
 <p> The array classes supports arrays of different types (Objects, Strings, Float, Int, Bool) without using any casting which increases efficiency of the implementation. It achieves this by creating separate classes for each data type which gives the user the insurance that there won't be mixed types in any array and the flexibility to pass in literal primitives instead of boxed primitives. This latter point is important as we feel that this is the most natural way that the user will interact with arrays in general.</p>
-</n><h4>Detailed comments on quality</h4>
+</n><h3>Detailed comments on quality</h3>
 <p><b> Documentation quality:</b> The array team was very clear in their documention for the specs and the functionality required for the array. There were no ambiguities about any provided functions, and we knew clearly what was required for implemention from the start.</p>
 <p><b>Responsiveness:</b> The array team was incredibly responsive and helpful as they were very willing to work with us regarding design changes. We submitted issues/PRs about possible design changes which were discussed by both us and the array team together in order to come to a decision about the design we thought was best. Communication with this team was swift and fulfilling. </p>
 <p><b>Test quality:</b> We felt that the array team's tests were not only adequate but went above and beyond with identifying errors in our code as well as made us feel confident that our implementation was robust and aligned with their specs. </p>
 
 </n></n>
 <h2>Queue</h2>
-<h4>General overview</h4>
+<h3>General overview</h3>
 <p> The queue classes supports queues for Strings and Objects without using any casting which like the array classes increases efficiency. The queue classes implements arrays under the hood and uses these arrays in a circular fashion to ensure that we are not unnecessarily wasting memory space or increasing run-time by decreasing or increasing the size of the underlying array.</p>
-</n><h4>Detailed comments on quality</h4>
+</n><h3>Detailed comments on quality</h3>
 <p><b> Documentation quality:</b>The queue team was good as as the specs were not ambiguous; however, we would have highly preferred if they had aligned their naming scheme with typical queue naming schemes. This would have increased the clarity of their function signatures.</p>
 <p><b>Responsiveness:</b> The queue was quite quick to respond. Fortunately and unfortunately, the queue team responded quickly to our first pull request (https://github.com/jeremyeng/cs4500_project/pull/9). However, once we realized that our first PR had design flaws, and we tried to communicate with the team about revising our changes and we felt that the team became unwilling to compromise (https://github.com/jeremyeng/cs4500_project/pull/15). The problem was that when they had pulled our initial changes on Sunday, they did not yet update their tests. As we were discussing the PR, and as I was explaining to them that their tests should match their API, they changed their tests to match a poor API design that would have lent itself to lots of casting and general inefficiency. Because they changed their tests after we had finished implementing an API that we thought was not only better than their latest design, but also matched their tests, our tests now do not match their API, _and_ our API deviates from theirs, even though our current implentation was their original design. </p>
 <p><b>Test quality:</b> The queue team's tests were comprehensive and relatively thorough. We felt that these tests were adequate for bug catching. Please see the above segment about the responsiveness about more on our tests.</p>
@@ -21,9 +21,9 @@
 
 </n></n>
 <h2>Map</h2>
-<h4>General overview</h4>
+<h3>General overview</h3>
 <p>The map classes we implemented support 3 mappings: Object to Object, String to Object, and String to String. We used two arrays, one to store keys and the other to store values. We used an algorithm where the key's hash value modulo the size of the key array at the current time determined where the key and value were placed in both arrays. Keys with colliding hash codes were placed in the next hole (open index) in the key array. We used a load factor of 50% which we felt would increase efficiency by reducing collisions. </p>
-</n><h4> Detailed comments on quality </h4>
+</n><h3> Detailed comments on quality </h3>
 <p><b> Documentation quality:</b> The map team provided acceptable documentation. A couple of their functions were difficult to interpret at first, but through communicating with the map team, we were able to resolve ambiguous signatures.</p>
 <p><b>Responsiveness:</b>Although the map team responded quickly to our queries, we had difficulties reconiciling our design decisions with their decisions. We had made a suggestion to create multiple map classes to support multiple mappings without having to cast (giving the user greater flexibility and increase effiency); however, they refused to compromise on the design (https://github.com/grahamwren/cs4500-assignment_1-part2/pull/7). We decided after consulting with Professor Jan Vitek, that it would be better to implement our design decisions which we feel are not only more efficient but more user-friendly. </p>
 <p><b>Test quality:</b> Their tests seemed comprehensive from a glance for a hypothetical implementation of their design. However, since we deviated from their design, we wrote our own tests loosely based on their's. We felt that our own test were comprehensive. An example of this comprehesion is that our tests helped us identify a bug with the reshashing function. We did note that their tests did not include a test for the reshashing function. </p>
