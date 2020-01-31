@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "object.h"
 #include "string.h"
-#include "Array.h"
+#include "array.h"
 
 //will be called when a test fails
 void fail()
