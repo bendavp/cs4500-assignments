@@ -791,6 +791,4 @@ public:
 
         return -1;
     }
-
-    bool equals(Object *other) = 0;
 };

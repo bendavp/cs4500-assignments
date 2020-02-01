@@ -1,5 +1,5 @@
 ARRAYSPECREPO = https://github.com/bendavp/A1-part2.git
-ARRAYSPECHASH = 87b97bed090b7d35855ed5cad4b7a38d46e93459
+ARRAYSPECHASH = df3ac3993a3930c01d7128a8221f034930812d33
 QUEUESPECREPO = https://github.com/bendavp/cs4500_project.git
 QUEUESPECHASH = 3773bdb1bc40335ff4b62d3663a51c3dd5af0b46
 MAPSPECREPO = https://github.com/bendavp/cs4500-assignment_1-part2.git
