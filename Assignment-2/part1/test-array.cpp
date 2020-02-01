@@ -92,7 +92,7 @@ void objectArrayTest()
     checkTrue(arr2->getElementAt(0)->equals(o6));
     checkTrue(arr2->getElementAt(1)->equals(o1));
     checkTrue(arr2->getElementAt(2)->equals(o2));
-    checkTrue(arr1->indexOf(o2) == 2);
+    checkTrue(arr1->indexOf(o2) == 1);
     checkTrue(arr2->getElementAt(3)->equals(o4));
     checkTrue(arr2->getElementAt(4)->equals(o5));
 
@@ -100,7 +100,7 @@ void objectArrayTest()
     checkTrue(arr2->getSize() == 5);
     checkTrue(arr2->getElementAt(0)->equals(o6));
     checkTrue(arr2->getElementAt(1)->equals(o1));
-    checkTrue(arr2->indexOf(o1) == 2);
+    checkTrue(arr2->indexOf(o1) == 1);
 
     arr2->remove(0);
     checkTrue(arr2->getSize() == 4);
@@ -120,9 +120,6 @@ void objectArrayTest()
     arr2->insertAtEnd(o3);
     checkTrue(arr2->getSize() == 1);
     checkTrue(arr2->getElementAt(0)->equals(o3));
-
-    delete arr1;
-    delete arr2;
 }
 
 void stringArrayTest()
@@ -168,9 +165,6 @@ void stringArrayTest()
     checkTrue(sRemoved->equals(s4));
     checkTrue(strArr->getSize() == 4);
     checkTrue(strArr->getElementAt(1)->equals(s5));
-
-    delete strArr;
-    delete strArr2;
 }
 
 void intArrayTest()

@@ -36,7 +36,6 @@ public:
             temp[i] = arr_[i];
         }
 
-        delete arr_;
         arr_ = temp;
     }
 
@@ -109,7 +108,6 @@ public:
     //clear Array
     void clear()
     {
-        delete arr_;
         memory_size_ = 16;
         arr_ = new Object *[memory_size_];
         size_ = 0;
@@ -124,10 +122,8 @@ public:
 
         for (int i = index; i < size_ - 1; i++)
         {
-            arr_[index] = arr_[index + 1];
+            arr_[i] = arr_[i + 1];
         }
-
-        delete arr_[size_ - 1];
 
         size_--;
 
@@ -195,7 +191,6 @@ public:
             temp[i] = arr_[i];
         }
 
-        delete arr_;
         arr_ = temp;
     }
 
@@ -268,7 +263,6 @@ public:
     //clear Array
     void clear()
     {
-        delete arr_;
         memory_size_ = 16;
         arr_ = new String *[memory_size_];
         size_ = 0;
@@ -283,10 +277,8 @@ public:
 
         for (int i = index; i < size_ - 1; i++)
         {
-            arr_[index] = arr_[index + 1];
+            arr_[i] = arr_[i + 1];
         }
-
-        delete arr_[size_ - 1];
 
         size_--;
 
@@ -354,7 +346,6 @@ public:
             temp[i] = arr_[i];
         }
 
-        delete arr_;
         arr_ = temp;
     }
 
@@ -427,7 +418,6 @@ public:
     //clear Array
     void clear()
     {
-        delete arr_;
         memory_size_ = 16;
         arr_ = new float[memory_size_];
         size_ = 0;
@@ -442,7 +432,7 @@ public:
 
         for (int i = index; i < size_ - 1; i++)
         {
-            arr_[index] = arr_[index + 1];
+            arr_[i] = arr_[i + 1];
         }
 
         size_--;
@@ -511,7 +501,6 @@ public:
             temp[i] = arr_[i];
         }
 
-        delete arr_;
         arr_ = temp;
     }
 
@@ -584,7 +573,6 @@ public:
     //clear Array
     void clear()
     {
-        delete arr_;
         memory_size_ = 16;
         arr_ = new int[memory_size_];
         size_ = 0;
@@ -599,7 +587,7 @@ public:
 
         for (int i = index; i < size_ - 1; i++)
         {
-            arr_[index] = arr_[index + 1];
+            arr_[i] = arr_[i + 1];
         }
 
         size_--;
@@ -668,7 +656,6 @@ public:
             temp[i] = arr_[i];
         }
 
-        delete arr_;
         arr_ = temp;
     }
 
@@ -741,7 +728,6 @@ public:
     //clear Array
     void clear()
     {
-        delete arr_;
         memory_size_ = 16;
         arr_ = new bool[memory_size_];
         size_ = 0;
@@ -756,7 +742,7 @@ public:
 
         for (int i = index; i < size_ - 1; i++)
         {
-            arr_[index] = arr_[index + 1];
+            arr_[i] = arr_[i + 1];
         }
 
         size_--;
