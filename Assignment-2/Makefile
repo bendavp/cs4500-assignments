@@ -1,9 +1,9 @@
 ARRAYSPECREPO = https://github.com/bendavp/A1-part2.git
-ARRAYSPECHASH = 53f149e9e3caa7f8cfc5431cb3ddb711b445485c
+ARRAYSPECHASH = df3ac3993a3930c01d7128a8221f034930812d33
 QUEUESPECREPO = https://github.com/bendavp/cs4500_project.git
 QUEUESPECHASH = 3773bdb1bc40335ff4b62d3663a51c3dd5af0b46
 MAPSPECREPO = https://github.com/bendavp/cs4500-assignment_1-part2.git
-MAPSPECHASH = e697ea613d9c0de891f0b44bff8916b21f3dd5f4
+MAPSPECHASH = 96aac2b9673a64cf599fa4166dfdf80bf6a3966c
 
 run: dircheck
 	- make first
@@ -15,7 +15,7 @@ first:
 	- rm -rf ./part1/test-array
 	git clone $(ARRAYSPECREPO) ./part1/test-array
 	cd ./part1/test-array; git checkout $(ARRAYSPECHASH)
-	cd ./part1; cp array.h queue.h map.h string.h object.h Makefile ./test-array 
+	cd ./part1; cp array.h queue.h map.h string.h object.h helper.h Makefile ./test-array 
 #	TODO: cp anything else to compile and run e.g. googletests? my-tests.cpp edited-tests.cpp 
 	- docker run -ti -v `pwd`:/test cs4500:0.1 bash -c "cd /test/part1/test-array ; make testArray"
 
@@ -24,7 +24,7 @@ second:
 	- rm -rf ./part1/test-queue
 	git clone $(QUEUESPECREPO) ./part1/test-queue
 	cd ./part1/test-queue; git checkout $(QUEUESPECHASH)
-	cd ./part1; cp array.h queue.h map.h string.h object.h Makefile ./test-queue 
+	cd ./part1; cp array.h queue.h map.h string.h object.h helper.h Makefile ./test-queue 
 #	TODO: cp anything else to compile and run e.g. googletests? my-tests.cpp edited-tests.cpp 
 	- docker run -ti -v `pwd`:/test cs4500:0.1 bash -c "cd /test/part1/test-queue ; make testQueue"
 
@@ -33,7 +33,7 @@ third:
 	- rm -rf ./part1/test-map
 	git clone $(MAPSPECREPO) ./part1/test-map
 	cd ./part1/test-map; git checkout $(MAPSPECHASH)
-	cd ./part1; cp array.h queue.h map.h string.h object.h Makefile ./test-map
+	cd ./part1; cp array.h queue.h map.h string.h object.h helper.h Makefile ./test-map
 #	TODO: cp anything else to compile and run e.g. googletests? my-tests.cpp edited-tests.cpp 
 	- docker run -ti -v `pwd`:/test cs4500:0.1 bash -c "cd /test/part1/test-map ; make testMap"
 
