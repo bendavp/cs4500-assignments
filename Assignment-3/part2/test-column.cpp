@@ -156,6 +156,43 @@ void testGetType()
 // tests the print() function in all columns
 void testPrint()
 {
+    BoolColumn *b1 = new BoolColumn(true, false);
+    BoolColumn *b2 = new BoolColumn(true, NULL);
+    const char *bool1 = " 1 \n 0 \n\0";
+    const char *bool2 = " 1 \n  \n\0";
+
+    IntColumn *i1 = new IntColumn(1, -2);
+    IntColumn *i2 = new IntColumn(1, NULL);
+    const char *int1 = " +1 \n -2 \n\0";
+    const char *int2 = " +1 \n  \n\0";
+
+    FloatColumn *f1 = new FloatColumn(1.0, -2.0);
+    FloatColumn *f2 = new FloatColumn(1.0, NULL);
+    const char *float1 = " +1.0 \n -2.0 \n\0";
+    const char *float2 = " +1.0 \n  \n\0";
+
+    StringColumn *s1 = new StringColumn("hello", "world");
+    StringColumn *s2 = new StringColumn("hello", nullptr);
+    const char *string1 = " hello \n world \n\0";
+    const char *string2 = " hello \n  \n\0";
+
+    assert(strcmp(b1->print(), bool1) == 0);
+    assert(strcmp(b2->print(), bool2) == 0);
+    assert(strcmp(i1->print(), int1) == 0);
+    assert(strcmp(i2->print(), int2) == 0);
+    assert(strcmp(f1->print(), float1) == 0);
+    assert(strcmp(f2->print(), float2) == 0);
+    assert(strcmp(s1->print(), string1) == 0);
+    assert(strcmp(s2->print(), string2) == 0);
+
+    delete b1;
+    delete b2;
+    delete i1;
+    delete i2;
+    delete f1;
+    delete f2;
+    delete s1;
+    delete s2;
 }
 
 // tests the subset() function in all columns
