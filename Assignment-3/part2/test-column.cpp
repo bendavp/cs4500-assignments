@@ -167,7 +167,7 @@ void testPrint()
     const char *int2 = " +1 \n  \n\0";
 
     FloatColumn *f1 = new FloatColumn(1.0, -2.0);
-    FloatColumn *f2 = new FloatColumn(1.0, NULL);
+    FloatColumn *f2 = new FloatColumn(1.0, NaN);
     const char *float1 = " +1.0 \n -2.0 \n\0";
     const char *float2 = " +1.0 \n  \n\0";
 
@@ -310,10 +310,10 @@ void testIsMissing()
     IntColumn *i3 = new IntColumn(1, NULL);
     IntColumn *i4 = new IntColumn(NULL);
 
-    FloatColumn *f1 = new FloatColumn(1.0, NULL, 2.0);
-    FloatColumn *f2 = new FloatColumn(NULL, 1.0);
-    FloatColumn *f3 = new FloatColumn(1.0, NULL);
-    FloatColumn *f4 = new FloatColumn(NULL);
+    FloatColumn *f1 = new FloatColumn(1.0, NaN, 2.0);
+    FloatColumn *f2 = new FloatColumn(NaN, 1.0);
+    FloatColumn *f3 = new FloatColumn(1.0, NaN);
+    FloatColumn *f4 = new FloatColumn(NaN);
 
     StringColumn *s1 = new StringColumn("hello", nullptr, "world");
     StringColumn *s2 = new StringColumn(nullptr, "world");

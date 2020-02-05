@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include "string.h"
+#include <math.h>
 
 /**
  * @brief Column class. Represents a unified type for the 4 column subclasses
@@ -55,14 +56,6 @@ public:
      * @param other The Object to be compared to this Column
      */
     virtual bool equals(Object *other) {}
-
-    /**
-     * @brief Get the Column type
-     * 
-     * @note Column class is not meant to be a standalone class, thus this function
-     * should always terminate
-     */
-    virtual String *getType() {}
 
     /**
      * @brief gets a (printable) char* that contains information about this Column
@@ -153,10 +146,25 @@ public:
      * @brief checks if the element at the given index in this BoolColumn is missing
      * 
      * @param idx the index at which to check for a missing element
-     * @return true if the element at the given index is missing
-     * @return false if the element at the given index is NOT missing
+     * @return true if the element at the given index is NULL
+     * @return false if the element at the given index is NOT NULL
      */
     bool isMissing(size_t idx) {}
+
+    /**
+     * @brief removes an element from the BoolColumn
+     *  
+     */
+    void remove() {}
+
+    /**
+     * @brief checks if the current BoolColumn has no elements in it 
+     * (missing elements are still elements, therefore a BoolColumn with only missing elements is NOT empty)
+     * 
+     * @return true if there are no elements
+     * @return false if there is at least one element
+     */
+    bool isEmpty() {}
 };
 
 /**
@@ -239,10 +247,25 @@ public:
      * @brief checks if the element at the given index in this IntColumn is missing
      * 
      * @param idx the index at which to check for a missing element
-     * @return true if the element at the given index is missing
-     * @return false if the element at the given index is NOT missing
+     * @return true if the element at the given index is NULL
+     * @return false if the element at the given index is NOT NULL
      */
     bool isMissing(size_t idx) {}
+
+    /**
+     * @brief removes an element from the IntColumn
+     *  
+     */
+    void remove() {}
+
+    /**
+     * @brief checks if the current IntColumn has no elements in it 
+     * (missing elements are still elements, therefore an IntColumns with only missing elements is NOT empty)
+     * 
+     * @return true if there are no elements
+     * @return false if there is at least one element
+     */
+    bool isEmpty() {}
 };
 
 /**
@@ -325,10 +348,25 @@ public:
      * @brief checks if the element at the given index in this FloatColumn is missing
      * 
      * @param idx the index at which to check for a missing element
-     * @return true if the element at the given index is missing
-     * @return false if the element at the given index is NOT missing
+     * @return true if the element at the given index is NaN
+     * @return false if the element at the given index is NOT NaN
      */
     bool isMissing(size_t idx) {}
+
+    /**
+     * @brief removes an element from the FloatColumn
+     *  
+     */
+    void remove() {}
+
+    /**
+     * @brief checks if the current FloatColumn has no elements in it
+     * (missing elements are still elements, therefore an FloatColumns with only missing elements is NOT empty)
+     * 
+     * @return true if there are no elements
+     * @return false if there is at least one element
+     */
+    bool isEmpty() {}
 };
 
 /**
@@ -411,8 +449,23 @@ public:
      * @brief checks if the element at the given index in this StringColumn is missing
      * 
      * @param idx the index at which to check for a missing element
-     * @return true if the element at the given index is missing
-     * @return false if the element at the given index is NOT missing
+     * @return true if the element at the given index is nullptr
+     * @return false if the element at the given index is NOT nullptr
      */
     bool isMissing(size_t idx) {}
+
+    /**
+     * @brief removes an element from the StringColumn
+     *  
+     */
+    void remove() {}
+
+    /**
+     * @brief checks if the current StringColumn has no elements in it
+     * (missing elements are still elements, therefore an StringColumns with only missing elements is NOT empty)
+     * 
+     * @return true if there are no elements
+     * @return false if there is at least one element
+     */
+    bool isEmpty() {}
 };
