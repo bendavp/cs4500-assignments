@@ -85,6 +85,7 @@ public:
     /**
      * @brief Construct a new Bool Column object
      * 
+     * @note takes a variable number of bools
      */
     BoolColumn() : Column() {}
 
@@ -139,6 +140,23 @@ public:
      * @return BoolColumn* the subset of this BoolColumn
      */
     BoolColumn *subset(size_t idx1, size_t idx2) {}
+
+    /**
+     * @brief gets the bool at the given index in this BoolColumn
+     * 
+     * @param idx the index at which to get the bool
+     * @return bool the bool at the given index
+     */
+    bool get(size_t idx) {}
+
+    /**
+     * @brief checks if the element at the given index in this BoolColumn is missing
+     * 
+     * @param idx the index at which to check for a missing element
+     * @return true if the element at the given index is missing
+     * @return false if the element at the given index is NOT missing
+     */
+    bool isMissing(size_t idx) {}
 };
 
 /**
@@ -153,6 +171,7 @@ public:
     /**
      * @brief Construct a new IntColumn object
      * 
+     * @note takes a variable number of ints
      */
     IntColumn() : Column() {}
 
@@ -207,6 +226,23 @@ public:
      * @return IntColumn* the subset of this IntColumn
      */
     IntColumn *subset(size_t idx1, size_t idx2) {}
+
+    /**
+     * @brief gets the int at the given index in this IntColumn
+     * 
+     * @param idx the index at which to get the int
+     * @return int the int at the given index
+     */
+    int get(size_t idx) {}
+
+    /**
+     * @brief checks if the element at the given index in this IntColumn is missing
+     * 
+     * @param idx the index at which to check for a missing element
+     * @return true if the element at the given index is missing
+     * @return false if the element at the given index is NOT missing
+     */
+    bool isMissing(size_t idx) {}
 };
 
 /**
@@ -221,6 +257,7 @@ public:
     /**
      * @brief Construct a new FloatColumn object
      * 
+     * @note takes a variable number of floats
      */
     FloatColumn() : Column() {}
 
@@ -275,6 +312,23 @@ public:
      * @return FloatColumn* the subset of this FloatColumn
      */
     FloatColumn *subset(size_t idx1, size_t idx2) {}
+
+    /**
+     * @brief gets the float at the given index in this FloatColumn
+     * 
+     * @param idx the index at which to get the float
+     * @return float the float at the given index
+     */
+    float get(size_t idx) {}
+
+    /**
+     * @brief checks if the element at the given index in this FloatColumn is missing
+     * 
+     * @param idx the index at which to check for a missing element
+     * @return true if the element at the given index is missing
+     * @return false if the element at the given index is NOT missing
+     */
+    bool isMissing(size_t idx) {}
 };
 
 /**
@@ -289,6 +343,7 @@ public:
     /**
      * @brief Construct a new StringColumn object
      * 
+     * @note takes a variable number of Strings
      */
     StringColumn() : Column() {}
 
@@ -343,4 +398,21 @@ public:
      * @return StringColumn* the subset of this StringColumn
      */
     StringColumn *subset(size_t idx1, size_t idx2) {}
+
+    /**
+     * @brief gets the String at the given index in this StringColumn
+     * 
+     * @param idx the index at which to get the String
+     * @return String* the String at the given index
+     */
+    String *get(size_t idx) {}
+
+    /**
+     * @brief checks if the element at the given index in this StringColumn is missing
+     * 
+     * @param idx the index at which to check for a missing element
+     * @return true if the element at the given index is missing
+     * @return false if the element at the given index is NOT missing
+     */
+    bool isMissing(size_t idx) {}
 };
