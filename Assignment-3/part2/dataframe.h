@@ -17,6 +17,7 @@ class Dataframe : public Object {
 public:
     // constructors
     Dataframe() : Object() {}
+    Dataframe(Column *n, ...) : Object() {} 
     Dataframe(Dataframe *df) : Object() {}
     ~Dataframe() {}
     
@@ -108,12 +109,31 @@ public:
      */
     size_t ncol(){}
 
-    void append(void*){}
+    /**
+     * @brief Appends a row of columns to the end of the dataframe (most bottom). If the columns being added to an
+     * non-empty dataframe are not of the same type as the existing or there is number, then the execution will be aborted. 
+     * 
+     * @param n 
+     * @param ... - va_list of columns to be appended
+     */
+    void append(Column *n, ...){}
+
+    /**
+     * @brief Appends a row of columns at the row of the specified index, ridx. The rows under the specified index will be pushed
+     * downwards. If the columns being added to an non-empty dataframe are not of the same type as the existing or there is 
+     * number, then the execution will be aborted. 
+     * 
+     * @param ridx - the row index that the columns will be appended to. 
+     * @param n - 
+     * @param ... - va_list of columns to be appended
+     */
+    void appendAt(size_t ridx, Column *n, ...){}
 
     /**
      * @brief adds a IntColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
      * of the existing dataframe and the dataframe is not empty. 
      * 
+     * @param IntColumn - column type of IntColumn
      */
     void insertIntCol(IntColumn *icol){}
 
@@ -122,7 +142,7 @@ public:
      * of the existing dataframe and the dataframe is not empty. 
      * 
      */
-    void insertIntCol(IntColumn *icol, size_t cidx){}
+    void insertIntColAt(IntColumn *icol, size_t cidx){}
 
     /**
      * @brief adds a FloatColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -136,7 +156,7 @@ public:
      * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
      * 
      */
-    void insertFloatCol(FloatColumn *fcol, size_t cidx){}
+    void insertFloatColAt(FloatColumn *fcol, size_t cidx){}
 
     /**
      * @brief adds a BoolColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -150,7 +170,7 @@ public:
      * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
      * 
      */
-    void insertBoolCol(BoolColumn *bcol, size_t cidx){}
+    void insertBoolColAt(BoolColumn *bcol, size_t cidx){}
 
     /**
      * @brief adds a StringColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -164,7 +184,7 @@ public:
      * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
      * 
      */
-    void insertStringCol(StringColumn *scol, size_t cidx){}
+    void insertStringColAt(StringColumn *scol, size_t cidx){}
 
     /**
      * @brief prints out the dataframe in the shape of the dataframe; separating columns via tab-delimited format to keep
@@ -274,10 +294,10 @@ public:
     /**
      * @brief Get a subset of the Dataframe by the specified start and end row and col indicies
      * 
-     * @param size_t ridx1 - beginning row index, inclusive
-     * @param size_t ridx2 - end row index, non-inclusive
-     * @param size_t cidx1 - beginning col index, inclusive
-     * @param size_t cidx2 - end col index, non-inclusive
+     * @param ridx1 - beginning row index, inclusive
+     * @param ridx2 - end row index, non-inclusive
+     * @param cidx1 - beginning col index, inclusive
+     * @param cidx2 - end col index, non-inclusive
      *
      * @return Dataframe* that is a subset of this dataframe with the specifications
      */
@@ -297,14 +317,14 @@ public:
     /**
      * @brief Deletes a row at the specificied index, ridx. All rows under the deleted row will effectively move upwards.
      * 
-     * @param size_t - ridx, the row that will deleted (this is the actual index, i.e. 0, 1, etc.)
+     * @param ridx - ridx, the row that will deleted (this is the actual index, i.e. 0, 1, etc.)
      */
     void delete_row(size_t ridx){}
 
     /**
      * @brief Deletes a column at the specified index, cidx. All columns to the right of it will move leftwards. 
      * 
-     * @param size_t - cidx, the column that will be deleted (this is the actual index, i.e. 0, 1, etc.)
+     * @param cidx - cidx, the column that will be deleted (this is the actual index, i.e. 0, 1, etc.)
      */
     void delete_col(size_t cidx){} 
 
