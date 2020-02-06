@@ -15,10 +15,31 @@
  */
 class Dataframe : public Object {
 public:
-    // constructors
+    /**
+     * @brief Construct a new Dataframe object
+     * 
+     */
     Dataframe() : Object() {}
+
+    /**
+     * @brief Construct a new Dataframe object
+     * 
+     * @param n 
+     * @param ... Columns that will be taken in
+     */
     Dataframe(Column *n, ...) : Object() {} 
+
+    /**
+     * @brief Construct a new Dataframe object. Copy construcor
+     * 
+     * @param df - the dataframe to be copied
+     */
     Dataframe(Dataframe *df) : Object() {}
+
+    /**
+     * @brief Destroy the Dataframe object
+     * 
+     */
     ~Dataframe() {}
     
     /**
