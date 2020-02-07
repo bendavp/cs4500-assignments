@@ -38,6 +38,12 @@ public:
         str_[0] = '\0';
     }
 
+    String(String *other)
+    {
+        size_ = other->size();
+        str_ = other->str_;
+    }
+
     ~String()
     {
         delete[] str_;

@@ -13,18 +13,19 @@ void testGet()
     String *s2 = new String("gg");
     String *s3 = new String("ez");
     // test pulling from different cells
-    assert(*df->getInt(0, 0) == 2);
+    size_t zero = 0;
+    assert(*df->getInt(zero, zero) == 2);
     assert(*df->getInt(0, 1) == 3);
     assert(*df->getInt(0, 2) == 4);
-    assert(df->getString(1, 0)->equals(s1);
+    assert(df->getString(1, 0)->equals(s1));
     assert(df->getString(1, 1)->equals(s2));
     assert(df->getString(1, 2)->equals(s3));
     assert(*df->getBool(2, 0) == true);
     assert(*df->getBool(2, 1) == false);
     assert(*df->getBool(2, 2) == true);
-    assert(abs(*df->getFloat(0, 3) - 1.2) < 0.01);
-    assert(abs(*df->getFloat(1, 3) - 42.4) < 0.01);
-    assert(abs(*df->getFloat(2, 3) - 666.6) < 0.01);
+    assert(*df->getFloat(0, 3) - 1.2 < 0.01);
+    assert(*df->getFloat(1, 3) - 42.4 < 0.01);
+    assert(*df->getFloat(2, 3) - 666.6 < 0.01);
 
     // rename rows and columns
     df->rename_row(0, new String("row1"));
@@ -35,18 +36,18 @@ void testGet()
     df->rename_col(2, new String("col3"));
     df->rename_col(3, new String("col4"));
     // tests pulling out these same values again with column/row names
-    assert(df->getInt(new String("row1"), new String("col1")) == 2);
-    assert(df->getInt(new String("row2"),new String("col1")) == 3);
-    assert(df->getInt(new String("row3"),new String("col1")) == 4);
-    assert(df->getString(new String("row1"), new String("col2"))->equals(s1);
+    assert(*df->getInt(new String("row1"), new String("col1")) == 2);
+    assert(*df->getInt(new String("row2"), new String("col1")) == 3);
+    assert(*df->getInt(new String("row3"), new String("col1")) == 4);
+    assert(df->getString(new String("row1"), new String("col2"))->equals(s1));
     assert(df->getString(new String("row2"), new String("col2"))->equals(s2));
     assert(df->getString(new String("row3"), new String("col2"))->equals(s3));
-    assert(df->getBool(new String("row1"), new String("col3")) == true);
-    assert(df->getBool(new String("row2"), new String("col3")) == false);
-    assert(df->getBool(new String("row3"), new String("col3")) == true);
-    assert(df->getFloat(new String("row1"), new String("col4")) == 1.2);
-    assert(df->getFloat(new String("row2"), new String("col4")) == 42.4);
-    assert(df->getFloat(new String("row3"), new String("col4")) == 666.6);
+    assert(*df->getBool(new String("row1"), new String("col3")) == true);
+    assert(*df->getBool(new String("row2"), new String("col3")) == false);
+    assert(*df->getBool(new String("row3"), new String("col3")) == true);
+    assert(*df->getFloat(new String("row1"), new String("col4")) == 1.2);
+    assert(*df->getFloat(new String("row2"), new String("col4")) == 42.4);
+    assert(*df->getFloat(new String("row3"), new String("col4")) == 666.6);
 
     delete df;
     delete s1;
@@ -74,26 +75,27 @@ void testSet()
     assert(*df->getInt(0, 2) == 4);
     assert(df->getString(1, 2)->equals(s3));
     assert(*df->getBool(2, 0) == true);
-    assert(abs(*df->getFloat(3, 0)) == 1.2);
+    assert(*df->getFloat(3, 0) == 1.2);
 
+    size_t zero = 0;
     // set the cells to new values via positional indicies
-    df->setInt(0, 0, new int(111));
+    df->setInt(zero, zero, new int(111));
     df->setInt(2, 0, new int(4));
     df->setString(1, 1, s1);
     df->setBool(2, 2, new bool(false));
     df->setFloat(2, 3, new float(1.45));
     // check that these cells changed as expected
-    assert(*df->getInt(0, 0) == 111);
+    assert(*df->getInt(zero, zero) == 111);
     assert(*df->getInt(2, 0) == 4);
     assert(df->getString(1, 1)->equals(s2));
     assert(*df->getBool(2, 2) == false);
-    assert(abs(*df->getFloat(2, 3) - 1.45) < 0.01);
+    assert(*df->getFloat(2, 3) - 1.45 < 0.01);
 
     // rename rows and columns
     df->rename_row(0, new String("row1"));
     df->rename_row(1, new String("row2"));
     df->rename_row(2, new String("row3"));
-    df->rename_row(3, 'row4');
+    df->rename_row(3, new String("row4"));
     df->rename_col(0, new String("col1"));
     df->rename_col(1, new String("col2"));
     df->rename_col(2, new String("col3"));
@@ -105,11 +107,11 @@ void testSet()
     df->setBool(new String("row2"), new String("col3"), new bool(true));
     df->setFloat(new String("row3"), new String("col4"), new float(1.85));
     // check that the cells changed as expected
-    assert(*df->get(new String("row1"), new String("col1")) == 1111);
-    assert(*df->get(new String("row2"), new String("col1")) == 44);
-    assert(df->get(new String("row3"), new String("col2"))->equals(s4));
-    assert(*df->get(new String("row2"), new String("col3")) == true);
-    assert(abs(*df->get(new String("row3"), new String("col4")) - 1.85) < 0.01);
+    assert(*df->getInt(new String("row1"), new String("col1")) == 1111);
+    assert(*df->getInt(new String("row2"), new String("col1")) == 44);
+    assert(df->getString(new String("row3"), new String("col2"))->equals(s4));
+    assert(*df->getBool(new String("row2"), new String("col3")) == true);
+    assert(*df->getFloat(new String("row3"), new String("col4")) - 1.85 < 0.01);
 
     delete df;
     delete s2;
@@ -161,7 +163,7 @@ void testSizesandShapes()
     assert(df->shape()->equals(a));
 
     // check empty array
-    Dataframe df1 = new Dataframe();
+    Dataframe *df1 = new Dataframe();
     assert(df->size() == 0);
     IntArray *a1 = new IntArray();
     a1->insertAtEnd(0);
@@ -188,24 +190,25 @@ void testRowColInfo()
     Column *f = new FloatColumn(3, new float(1.2), new float(42.4), new float(666.6));
     Dataframe *df = new Dataframe(4, n, s, b, f);
 
+    size_t zero = 0;
     // get col types by positonal index
-    assert(df->getColType(0)->equals(s_int));
+    assert(df->getColType(zero)->equals(s_int));
     assert(df->getColType(1)->equals(s_str));
-    assert(df->getColType(2)->equals(s_f);
+    assert(df->getColType(2)->equals(s_f));
     assert(df->getColType(3)->equals(s_bool));
 
     // get names of rows
     StringArray *cols = new StringArray();
-    cols->insertAtEnd(new String('0'));
-    cols->insertAtEnd(new String('1'));
-    cols->insertAtEnd(new String('2'));
-    cols->insertAtEnd(new String('3'));
+    cols->insertAtEnd(new String("0"));
+    cols->insertAtEnd(new String("1"));
+    cols->insertAtEnd(new String("2"));
+    cols->insertAtEnd(new String("3"));
     StringArray *rows = new StringArray();
-    rows->insertAtEnd(new String('0'));
-    rows->insertAtEnd(new String('1'));
-    rows->insertAtEnd(new String('2'));
+    rows->insertAtEnd(new String("0"));
+    rows->insertAtEnd(new String("1"));
+    rows->insertAtEnd(new String("2"));
     assert(df->getRowNames()->equals(rows));
-    assert(df->getColsNames()->equals(cols));
+    assert(df->getColNames()->equals(cols));
 
     // rename rows and columns
     df->rename_row(0, new String("row1"));
@@ -214,7 +217,7 @@ void testRowColInfo()
     df->rename_col(0, new String("col1"));
     df->rename_col(1, new String("col2"));
     df->rename_col(2, new String("col3"));
-    df->rename_col(3, new String('col4'));
+    df->rename_col(3, new String("col4"));
     StringArray *cols1 = new StringArray();
     cols1->insertAtEnd(new String(new String("col1")));
     cols1->insertAtEnd(new String(new String("col2")));
@@ -225,17 +228,17 @@ void testRowColInfo()
     rows->insertAtEnd(new String(new String("row2")));
     rows->insertAtEnd(new String(new String("row3")));
     assert(df->getRowNames()->equals(rows1));
-    assert(df->getColsNames()->equals(cols1));
+    assert(df->getColNames()->equals(cols1));
 
     // get col types by referrable index
     assert(df->getColType(new String("col1"))->equals(s_int));
     assert(df->getColType(new String("col2"))->equals(s_str));
-    assert(df->getColType(new String("col3"))->equals(s_f);
+    assert(df->getColType(new String("col3"))->equals(s_f));
     assert(df->getColType(new String("col4"))->equals(s_bool));
 
     // check col types after changing them
     df->delete_col(2);
-    assert(df->getColType(0)->equals(s_int));
+    assert(df->getColType(zero)->equals(s_int));
     assert(df->getColType(1)->equals(s_str));
     assert(df->getColType(2)->equals(s_bool));
 
@@ -366,7 +369,7 @@ void testInsert()
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
     // check inserting columns in middle
-    df->insertIntBoolAt(1, b);
+    df->insertBoolColAt(1, b);
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
     // clear df
@@ -387,16 +390,16 @@ void testDelete()
 
     // get names of rows
     StringArray *cols = new StringArray();
-    cols->insertAtEnd(new String('0'));
-    cols->insertAtEnd(new String('1'));
-    cols->insertAtEnd(new String('2'));
-    cols->insertAtEnd(new String('3'));
+    cols->insertAtEnd(new String("0"));
+    cols->insertAtEnd(new String("1"));
+    cols->insertAtEnd(new String("2"));
+    cols->insertAtEnd(new String("3"));
     StringArray *rows = new StringArray();
-    rows->insertAtEnd(new String('0'));
-    rows->insertAtEnd(new String('1'));
-    rows->insertAtEnd(new String('2'));
-    rows->insertAtEnd(new String('3'));
-    rows->insertAtEnd(new String('4'));
+    rows->insertAtEnd(new String("0"));
+    rows->insertAtEnd(new String("1"));
+    rows->insertAtEnd(new String("2"));
+    rows->insertAtEnd(new String("3"));
+    rows->insertAtEnd(new String("4"));
 
     StringArray *cols1 = new StringArray();
     cols1->insertAtEnd(new String(new String("col1")));
@@ -410,13 +413,14 @@ void testDelete()
 
     // check row and col names
     assert(df->getRowNames()->equals(rows));
-    assert(df->getColsNames()->equals(cols));
+    assert(df->getColNames()->equals(cols));
 
+    size_t zero = 0;
     // delete a row by index
-    df->delete_row(0);
+    df->delete_row(zero);
     rows->remove(0);
     assert(df->getRowNames()->equals(rows));
-    assert(df->getColsNames()->equals(cols));
+    assert(df->getColNames()->equals(cols));
 
     // delete a row by referrable index
     // rename rows and columns
@@ -428,13 +432,13 @@ void testDelete()
     df->delete_row('row2');
     rows1->remove(1);
     assert(df->getRowNames()->equals(rows));
-    assert(df->getColsNames()->equals(cols));
+    assert(df->getColNames()->equals(cols));
 
     // delete col by index
     df->delete_col(2);
     cols->remove(2);
     assert(df->getRowNames()->equals(rows1));
-    assert(df->getColsNames()->equals(cols));
+    assert(df->getColNames()->equals(cols));
 
     // delete a col by  referrable index
     df->rename_col(0, new String("col1"));
@@ -443,7 +447,7 @@ void testDelete()
     df->delete_col('col2');
     cols->remove(1);
     assert(df->getRowNames()->equals(rows1));
-    assert(df->getColsNames()->equals(cols1));
+    assert(df->getColNames()->equals(cols1));
 
     delete df;
     delete cols;
@@ -489,7 +493,7 @@ void testSubset()
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
     Column *b = new BoolColumn(3, new bool(true), new bool(false), new bool(true));
     Column *f = new FloatColumn(3, new float(1.2), new float(42.4), new float(666.6));
-    Datarame *df = new Dataframe(4, n, s, b, f);
+    Dataframe *df = new Dataframe(4, n, s, b, f);
 
     Column *n2 = new IntColumn(4, new int(2), new int(3), new int(4), new int(5));
     Column *s2 = new StringColumn(4, new String("s"), new String("gg"), new String("ez"), new String("hello"));
@@ -519,9 +523,9 @@ void testPrinting()
     df->rename_col(1, new String("col2"));
     df->rename_col(2, new String("col3"));
 
-    const char *output = 'index\tcol1\tcol2\tcol3\t3\nrow1\t2\ts\ttrue\t-\nrow2\t-\tgg\tfalse\t1.2\n\trow3\t3\tez\t-\t42.2\n\t3\t4\t-\ttrue\t666.6'
+    const char *output = "index\tcol1\tcol2\tcol3\t3\nrow1\t2\ts\ttrue\t-\nrow2\t-\tgg\tfalse\t1.2\n\trow3\t3\tez\t-\t42.2\n\t3\t4\t-\ttrue\t666.6";
 
-        assert(strcmp(df->print(), output) == 0);
+    assert(strcmp(df->print(), output) == 0);
 }
 
 void testDTypes()
@@ -538,16 +542,16 @@ void testDTypes()
     String *s_f = new String("float");
     String *s_bool = new String("bool");
 
-    StringArray a = new StringArray();
+    StringArray *a = new StringArray();
     a->insertAtEnd(s_int);
     a->insertAtEnd(s_str);
-    a->indertAtEnd(s_bool);
+    a->insertAtEnd(s_bool);
     a->insertAtEnd(s_f);
     assert(df->dTypes()->equals(a));
 
     // remove a column and check
     df->delete_col(2);
-    StringArray a1 = new StringArray();
+    StringArray *a1 = new StringArray();
     a1->insertAtEnd(s_int);
     a1->insertAtEnd(s_str);
     a1->insertAtEnd(s_f);
@@ -555,7 +559,7 @@ void testDTypes()
 
     // insert a column and check
     df->insert(f);
-    StringArray a2 = new StringArray();
+    StringArray *a2 = new StringArray();
     a2->insertAtEnd(s_int);
     a2->insertAtEnd(s_str);
     a2->insertAtEnd(s_f);
@@ -581,12 +585,12 @@ int main()
     testSet();
     testAppend();
     testDelete();
-    testRename();
     testSubset();
     testDTypes();
     testClear();
     testEmpty();
     testPrinting();
     testRowColInfo();
+    println("All tests passed!");
     return 0;
 }

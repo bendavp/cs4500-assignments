@@ -236,7 +236,7 @@ public:
      * 
      * @param icol - IntColumn to be inserted
      */
-    void insertIntCol(IntColumn *icol) {}
+    void insertIntCol(Column *icol) {}
 
     /**
      * @brief adds a IntColumn at the index specified by cidx. Aborts execution if column does not fit the shape
@@ -245,7 +245,7 @@ public:
      * @param cidx - the index to insert at
      * @param icol - the IntColumn to be inserted
      */
-    void insertIntColAt(size_t cidx, IntColumn *icol) {}
+    void insertIntColAt(size_t cidx, Column *icol) {}
 
     /**
      * @brief adds a FloatColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -253,7 +253,7 @@ public:
      * 
      * @param fcol - FloatColumn to be inserted
      */
-    void insertFloatCol(FloatColumn *fcol) {}
+    void insertFloatCol(Column *fcol) {}
 
     /**
      * @brief adds a FloatColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
@@ -262,7 +262,7 @@ public:
      * @param cidx - the index to insert at
      * @param fcol - - FloatColumn to be inserted
      */
-    void insertFloatColAt(size_t cidx, FloatColumn *fcol) {}
+    void insertFloatColAt(size_t cidx, Column *fcol) {}
 
     /**
      * @brief adds a BoolColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -270,7 +270,7 @@ public:
      * 
      * @param bcol - BoolColumn to be inserted
      */
-    void insertBoolCol(BoolColumn *bcol) {}
+    void insertBoolCol(Column *bcol) {}
 
     /**
      * @brief adds a BoolColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
@@ -279,7 +279,7 @@ public:
      * @param cidx - the index to insert at
      * @param bcol - BoolColumn to be inserted
      */
-    void insertBoolColAt(size_t cidx, BoolColumn *bcol) {}
+    void insertBoolColAt(size_t cidx, Column *bcol) {}
 
     /**
      * @brief adds a StringColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -287,7 +287,7 @@ public:
      * 
      * @param scol - StringColumn to be inserted
      */
-    void insertStringCol(StringColumn *scol) {}
+    void insertStringCol(Column *scol) {}
 
     /**
      * @brief adds a StringColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
@@ -296,7 +296,7 @@ public:
      * @param cidx - the index to insert at
      * @param scol - StringColumn to be inserted
      */
-    void insertStringColAt(size_t cidx, StringColumn *scol) {}
+    void insertStringColAt(size_t cidx, Column *scol) {}
 
     /**
      * @brief prints out the dataframe in the shape of the dataframe; separating columns via tab-delimited format to keep
