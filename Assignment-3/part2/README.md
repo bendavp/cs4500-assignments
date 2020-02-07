@@ -219,17 +219,113 @@ df->renameCol(0, "column");
 df->getColType("column"); // returns "BOOL"
 ```
 
-// remove
+Dataframes can delete a row or column at a specified index using `delete_row(ridx)` and `delete_col(cidx)` where ridx and cidx are the specified indices. Similarly to the subset(...) and getInt()/getFloat()/etc. functions, the execution will be terminated
+if the speicified indices are out of bounds.
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
 
-// empty
-// clear
+df->delete_row(0); // the dataframe will only have 1 row now; the first row is deleted
+df->delete_col(2); // the dataframe deletes the third column; now there are only 3 columns
+```
 
-// size
-// nrow
-// ncol
-// shape()
+Dataframes can check if they are empty (i.e. have no columns/no cells), and Dataframes can also clear() themselves to become empty (i.e.: get rid of any Columns that the Dataframe contains).
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
 
-// insertCol
-// append
+df->empty(); // returns false since the dataframe contains Columns
 
-// set
+df->clear(); // clears the dataframe of all its Columns
+df->empty(); // returns true since now there are no Columns
+
+df->clear(); // we should be able to clear an empty df without an errors (although nothing will change)
+df->empty(); // returns true (df is still empty)
+```
+
+Dataframes can return the number of rows and columns they have as well as the total number of cells and its shape. The functions `nrow()` and `ncol()` gives the lengths of the axes. `size()` function gives the the total number of cells (which is number of rows X number of cols). `shape()` returns an IntArray of length 2, with the first value being the number of rows and the second value being the number of cols. Aside from `shape()` function, all of these functions have a `size_t` return type. 
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+// functions on a non-empty df
+df->nrow(); // returns number of rows, 2
+df->ncol(); // returns number of cols, 4
+df->size(); // returns total number of cells = nrows X ncols = 2X4 = 8
+df->shape(); // returns IntArray with values [2, 4]
+
+Dataframe *df2 = new Dataframe(); // empty dataframe
+// functions on an empty df
+df2->nrow(); // returns number of rows, 0
+df2->ncol(); // returns number of cols, 0
+df2->size(); // returns total number of cells = nrows X ncols = 0X0 = 0
+df2->shape(); // returns IntArray with values [0, 0]
+```
+
+Dataframes have the functionality of inserting Columns, either at the end or at a specified index with `insert(Column c)` and `insertAt(size_t idx, Column n)`. Indices are considered valid if; they are within the bounds of (0, nrow/ncol) including the upper bound. If the given index is not valid, the index will be considered out of bounds and the execution will be terminated. 
+```{C++}
+Dataframe *df = new Dataframe(); // empty dataframe
+
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+
+// inserting columns
+df->insert(boolColumn); // inserts boolColumn at the end
+df->insertAt(1, intColumn); // inserts intColumn at the end effectively (1 is the index of the column)
+df->insertAt(1, floatColumn); // inserts floatColumn at index 1
+df->insert(5, stringColumn); // index is out of bounds, so this would terminate the execution
+```
+
+Dataframes have the functionality of appending row(s), either at the bottom of the Dataframe or at a specified index. This works similarly to `insert(...)/insertAt(...)`; however, the user needs to pass in Columns which match the current Dataframe to append. This also allows the functionality of appending multiple rows at once. 
+```{C++}
+Dataframe *df = new Dataframe(); // empty dataframe 
+
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+
+df->append(4, boolColumn, intColumn, floatColumn, stringColumn); // adds these 4 columns to the dataframe
+
+df->append(3, boolColumn, intColumn, floatColumn); // the execution will terminate, since this does not match the shape of the dataframe (there are 4 columns so now when we append we need to have 4 columns)
+
+Column *col = new BoolColumn(1, new bool(true)); 
+df->append(4, col, intColumn, floatColumn, stringColumn)); // the execution will terminate; the columns are not of equal lengths (1, 2, 2, 2)
+
+df->append(4, intColumn, stringColumn, boolColumn, floatColumn); // the execution will terminate; the columns must adhere to the existing columns in the Dataframe (these are changing the type of Column)
+
+// appendAt has the same restrictions as append, except now an index can be specified
+
+df->appendAt(1, 4, boolColumn, intColumn, floatColumn, stringColumn); // adds these 4 columns at index 1
+
+df->appendAt(100, 4, boolColumn, intColumn, floatColumn, stringColumn); // 100 is out of bounds index so the execution will be terminated
+```
+
+Dataframes have functions for setting the value in a specific cell by index. The set functions take in a specific type (Int*, Float*, etc.); therefore, when setting the cell, the user must make sure that the type is the same as the specified Column. Additionally, the indices must be in bounds (as described above), and if not, the execution will be terminated. 
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+df->setBool(1, 0, new bool(false)); // sets the value @ (0,1) to false
+df->setBool(1, 3, new bool(false)); // execution will be aborted because the fourth column is not a BoolColumn
+// the other set functions will fail under similar conditions to setBool 
+
+df->setInt(1, 1, new int(1000)); // sets value @ (1,1) to 1000
+df->setString(0, 3, new String("str")); // sets value @ (0,3) to "str"
+df->setFloat(1, 2), new float(1.2222); // sets value @ (1,2) to 1.2222
+
+
+```
