@@ -325,7 +325,5 @@ df->setBool(1, 3, new bool(false)); // execution will be aborted because the fou
 
 df->setInt(1, 1, new int(1000)); // sets value @ (1,1) to 1000
 df->setString(0, 3, new String("str")); // sets value @ (0,3) to "str"
-df->setFloat(1, 2), new float(1.2222); // sets value @ (1,2) to 1.2222
-
-
+df->setFloat(1, 2), new float(1.2222); // sets value @ (1,2) to 1.2222s
 ```
