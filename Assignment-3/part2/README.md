@@ -115,7 +115,8 @@ intColumn->insert(new int(7)); // inserts int 7 at the end
 As you can probably tell, the functions that were built in to Columns are really there to facilitate similar functions in Dataframe. 
 
 <h2> Dataframe </h2>
-Dataframe objects can be initialized either as an empty Dataframe or Dataframe with specified columns. If initialized as a nonempty Dataframe object, all of the Columns must be the same length, and the total number of columns being used to initialize the Dataframe must be specified before any Columns are given. Additionally, Dataframe objects also have a copy constructor. 
+Dataframe objects can be initialized either as an empty Dataframe or Dataframe with specified columns. If initialized as a nonempty Dataframe object, all of the Columns must be the same length, and the total number of columns being used to initialize the Dataframe must be specified before any Columns are given. Additionally, Dataframe objects also have a copy constructor.
+ 
 ```{C++}
 Dataframe *df = new Dataframe(); // empty dataframe
 
