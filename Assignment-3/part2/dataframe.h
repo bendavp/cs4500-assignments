@@ -15,10 +15,31 @@
  */
 class Dataframe : public Object {
 public:
-    // constructors
+    /**
+     * @brief Construct a new Dataframe object
+     * 
+     */
     Dataframe() : Object() {}
-    Dataframe(Column *n, ...) : Object() {} 
+
+    /**
+     * @brief Construct a new Dataframe object
+     * 
+     * @param n number of arguments including this one
+     * @param ... Columns that will be taken in
+     */
+    Dataframe(int n, ...) : Object() {} 
+
+    /**
+     * @brief Construct a new Dataframe object. Copy construcor
+     * 
+     * @param df - the dataframe to be copied
+     */
     Dataframe(Dataframe *df) : Object() {}
+
+    /**
+     * @brief Destroy the Dataframe object
+     * 
+     */
     ~Dataframe() {}
     
     /**
@@ -96,6 +117,78 @@ public:
     String *getString(const char* ridx, const char* cidx) {}
 
     /**
+     * @brief Sets the specified cell in the dataframe to be an int. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as a size_t
+     * @param cidx - row index given as a size_t
+     */
+    void setInt(size_t ridx, size_t cidx) {} 
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be an int. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as the name of the row (could be an int)
+     * @param cidx - col index given as the name of the col (could be an int)
+     */
+    void setInt(const char* ridx, const char* cidx) {}
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be an float. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as a size_t
+     * @param cidx - col index given as a size_t
+     */
+    void setFloat(size_t ridx, size_t cidx) {} 
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be an float. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as the name of the row
+     * @param cidx - col index given as the name of the col
+     */
+    void setFloat(const char* ridx, const char* cidx) {}
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be a bool. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as a size_t
+     * @param cidx - col index given as a size_t
+     */
+    void setBool(size_t ridx, size_t cidx) {} 
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be a bool. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as the name of the row
+     * @param cidx - col index given as the name of the col
+     */
+    void setBool(const char* ridx, const char* cidx) {}
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be a String. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as a size_t
+     * @param cidx - col index given as a size_t
+     */
+    void *setString(size_t ridx, size_t cidx) {}
+
+    /**
+     * @brief Sets the specified cell in the dataframe to be a String. The column type that the cell is in must already by an int or
+     * the execution wil be aborted.
+     * 
+     * @param ridx - row index given as the name of the row
+     * @param cidx - col index given as the name of the col
+     */
+    void *setString(const char* ridx, const char* cidx) {}
+
+    /**
      * @brief returns the total number of rows (not including headers) of the dataframe
      * 
      * @return size_t - num of rows
@@ -113,10 +206,10 @@ public:
      * @brief Appends a row of columns to the end of the dataframe (most bottom). If the columns being added to an
      * non-empty dataframe are not of the same type as the existing or there is number, then the execution will be aborted. 
      * 
-     * @param n 
+     * @param n number of arguments (i.e. columns that will be appended)
      * @param ... - va_list of columns to be appended
      */
-    void append(Column *n, ...){}
+    void append(int n, ...){}
 
     /**
      * @brief Appends a row of columns at the row of the specified index, ridx. The rows under the specified index will be pushed
@@ -124,10 +217,10 @@ public:
      * number, then the execution will be aborted. 
      * 
      * @param ridx - the row index that the columns will be appended to. 
-     * @param n - 
+     * @param n - number of columns to be appended/arguments of the va_list + 1 (includes this argument)
      * @param ... - va_list of columns to be appended
      */
-    void appendAt(size_t ridx, Column *n, ...){}
+    void appendAt(size_t ridx, int n, ...){}
 
     /**
      * @brief adds a IntColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
@@ -216,9 +309,9 @@ public:
      * If the user has not entered any specific indicies such as ('Mazda RX4', 'Datsun 710') to be the row names, the automatic indexing
      * names will be returned ('0', '1', etc.) or a mix of these ('0', 'Mazda RX4', '2', etc.)
      * 
-     * @return String** - a String array of the names of the row names
+     * @return StringArray * - a String array of the names of the row names
      */
-    String **getRowNames(){}
+    StringArray *getRowNames(){}
 
     /**
      * @brief gets the names of the indices which the rows can be referred to as and returns them to the user as an String array. 
@@ -227,14 +320,14 @@ public:
      * 
      * @return String** - a String array of the names of the col names
      */
-    String **getColNames(){}
+    StringArray *getColNames(){}
 
     /**
      * @brief returns in String array, written in plain english, that specifies the type (Int, Bool, etc) of the columns
      * 
-     * @return String** - a String array, specifying in english (Int, Bool, etc), the type of the col types
+     * @return StringArray* - a String array, specifying in english (Int, Bool, etc), the type of the col types
      */
-    String **dTypes(){}
+    StringArray *dTypes(){}
 
     /**
      * @brief returns, in plain english via a String, the type of the specified column (specified by cidx, which represents 
