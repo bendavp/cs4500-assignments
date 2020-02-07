@@ -74,12 +74,43 @@ public:
     virtual Column *subset(size_t idx1, size_t idx2) {}
 
     /**
-     * @brief gets the void at the given index in this Column
-     * 
-     * @param idx the index at which to get the void
-     * @return void* the void at the given index
+     * @brief gets the bool at the given index in this Column
+     *
+     * @param idx the index at which to get the bool
+     * @return bool* the bool at the given index
      */
-    virtual void *get(size_t idx) {}
+    virtual bool *getBool(size_t idx) {}
+
+    /**
+     * @brief gets the int at the given index in this Column
+     *
+     * @param idx the index at which to get the int
+     * @return int* the int at the given index
+     */
+    virtual int *getInt(size_t idx) {}
+
+    /**
+     * @brief gets the float at the given index in this Column
+     *
+     * @param idx the index at which to get the float
+     * @return float* the float at the given index
+     */
+    virtual float *getFloat(size_t idx) {}
+
+    /**
+     * @brief gets the String at the given index in this Column
+     *
+     * @param idx the index at which to get the String
+     * @return String* the String at the given index
+     */
+    virtual String *getString(size_t idx) {}
+
+    /**
+     * @brief Get the Column type
+     * 
+     * @return String* always returns "VOID" as this is a Column
+     */
+    virtual String *getType() {}
 
     /**
      * @brief checks if the element at the given index in this Column is missing
@@ -212,7 +243,7 @@ public:
      * @param idx the index at which to get the bool
      * @return bool the bool at the given index
      */
-    bool *get(size_t idx) {}
+    bool *getBool(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this BoolColumn is missing
@@ -345,7 +376,7 @@ public:
      * @param idx the index at which to get the int
      * @return int the int at the given index
      */
-    int *get(size_t idx) {}
+    int *getInt(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this IntColumn is missing
@@ -478,7 +509,7 @@ public:
      * @param idx the index at which to get the float
      * @return float the float at the given index
      */
-    float *get(size_t idx) {}
+    float *getFloat(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this FloatColumn is missing
@@ -611,7 +642,7 @@ public:
      * @param idx the index at which to get the String
      * @return String* the String at the given index
      */
-    String *get(size_t idx) {}
+    String *getString(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this StringColumn is missing
