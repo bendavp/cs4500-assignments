@@ -5,10 +5,9 @@
 #include <stdarg.h>
 #include <assert.h>
 #include "string.h"
-#include <math.h>
 
 /**
- * @brief Column class. Represents a unified type for the 4 column subclasses
+ * @brief Column class. Represents a unified type for the 4 column subclasses. Can also be standalone and hold void* values
  * 
  * @author Benjamin Kosiborod - kosiborod.b@husky.neu.edu
  * @author Amy Tang - tang.amy@husky.neu.edu
@@ -34,6 +33,15 @@ public:
     Column(Column *c) : Object() {}
 
     /**
+     * @brief Construct a new Column object using a va_list
+     * 
+     * @param num the number of arguments coming in the va_list
+     * @param ... a va_list that will contain pointers to all the voids so that nullptr can be passed
+     * in to represent a missing value
+     */
+    Column(int num, ...) {}
+
+    /**
      * @brief Destroy the Column object
      * 
      */
@@ -41,17 +49,11 @@ public:
 
     /**
      * @brief hashes this Column
-     * 
-     * @note Column class is not meant to be a standalone class, thus this function
-     * should always terminate
      */
     virtual size_t hash() {}
 
     /**
      * @brief Checks whether a given Object is equal to this Column
-     * 
-     * @note Column class is not meant to be a standalone class, thus this function
-     * should always terminate
      * 
      * @param other The Object to be compared to this Column
      */
@@ -59,11 +61,72 @@ public:
 
     /**
      * @brief gets a (printable) char* that contains information about this Column
-     * 
-     * @note Column class is not meant to be a standalone class, thus this function
-     * should always terminate
      */
     virtual const char *print() {}
+
+    /**
+     * @brief gets a subset of this Column 
+     * 
+     * @param idx1 the index of this Column to start taking the subset (inclusive)
+     * @param idx2 the index of this Column to stop taking the subset (exclusive)
+     * @return Column* the subset of this Column
+     */
+    virtual Column *subset(size_t idx1, size_t idx2) {}
+
+    /**
+     * @brief gets the void at the given index in this Column
+     * 
+     * @param idx the index at which to get the void
+     * @return void* the void at the given index
+     */
+    virtual void *get(size_t idx) {}
+
+    /**
+     * @brief checks if the element at the given index in this Column is missing
+     * 
+     * @param idx the index at which to check for a missing element
+     * @return true if the element at the given index is NULL
+     * @return false if the element at the given index is NOT NULL
+     */
+    virtual bool isMissing(size_t idx) {}
+
+    /**
+     * @brief removes an element from the Column
+     *  
+     * @param idx the index at which to remove the element
+     */
+    virtual void remove(size_t idx) {}
+
+    /**
+     * @brief checks if the current Column has no elements in it 
+     * (missing elements are still elements, therefore a Column with only missing elements is NOT empty)
+     * 
+     * @return true if there are no elements
+     * @return false if there is at least one element
+     */
+    virtual bool isEmpty() {}
+
+    /**
+     * @brief gets the number of elements in this Column
+     * 
+     * @return size_t the number of elements
+     */
+    virtual size_t size() {}
+
+    /**
+     * @brief inserts an element at the end (bottom of the Column)
+     * 
+     * @param val the element to be inserted at the end
+     */
+    virtual void insert(void *val) {}
+
+    /**
+     * @brief inserts an element at the given index (row) of the Column (starting from 0)
+     * 
+     * @param val the element to be inserted at the given index
+     * @param idx the index at which to insert the element
+     */
+    virtual void insertAt(size_t idx, void *val) {}
 };
 
 /**
@@ -88,6 +151,15 @@ public:
      * @param b The BoolColumn whose information is to be copied to this BoolObject
      */
     BoolColumn(BoolColumn *b) : Column() {}
+
+    /**
+     * @brief Construct a new Bool Column object using a va_list
+     * 
+     * @param num the number of arguments coming in the va_list
+     * @param ... a va_list that will contain pointers to all the bools so that nullptr can be passed
+     * in to represent a missing value
+     */
+    BoolColumn(int num, ...) {}
 
     /**
      * @brief Destroy the Bool Column object
@@ -140,7 +212,7 @@ public:
      * @param idx the index at which to get the bool
      * @return bool the bool at the given index
      */
-    bool get(size_t idx) {}
+    bool *get(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this BoolColumn is missing
@@ -154,8 +226,9 @@ public:
     /**
      * @brief removes an element from the BoolColumn
      *  
+     * @param idx the index at which to remove the element
      */
-    void remove() {}
+    void remove(size_t idx) {}
 
     /**
      * @brief checks if the current BoolColumn has no elements in it 
@@ -165,6 +238,28 @@ public:
      * @return false if there is at least one element
      */
     bool isEmpty() {}
+
+    /**
+     * @brief gets the number of elements in this BoolColumn
+     * 
+     * @return size_t the number of elements
+     */
+    size_t size() {}
+
+    /**
+     * @brief inserts an element at the end (bottom of the BoolColumn)
+     * 
+     * @param val the element to be inserted at the end
+     */
+    void insert(bool *val) {}
+
+    /**
+     * @brief inserts an element at the given index (row) of the BoolColumn (starting from 0)
+     * 
+     * @param val the element to be inserted at the given index
+     * @param idx the index at which to insert the element
+     */
+    void insertAt(size_t idx, bool *val) {}
 };
 
 /**
@@ -189,6 +284,15 @@ public:
      * @param i The BoolColumn whose information is to be copied to this BoolObject
      */
     IntColumn(IntColumn *i) : Column() {}
+
+    /**
+     * @brief Construct a new Int Column object using a va_list
+     * 
+     * @param num the number of arguments coming in the va_list
+     * @param ... a va_list that will contain pointers to all the ints so that nullptr can be passed
+     * in to represent a missing value
+     */
+    IntColumn(int num, ...) {}
 
     /**
      * @brief Destroy the IntColumn object
@@ -241,7 +345,7 @@ public:
      * @param idx the index at which to get the int
      * @return int the int at the given index
      */
-    int get(size_t idx) {}
+    int *get(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this IntColumn is missing
@@ -255,8 +359,9 @@ public:
     /**
      * @brief removes an element from the IntColumn
      *  
+     * @param idx the index at which to remove the element
      */
-    void remove() {}
+    void remove(size_t idx) {}
 
     /**
      * @brief checks if the current IntColumn has no elements in it 
@@ -266,6 +371,28 @@ public:
      * @return false if there is at least one element
      */
     bool isEmpty() {}
+
+    /**
+     * @brief gets the number of elements in this IntColumn
+     * 
+     * @return size_t the number of elements
+     */
+    size_t size() {}
+
+    /**
+     * @brief inserts an element at the end (bottom of the IntColumn)
+     * 
+     * @param val the element to be inserted at the end
+     */
+    void insert(int *val) {}
+
+    /**
+     * @brief inserts an element at the given index (row) of the IntColumn (starting from 0)
+     * 
+     * @param val the element to be inserted at the given index
+     * @param idx the index at which to insert the element
+     */
+    void insertAt(size_t idx, int *val) {}
 };
 
 /**
@@ -290,6 +417,15 @@ public:
      * @param f The FloatColumn whose information is to be copied to this FloatObject
      */
     FloatColumn(FloatColumn *f) : Column() {}
+
+    /**
+     * @brief Construct a new Float Column object using a va_list
+     * 
+     * @param num the number of arguments coming in the va_list
+     * @param ... a va_list that will contain pointers to all the floats so that nullptr can be passed
+     * in to represent a missing value
+     */
+    FloatColumn(int num, ...) {}
 
     /**
      * @brief Destroy the FloatColumn object
@@ -342,7 +478,7 @@ public:
      * @param idx the index at which to get the float
      * @return float the float at the given index
      */
-    float get(size_t idx) {}
+    float *get(size_t idx) {}
 
     /**
      * @brief checks if the element at the given index in this FloatColumn is missing
@@ -356,8 +492,9 @@ public:
     /**
      * @brief removes an element from the FloatColumn
      *  
+     * @param idx the index at which to remove the element
      */
-    void remove() {}
+    void remove(size_t idx) {}
 
     /**
      * @brief checks if the current FloatColumn has no elements in it
@@ -367,6 +504,28 @@ public:
      * @return false if there is at least one element
      */
     bool isEmpty() {}
+
+    /**
+     * @brief gets the number of elements in this FloatColumn
+     * 
+     * @return size_t the number of elements
+     */
+    size_t size() {}
+
+    /**
+     * @brief inserts an element at the end (bottom of the FloatColumn)
+     * 
+     * @param val the element to be inserted at the end
+     */
+    void insert(float *val) {}
+
+    /**
+     * @brief inserts an element at the given index (row) of the FloatColumn (starting from 0)
+     * 
+     * @param val the element to be inserted at the given index
+     * @param idx the index at which to insert the element
+     */
+    void insertAt(size_t idx, float *val) {}
 };
 
 /**
@@ -391,6 +550,15 @@ public:
      * @param s The StringColumn whose information is to be copied to this StringObject
      */
     StringColumn(StringColumn *s) : Column() {}
+
+    /**
+     * @brief Construct a new Bool Column object using a va_list
+     * 
+     * @param num the number of arguments coming in the va_list
+     * @param ... a va_list that will contain pointers to all the Strings (already initialized as pointers...)
+     * so that nullptr can be passed in to represent a missing value
+     */
+    StringColumn(int num, ...) {}
 
     /**
      * @brief Destroy the StringColumn object
@@ -457,8 +625,9 @@ public:
     /**
      * @brief removes an element from the StringColumn
      *  
+     * @param idx the index at which to remove the element
      */
-    void remove() {}
+    void remove(size_t idx) {}
 
     /**
      * @brief checks if the current StringColumn has no elements in it
@@ -468,4 +637,26 @@ public:
      * @return false if there is at least one element
      */
     bool isEmpty() {}
+
+    /**
+     * @brief gets the number of elements in this StringColumn
+     * 
+     * @return size_t the number of elements
+     */
+    size_t size() {}
+
+    /**
+     * @brief inserts an element at the end (bottom of the StringColumn)
+     * 
+     * @param val the element to be inserted at the end
+     */
+    void insert(String *val) {}
+
+    /**
+     * @brief inserts an element at the given index (row) of the StringColumn (starting from 0)
+     * 
+     * @param val the element to be inserted at the given index
+     * @param idx the index at which to insert the element
+     */
+    void insertAt(size_t idx, String *val) {}
 };
