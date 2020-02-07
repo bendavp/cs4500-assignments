@@ -231,72 +231,21 @@ public:
     void appendAt(size_t ridx, int n, ...) {}
 
     /**
-     * @brief adds a IntColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
+     * @brief adds a Column to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
      * of the existing dataframe and the dataframe is not empty. 
      * 
-     * @param icol - IntColumn to be inserted
+     * @param col - Column to be inserted
      */
-    void insertIntCol(Column *icol) {}
+    void insertCol(Column *col) {}
 
     /**
-     * @brief adds a IntColumn at the index specified by cidx. Aborts execution if column does not fit the shape
+     * @brief adds a Column at the index specified by cidx. Aborts execution if column does not fit the shape
      * of the existing dataframe and the dataframe is not empty. 
      * 
      * @param cidx - the index to insert at
-     * @param icol - the IntColumn to be inserted
+     * @param col - the Column to be inserted
      */
-    void insertIntColAt(size_t cidx, Column *icol) {}
-
-    /**
-     * @brief adds a FloatColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
-     * of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param fcol - FloatColumn to be inserted
-     */
-    void insertFloatCol(Column *fcol) {}
-
-    /**
-     * @brief adds a FloatColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
-     * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param cidx - the index to insert at
-     * @param fcol - - FloatColumn to be inserted
-     */
-    void insertFloatColAt(size_t cidx, Column *fcol) {}
-
-    /**
-     * @brief adds a BoolColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
-     * of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param bcol - BoolColumn to be inserted
-     */
-    void insertBoolCol(Column *bcol) {}
-
-    /**
-     * @brief adds a BoolColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
-     * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param cidx - the index to insert at
-     * @param bcol - BoolColumn to be inserted
-     */
-    void insertBoolColAt(size_t cidx, Column *bcol) {}
-
-    /**
-     * @brief adds a StringColumn to the end (most right side) of the dataframe. Aborts execution if column does not fit the shape
-     * of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param scol - StringColumn to be inserted
-     */
-    void insertStringCol(Column *scol) {}
-
-    /**
-     * @brief adds a StringColumn at the index specified by cidx (other columns will be pushed to the right). Aborts execution 
-     * if column does not fit the shape of the existing dataframe and the dataframe is not empty. 
-     * 
-     * @param cidx - the index to insert at
-     * @param scol - StringColumn to be inserted
-     */
-    void insertStringColAt(size_t cidx, Column *scol) {}
+    void insertColAt(size_t cidx, Column *col) {}
 
     /**
      * @brief prints out the dataframe in the shape of the dataframe; separating columns via tab-delimited format to keep

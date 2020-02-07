@@ -310,15 +310,15 @@ void testInsert()
 
     // df is now empty, checking inserting for ints
     // check inserting columns now at end
-    df->insertIntCol(n);
+    df->insertCol(n);
     a->insertAtEnd(new String("int"));
     assert(df->dTypes()->equals(a));
     // check inserting column at end via index
-    df->insertIntColAt(1, n);
+    df->insertColAt(1, n);
     a->insertAtEnd(new String("int"));
     assert(df->dTypes()->equals(a));
     // check inserting columns in middle
-    df->insertIntColAt(1, n);
+    df->insertColAt(1, n);
     a->insertAtEnd(new String("int"));
     assert(df->dTypes()->equals(a));
     // clear df
@@ -327,15 +327,15 @@ void testInsert()
 
     // df is now empty, checking inserting for strings
     // check inserting columns now at end
-    df->insertStringCol(s);
+    df->insertCol(s);
     a->insertAtEnd(new String("String"));
     assert(df->dTypes()->equals(a));
     // check inserting column at end via index
-    df->insertStringColAt(1, s);
+    df->insertColAt(1, s);
     a->insertAtEnd(new String("String"));
     assert(df->dTypes()->equals(a));
     // check inserting columns in middle
-    df->insertStringColAt(1, s);
+    df->insertColAt(1, s);
     a->insertAtEnd(new String("String"));
     assert(df->dTypes()->equals(a));
     // clear df
@@ -344,15 +344,15 @@ void testInsert()
 
     // df is now empty, checking inserting for floats
     // check inserting columns now at end
-    df->insertFloatCol(f);
+    df->insertCol(f);
     a->insertAtEnd(new String("float"));
     assert(df->dTypes()->equals(a));
     // check inserting column at end via index
-    df->insertFloatColAt(1, f);
+    df->insertColAt(1, f);
     a->insertAtEnd(new String("float"));
     assert(df->dTypes()->equals(a));
     // check inserting columns in middle
-    df->insertFloatColAt(1, f);
+    df->insertColAt(1, f);
     a->insertAtEnd(new String("float"));
     assert(df->dTypes()->equals(a));
     // clear df
@@ -361,15 +361,15 @@ void testInsert()
 
     // df is now empty, checking inserting for bools
     // check inserting columns now at end
-    df->insertBoolCol(b);
+    df->insertCol(b);
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
     // check inserting column at end via index
-    df->insertBoolColAt(1, b);
+    df->insertColAt(1, b);
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
     // check inserting columns in middle
-    df->insertBoolColAt(1, b);
+    df->insertColAt(1, b);
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
     // clear df
@@ -558,7 +558,7 @@ void testDTypes()
     assert(df->dTypes()->equals(a1));
 
     // insert a column and check
-    df->insert(f);
+    df->insertCol(f);
     StringArray *a2 = new StringArray();
     a2->insertAtEnd(s_int);
     a2->insertAtEnd(s_str);
