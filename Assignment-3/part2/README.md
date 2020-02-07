@@ -1,12 +1,12 @@
-<h1> Read Me <h1>
-<h2> Introduction <h2>
+<h1> Read Me </h1>
+<h2> Introduction </h2>
 A Dataframe can hold 4 different types of Data: Booleans, Integers, Floats, and Strings. These 4 types of data can be housed in Columns that are then stored in the Dataframe.
 There are 4 different types of columns, that are each a subclass of Column, so that each different type of Column can be unified under one type to be stored in Dataframe. 
 Each type of column is named accordingly: BoolColumn, IntColumn, FloatColumn, and StringColumn. 
 As you may have guessed, each subclass of Column can only hold one type, and as such each Column in the Dataframe must be homogeneous, as Dataframes are not meant to take actual Column objects, only Column _subclass_ objects. 
-Each row, however, can contain different types of data across the multiple columns in the Dataframe.
+Each row, however, can contain different types of data across the multiple columns in the Dataframe. 
 
-<h2> Columns <h2>
+<h2> Columns </h2>
 Column objects can be initialized with any number of arguments that match the type of the object, so long as the total number of arguments are included beforehand.
 However, the primitive arguments must actually be pointers. This is to support representing missing values as `nullptr`. 
 i.e.:
