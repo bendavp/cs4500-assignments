@@ -1,9 +1,7 @@
 //lang::CwC
 
-#include "string.h"
 #include "column.h"
 #include "array.h"
-#include <stdarg.h>
 
 #pragma once
 

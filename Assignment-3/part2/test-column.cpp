@@ -1,5 +1,4 @@
 #include "column.h"
-#include "assert.h"
 #include "helper.h"
 
 // tests the hash() function in all columns

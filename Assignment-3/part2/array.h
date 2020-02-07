@@ -1,6 +1,5 @@
 #pragma once
 
-#include "object.h"
 #include "helper.h"
 #include "string.h"
 
