@@ -1,8 +1,7 @@
 #include "dataframe.h"
-#include "column.h"
-#include "array.h"
 
-void testGet(){  
+void testGet()
+{
     // nonempty dataframe with all types
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -55,7 +54,8 @@ void testGet(){
     delete s3;
 }
 
-void testSet(){
+void testSet()
+{
     // nonempty dataframe with all types
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -116,7 +116,8 @@ void testSet(){
     delete s4;
 }
 
-void testEquals(){
+void testEquals()
+{
     // creating nonempty data frame
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -131,11 +132,11 @@ void testEquals(){
     Dataframe *df3 = new Dataframe();
     Dataframe *df4 = new Dataframe();
 
-    assert(df->equals(df1)); // same not empty == same not empty
-    assert(!df->equals(df2)); // diff not empty != diff not empty
+    assert(df->equals(df1));   // same not empty == same not empty
+    assert(!df->equals(df2));  // diff not empty != diff not empty
     assert(!df3->equals(df2)); // empty != not empty
-    assert(!df->equals(df3)); // not empty != empty
-    assert(df3->equals(df4)); // empty == empty
+    assert(!df->equals(df3));  // not empty != empty
+    assert(df3->equals(df4));  // empty == empty
 
     delete df;
     delete df1;
@@ -144,7 +145,8 @@ void testEquals(){
     delete df4;
 }
 
-void testSizesandShapes(){
+void testSizesandShapes()
+{
     // nonempty dataframe with all types
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -172,7 +174,8 @@ void testSizesandShapes(){
     delete df1;
 }
 
-void testRowColInfo(){
+void testRowColInfo()
+{
     String *s_int = new String("int");
     String *s_str = new String("String");
     String *s_f = new String("float");
@@ -247,7 +250,8 @@ void testRowColInfo(){
     delete rows1;
 }
 
-void testAppend(){
+void testAppend()
+{
     // appending to an empty data frame
     Dataframe *df = new Dataframe();
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
@@ -290,7 +294,8 @@ void testAppend(){
     delete df3;
 }
 
-void testInsert(){
+void testInsert()
+{
     // empty df
     Dataframe *df = new Dataframe();
     StringArray *a = new StringArray();
@@ -299,7 +304,7 @@ void testInsert(){
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
     Column *b = new BoolColumn(3, new bool(true), new bool(false), new bool(true));
     Column *f = new FloatColumn(3, new float(1.2), new float(42.4), new float(666.6));
-    
+
     // df is now empty, checking inserting for ints
     // check inserting columns now at end
     df->insertIntCol(n);
@@ -313,7 +318,7 @@ void testInsert(){
     df->insertIntColAt(1, n);
     a->insertAtEnd(new String("int"));
     assert(df->dTypes()->equals(a));
-    // clear df 
+    // clear df
     df->clear();
     a->clear();
 
@@ -330,7 +335,7 @@ void testInsert(){
     df->insertStringColAt(1, s);
     a->insertAtEnd(new String("String"));
     assert(df->dTypes()->equals(a));
-    // clear df 
+    // clear df
     df->clear();
     a->clear();
 
@@ -347,7 +352,7 @@ void testInsert(){
     df->insertFloatColAt(1, f);
     a->insertAtEnd(new String("float"));
     assert(df->dTypes()->equals(a));
-    // clear df 
+    // clear df
     df->clear();
     a->clear();
 
@@ -364,7 +369,7 @@ void testInsert(){
     df->insertIntBoolAt(1, b);
     a->insertAtEnd(new String("bool"));
     assert(df->dTypes()->equals(a));
-    // clear df 
+    // clear df
     df->clear();
     a->clear();
 
@@ -372,7 +377,8 @@ void testInsert(){
     delete a;
 }
 
-void testDelete(){
+void testDelete()
+{
     Column *n4 = new IntColumn(5, new int(2), new int(3), new int(4), new int(2), new int(5));
     Column *s4 = new StringColumn(5, new String("s"), new String("gg"), new String("ez"), new String("hill"), new String("hello"));
     Column *b4 = new BoolColumn(5, new bool(true), new bool(false), new bool(true), new bool(true), new bool(false));
@@ -391,7 +397,7 @@ void testDelete(){
     rows->insertAtEnd(new String('2'));
     rows->insertAtEnd(new String('3'));
     rows->insertAtEnd(new String('4'));
-    
+
     StringArray *cols1 = new StringArray();
     cols1->insertAtEnd(new String(new String("col1")));
     cols1->insertAtEnd(new String(new String("col2")));
@@ -418,12 +424,12 @@ void testDelete(){
     df->rename_row(1, new String("row2"));
     df->rename_row(2, new String("row3"));
     df->rename_row(3, new String("row4"));
-    
+
     df->delete_row('row2');
     rows1->remove(1);
     assert(df->getRowNames()->equals(rows));
     assert(df->getColsNames()->equals(cols));
-    
+
     // delete col by index
     df->delete_col(2);
     cols->remove(2);
@@ -446,7 +452,8 @@ void testDelete(){
     delete rows1;
 }
 
-void testClear(){
+void testClear()
+{
     // creating nonempty data frame
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -460,7 +467,8 @@ void testClear(){
     delete df;
 }
 
-void testEmpty(){
+void testEmpty()
+{
     // empty dataframe
     Dataframe *df = new Dataframe();
     // creating nonempty data frame
@@ -475,7 +483,8 @@ void testEmpty(){
     delete df2;
 }
 
-void testSubset(){
+void testSubset()
+{
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
     Column *b = new BoolColumn(3, new bool(true), new bool(false), new bool(true));
@@ -492,11 +501,12 @@ void testSubset(){
     assert(df->equals(df3));
 
     Dataframe *df4 = new Dataframe();
-    Dataframe *df5 = df->subset(0,0,1,1);
+    Dataframe *df5 = df->subset(0, 0, 1, 1);
     assert(df4->equals(df5));
 }
 
-void testPrinting(){
+void testPrinting()
+{
     Column *n = new IntColumn(4, new int(2), nullptr, new int(3), new int(4));
     Column *s = new StringColumn(4, new String("s"), new String("gg"), new String("ez"), nullptr);
     Column *b = new BoolColumn(4, new bool(true), new bool(false), nullptr, new bool(true));
@@ -511,12 +521,11 @@ void testPrinting(){
 
     const char *output = 'index\tcol1\tcol2\tcol3\t3\nrow1\t2\ts\ttrue\t-\nrow2\t-\tgg\tfalse\t1.2\n\trow3\t3\tez\t-\t42.2\n\t3\t4\t-\ttrue\t666.6'
 
-    assert(strcmp(df->print(), output) == 0);
+        assert(strcmp(df->print(), output) == 0);
 }
 
-
-
-void testDTypes(){
+void testDTypes()
+{
     // nonempty dataframe with all types
     Column *n = new IntColumn(3, new int(2), new int(3), new int(4));
     Column *s = new StringColumn(3, new String("s"), new String("gg"), new String("ez"));
@@ -563,7 +572,8 @@ void testDTypes(){
     delete s_bool;
 }
 
-int main(){
+int main()
+{
     testEquals();
     testEmpty();
     testGet();
@@ -580,4 +590,3 @@ int main(){
     testRowColInfo();
     return 0;
 }
-
