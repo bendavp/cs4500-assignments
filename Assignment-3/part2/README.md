@@ -204,8 +204,6 @@ df->getBool(1, "row"); // terminates execution -- can't mix indices and names
 df->getBool("column", 1); // same as above
 ```
 
-// dTypes
-// getColType
 Dataframes have `dTypes()`, `getColType(size_t idx)`, `getColType(String *idx)`. `dTypes()` returns a StringArray with a list of all the types of the Columns in the Dataframe ("BOOL", "INT", "FLOAT", "STRING"). The latter two functions allow you to get the type of a specific column by index or by name.
 ```{C++}
 Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
