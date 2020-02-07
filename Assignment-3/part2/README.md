@@ -4,7 +4,7 @@ A Dataframe can hold 4 different types of Data: Booleans, Integers, Floats, and 
 There are 4 different types of columns, that are each a subclass of Column, so that each different type of Column can be unified under one type to be stored in Dataframe. 
 Each type of column is named accordingly: BoolColumn, IntColumn, FloatColumn, and StringColumn. 
 As you may have guessed, each subclass of Column can only hold one type, and as such each Column in the Dataframe must be homogeneous, as Dataframes are not meant to take actual Column objects, only Column _subclass_ objects. 
-Each row, however, can contain different types of data across the multiple columns in the Dataframe. 
+Each row, however, can contain different types of data across the multiple columns in the Dataframe.
 
 <h2> Columns </h2>
 Column objects can be initialized with any number of arguments that match the type of the object, so long as the total number of arguments are included beforehand.
@@ -24,7 +24,7 @@ Column *boolColumn = new BoolColumn();
 Column *boolColumn2 = new BoolColumn(0); // same as above
 ```
 
-The `hash()`, `equals(Object *other)`, and `print()` functions are inherited from Object. They work the same as in Object:
+The `hash()`, `equals(Object *other)`, and `print()` functions are inherited from Object. Two Columns are equal if they are the same class and have the same elements in the same order. All methods work the same as in Object:
 ```{C++}
 BoolColumn *boolColumn = new BoolColumn(1, new bool(true));
 boolColumn->hash() // gets the hashcode for the column
@@ -33,7 +33,7 @@ boolColumn->equals(new Object()) // would return false in this case
 boolColumn->equals(new IntColumn(1, new int(2))); // would return false in this case
 boolColumn->equals(new BoolColumn(1, new bool(false))); // would return false in this case
 boolColumn->equals(new BoolColumn(1, new bool(true))); // would return true in this case
-boolColumn->print() // would return a const char*, i.e. a string representation of the boolColumn and its elements
+println(boolColumn->print()) // would return a const char*, i.e. a string representation of the boolColumn and its elements
 ```
 
 Column objects have a `subset(size_t idx1, size_t idx2)` function, which returns the same type of object as the column object, but with only a subset of its elements. 
@@ -114,3 +114,92 @@ intColumn->insert(new int(7)); // inserts int 7 at the end
 
 As you can probably tell, the functions that were built in to Columns are really there to facilitate similar functions in Dataframe. 
 
+<h2> Dataframe </h2>
+Dataframe objects can be initialized either as an empty Dataframe or Dataframe with specified columns. If initialized as a nonempty Dataframe object, all of the Columns must be the same length, and the total number of columns being used to initialize the Dataframe must be specified before any Columns are given. Additionally, Dataframe objects also have a copy constructor. 
+```{C++}
+Dataframe *df = new Dataframe(); // empty dataframe
+
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df2 = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+Column *col1 = new BoolColumn(1, new bool(true));
+Dataframe *df_bad = new Dataframe(2, boolColumn, col1); // this does NOT work; the number of items in each column added needs to be equal
+
+Dataframe *df3 = new Dataframe(0); // another way to initialize an empty dataframe
+```
+
+Dataframe objects like Column objects inherit from the Object class, and as such have `equals(Object *other)`, `hash()`, and `print()`. Two Dataframe objects are considered equal if all of their Columns are the same type, in the same order, and those Columns have the same values. `print()` gives a `const char*` that represents the Dataframe object as a string, using a tab-delimited format.
+```{C++}
+Dataframe *df = new Dataframe();
+df->equals(new Dataframe();) // returns true, since both are empty
+df->equals(new Dataframe(0)); // also returns true
+df->equals(new Dataframe(1, new BoolColumn())); // returns false, since an empty Dataframe is not the same as a Dataframe with a Column in it. 
+df->hash(); // returns the hashcode of the DataFrame
+println(df->print()); // returns a const char* which can be used to display the df
+```
+
+Columns and rows in Dataframes can be named. To name a column, use the `rename_col(size_t cidx, String *new_cidx)` function, which takes the index of the column you want to rename, and a String* of the name you want to give it. Renaming a row is similar using the `rename_row(size_t ridx, String *new_ridx)` function. To get the names of all columns, use the `getColNames()` function, which returns a StringArray* of all the names of the columns (and nullptr if there is an unnamed column). Similarly, you can use the `getRowNames()` function with rows. 
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df2 = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+df2->rename_row(0, “testing”);
+df2->rename_row(1, “testing123”);
+df2->rename_row(2, “invalid”); // will terminate execution because row 2 does not exist
+df2->rename_col(0, “test”);
+df2->getRowNames(); // [new String(“testing”), new String(“testing123”)]
+df2->getColNames(); // [new String(“test”), nullptr, nullptr, nullptr]
+
+The first 6 rows of the Dataframe can be printed out with the `head()` function. This returns a const char* that represents the first 6 rows of the Dataframe.
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe();
+Dataframe *df2 = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+println(df->head()); // in this case would print nothing
+println(df2->head()); // in this case would only print 2 rows
+```
+
+Dataframes also have a `subset(ridx1, ridx2, cidx1, cidx2)` function. `subset(...)` takes two row indices and two column indices, then returns a new Dataframe which is a subset of the original dataframe. The `subset(...)`  function can use the Columns’ `subset(...)` function in its implementation. 
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+df->subset(0,2,1,3); // creates a new dataframe with all of the rows and just the middle 2 columns from the original dataframe
+df->subset(1, 0, 1, 3); // the row indices must be given in ascending order; this will terminate the execution
+df->subset(0, 2, 3, 1); // the col indices must be given in ascending order; this will terminate the execution
+df->subset(0, 3, 1, 2); // the row indices must be valid; this is out of bounds and will terminate the execution
+df->subset(0, 1, 3, 4); // the col indices must be valid; this is out of bounds and will terminate the execution
+df->subset(0, 0, 1, 1); // gives a empty dataframe
+```
+
+Dataframes have `getBool(size_t cidx, size_t ridx)`, `getBool(String *cidx, String *ridx)`, `getInt(size_t cidx, size_t ridx)`, `getInt(String *cidx, String *ridx)`, `getFloat(size_t cidx, size_t ridx)`, `getFloat(String *cidx, String *ridx)`, `getString(size_t cidx, size_t ridx)`, and `getString(String *cidx, String *ridx)`. These functions get 
+
+// dTypes
+// getColType
+
+// remove
+
+// empty
+// clear
+
+//size
+// nrow
+// ncol
+// shape()
+
+// insertCol
+// append
+
+// set
