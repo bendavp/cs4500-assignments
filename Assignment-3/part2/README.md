@@ -200,12 +200,26 @@ df->getBool(0, 7); // terminates execution, as there is no row with index 7 in c
 df->renameCol(0, "column");
 df->renameRow(0, "row");
 df->getBool("column", "row"); // same as getBool(0,0)
-df->getBool(1, "row"); // nope
-df->getBool("column", 1); // nope
+df->getBool(1, "row"); // terminates execution -- can't mix indices and names
+df->getBool("column", 1); // same as above
 ```
 
 // dTypes
 // getColType
+Dataframes have `dTypes()`, `getColType(size_t idx)`, `getColType(String *idx)`. `dTypes()` returns a StringArray with a list of all the types of the Columns in the Dataframe ("BOOL", "INT", "FLOAT", "STRING"). The latter two functions allow you to get the type of a specific column by index or by name.
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+df->dTypes(); // returns ["BOOL", "INT", "FLOAT", "STRING"]
+df->getColType(0); // returns "BOOL"
+df->getColType(3); // returns "STRING"
+df->renameCol(0, "column");
+df->getColType("column"); // returns "BOOL"
+```
 
 // remove
 
