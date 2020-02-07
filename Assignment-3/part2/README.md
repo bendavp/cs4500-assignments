@@ -116,7 +116,7 @@ As you can probably tell, the functions that were built in to Columns are really
 
 <h2> Dataframe </h2>
 Dataframe objects can be initialized either as an empty Dataframe or Dataframe with specified columns. If initialized as a nonempty Dataframe object, all of the Columns must be the same length, and the total number of columns being used to initialize the Dataframe must be specified before any Columns are given. Additionally, Dataframe objects also have a copy constructor.
- 
+
 ```{C++}
 Dataframe *df = new Dataframe(); // empty dataframe
 
@@ -185,7 +185,24 @@ df->subset(0, 1, 3, 4); // the col indices must be valid; this is out of bounds 
 df->subset(0, 0, 1, 1); // gives a empty dataframe
 ```
 
-Dataframes have `getBool(size_t cidx, size_t ridx)`, `getBool(String *cidx, String *ridx)`, `getInt(size_t cidx, size_t ridx)`, `getInt(String *cidx, String *ridx)`, `getFloat(size_t cidx, size_t ridx)`, `getFloat(String *cidx, String *ridx)`, `getString(size_t cidx, size_t ridx)`, and `getString(String *cidx, String *ridx)`. These functions get 
+Dataframes have `getBool(size_t cidx, size_t ridx)`, `getBool(String *cidx, String *ridx)`, `getInt(size_t cidx, size_t ridx)`, `getInt(String *cidx, String *ridx)`, `getFloat(size_t cidx, size_t ridx)`, `getFloat(String *cidx, String *ridx)`, `getString(size_t cidx, size_t ridx)`, and `getString(String *cidx, String *ridx)`. These functions get data points at individual cells in the Dataframe, either by column/row index, or by column/row name (note: both applicable column AND row must be named for this to work):
+```{C++}
+Column *boolColumn = new BoolColumn(2, new bool(true), new bool(true));
+Column *intColumn = new IntColumn(2, new int(3), new int(2));
+Column *floatColumn = new FloatColumn(2, new float(1.0), nullptr);
+Column *stringColumn = new StringColumn(2, new String("hello"), new String("world"));
+Dataframe *df = new Dataframe(4, boolColumn, intColumn, floatColumn, stringColumn); // creates a Dataframe with 4 Columns and 2 rows
+
+df->getBool(0, 1); // returns bool at column 0 row 1
+df->getInt(1, 0); // returns int at column 1 row 0
+df->getBool(1, 0); // terminates execution, as column 1 is only ints
+df->getBool(0, 7); // terminates execution, as there is no row with index 7 in column 0
+df->renameCol(0, "column");
+df->renameRow(0, "row");
+df->getBool("column", "row"); // same as getBool(0,0)
+df->getBool(1, "row"); // nope
+df->getBool("column", 1); // nope
+```
 
 // dTypes
 // getColType
@@ -195,7 +212,7 @@ Dataframes have `getBool(size_t cidx, size_t ridx)`, `getBool(String *cidx, Stri
 // empty
 // clear
 
-//size
+// size
 // nrow
 // ncol
 // shape()
