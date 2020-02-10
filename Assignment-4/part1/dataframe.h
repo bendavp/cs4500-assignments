@@ -51,7 +51,19 @@ public:
         size_ = 0;
     }
 
-    IntColumn(int n, ...) {}
+    IntColumn(int n, ...)
+    {
+        size_ = n;
+        // set memory_size_ to next biggest power of 2
+        arr_ = new int[memory_size_];
+        va_list v1;
+        va_start(v1, n);
+        for (size_t i = 0; i < n; i++)
+        {
+            arr_[i] = va_arg(v1, int);
+        }
+        va_end(v1);
+    }
 
     // gets value
     int get(size_t idx)
