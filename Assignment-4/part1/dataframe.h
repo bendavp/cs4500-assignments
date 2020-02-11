@@ -1,6 +1,9 @@
 //lang::Cpp
 
 #pragma once
+
+#include "../string.h"
+#include "fastarray.h"
 /*************************************************************************
  * Schema::
  * A schema is a description of the contents of a data frame, the schema
@@ -11,17 +14,32 @@
 class Schema : public Object
 {
 public:
+    StrBuff coltypes_;
+    StringFastArray row_names_;
+    StringFastArray col_names_;
+
     /** Copying constructor */
-    Schema(Schema &from) {}
+    Schema(Schema &from)
+    {
+        this = from;
+    }
 
     /** Create an empty schema **/
-    Schema() {}
+    Schema()
+    {
+        coltypes_ = new StrBuff();
+        row_names_ = new StringFastArray();
+        col_names_ = new StringFastArray();
+    }
 
     /** Create a schema from a string of types. A string that contains
     * characters other than those identifying the four type results in
     * undefined behavior. The argument is external, a nullptr argument is
     * undefined. **/
-    Schema(const char *types) {}
+    Schema(const char *types)
+    {
+        coltypes_ = new StrBuff(types);
+    }
 
     /** Add a column of the given type and name (can be nullptr), name
     * is external. Names are expectd to be unique, duplicates result
