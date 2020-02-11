@@ -30,7 +30,29 @@ public:
     virtual size_t size() {}
 
     /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
-    char get_type() {}
+    char get_type()
+    {
+        if (this->as_int() != nullptr)
+        {
+            return 'I';
+        }
+        else if (this->as_bool() != nullptr)
+        {
+            return 'B';
+        }
+        else if (this->as_float() != nullptr)
+        {
+            return 'F';
+        }
+        else if (this->as_string() != nullptr)
+        {
+            return 'S';
+        }
+        else
+        {
+            exit(1);
+        }
+    }
 };
 
 /*************************************************************************/
@@ -41,41 +63,134 @@ public:
 class BoolColumn : public Column
 {
 public:
-    IntColumn() {}
-    IntColumn(int n, ...) {}
-    int get(size_t idx) {}
-    IntColumn *as_int() {}
+    BoolFastArray *arr_;
+
+    BoolColumn()
+    {
+        arr_ = new BoolFastArray();
+    }
+
+    BoolColumn(int n, ...)
+    {
+        va_list = v1;
+        arr_ = new BoolFastArray(n, v1);
+    }
+
+    bool get(size_t idx)
+    {
+        return arr_->get(idx);
+    }
+
+    BoolColumn *as_bool()
+    {
+        return this;
+    }
+
     /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, int val) {}
-    size_t size() {}
+    void set(size_t idx, bool val)
+    {
+        arr_->set(idx, val);
+    }
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(bool val)
+    {
+        arr_->push_back(val);
+    }
 };
 
-/**
+/*************************************************************************
  * IntColumn::
  * Holds int values.
  */
 class IntColumn : public Column
 {
 public:
-    IntColumn() {}
-    IntColumn(int n, ...) {}
-    int get(size_t idx) {}
-    IntColumn *as_int() {}
+    IntFastArray *arr_;
+
+    IntColumn()
+    {
+        arr_ = new IntFastArray();
+    }
+
+    IntColumn(int n, ...)
+    {
+        va_list = v1;
+        arr_ = new IntFastArray(n, v1);
+    }
+
+    int get(size_t idx)
+    {
+        return arr_->get(idx);
+    }
+
+    IntColumn *as_int()
+    {
+        return this;
+    }
     /** Set value at idx. An out of bound idx is undefined.  */
     void set(size_t idx, int val) {}
-    size_t size() {}
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(int val)
+    {
+        arr_->push_back(val);
+    }
 };
 
+/*************************************************************************
+ * FloatColumn::
+ * Holds float values.
+ */
 class FloatColumn : public Column
 {
 public:
-    IntColumn() {}
-    IntColumn(int n, ...) {}
-    int get(size_t idx) {}
-    IntColumn *as_int() {}
+    FloatFastArray *arr_;
+
+    FloatColumn()
+    {
+        arr_ = new FloatFastArray();
+    }
+
+    FloatColumn(int n, ...)
+    {
+        va_list = v1;
+        arr_ = new FloatFastArray(n, v1);
+    }
+
+    float get(size_t idx)
+    {
+        return arr_->get(idx);
+    }
+
+    FloatColumn *as_float()
+    {
+        return this;
+    }
+
     /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, int val) {}
-    size_t size() {}
+    void set(size_t idx, float val)
+    {
+        arr_->set(idx, val);
+    }
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(float val)
+    {
+        arr_->push_back(val);
+    }
 };
 
 /*************************************************************************
@@ -86,12 +201,41 @@ public:
 class StringColumn : public Column
 {
 public:
-    StringColumn() {}
-    StringColumn(int n, ...) {}
-    StringColumn *as_string() {}
+    StringFastArray *arr_;
+
+    StringColumn()
+    {
+        arr_ = new StringFastArray();
+    }
+
+    StringColumn(int n, ...)
+    {
+        va_list = v1;
+        arr_ = new StringFastArray(n, v1);
+    }
+
+    StringColumn *as_string()
+    {
+        return this;
+    }
+
     /** Returns the string at idx; undefined on invalid idx.*/
-    String *get(size_t idx) {}
+    String *get(size_t idx)
+    {
+        return arr_->get(idx);
+    }
     /** Out of bound idx is undefined. */
-    void set(size_t idx, String *val) {}
-    size_t size() {}
+    void set(size_t idx, String *val)
+    {
+        arr_->set(idx, val);
+    }
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(String *val)
+    {
+        arr_->push_back(val);
+    }
 };
