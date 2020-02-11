@@ -1,7 +1,8 @@
-//lang::CwC
+//lang::Cpp
 
-#include "string.h"
 #pragma once
+
+#include "fastarray.h"
 
 /**************************************************************************
  * Column ::
@@ -9,29 +10,18 @@
  * This abstract class defines methods overriden in subclasses. There is
  * one subclass per element type. Columns are mutable, equality is pointer
  * equality. */
-
 class Column : public Object
 {
 public:
-    /** Type converters: Return same column under its actual type, or nullptr if of the wrong type.  */
-    virtual IntColumn *as_int()
-    {
-        return nullptr;
-    }
-    virtual BoolColumn *as_bool()
-    {
-        return nullptr;
-    }
-    virtual FloatColumn *as_float()
-    {
-        return nullptr;
-    }
-    virtual StringColumn *as_string()
-    {
-        return nullptr;
-    }
+    /** Type converters: Return same column under its actual type, or
+   *  nullptr if of the wrong type.  */
+    virtual IntColumn *as_int() { return nullptr; }
+    virtual BoolColumn *as_bool() { return nullptr; }
+    virtual FloatColumn *as_float() { return nullptr; }
+    virtual StringColumn *as_string() { return nullptr; }
 
-    /** Type appropriate push_back methods. Calling the wrong method is undefined behavior. **/
+    /** Type appropriate push_back methods. Calling the wrong method is
+    * undefined behavior. **/
     virtual void push_back(int val) {}
     virtual void push_back(bool val) {}
     virtual void push_back(float val) {}
@@ -44,181 +34,49 @@ public:
     char get_type() {}
 };
 
-/*************************************************************************
+/*************************************************************************/
+/**
+ * BoolColumn::
+ * Holds int values.
+ */
+class BoolColumn : public Column
+{
+public:
+    IntColumn() {}
+    IntColumn(int n, ...) {}
+    int get(size_t idx) {}
+    IntColumn *as_int() {}
+    /** Set value at idx. An out of bound idx is undefined.  */
+    void set(size_t idx, int val) {}
+    size_t size() {}
+};
+
+/**
  * IntColumn::
  * Holds int values.
  */
 class IntColumn : public Column
 {
 public:
-    int *arr_;
-    size_t size_;
-    size_t memory_size_;
-
-    // constructor
-    IntColumn()
-    {
-        memory_size_ = 16;
-        arr_ = new int[memory_size_];
-        size_ = 0;
-    }
-
-    // constructor with ints to add
-    IntColumn(int n, ...)
-    {
-        size_ = n;
-        // set memory_size_ to next biggest power of 2
-        arr_ = new int[memory_size_];
-        va_list v1;
-        va_start(v1, n);
-        for (size_t i = 0; i < n; i++)
-        {
-            arr_[i] = va_arg(v1, int);
-        }
-        va_end(v1);
-    }
-
-    // gets value
-    int get(size_t idx)
-    {
-        assert(idx < size_);
-        return arr_[idx];
-    }
-
-    // ask code clinic about returning this versus *this
-    IntColumn *as_int()
-    {
-        return this;
-    }
-
+    IntColumn() {}
+    IntColumn(int n, ...) {}
+    int get(size_t idx) {}
+    IntColumn *as_int() {}
     /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, int val)
-    {
-        assert(idx < size_);
-        arr_[idx] = val;
-    }
-
-    // returns size of IntColumn
-    size_t size()
-    {
-        return size_;
-    }
+    void set(size_t idx, int val) {}
+    size_t size() {}
 };
 
-/*************************************************************************
- * FloatColumn::
- * Holds float values.
- */
 class FloatColumn : public Column
 {
 public:
-    float *arr_;
-    size_t size_;
-    size_t memory_size_;
-
-    // constructor
-    FloatColumn()
-    {
-        memory_size_ = 16;
-        arr_ = new float[memory_size_];
-        size_ = 0;
-    }
-
-    // constructor with floats to add
-    FloatColumn(int n, ...)
-    {
-        size_ = n;
-        // set memory_size_ to next biggest power of 2
-        arr_ = new float[memory_size_];
-        va_list v1;
-        va_start(v1, n);
-        for (size_t i = 0; i < n; i++)
-        {
-            arr_[i] = va_arg(v1, float);
-        }
-        va_end(v1);
-    }
-
-    float get(size_t idx)
-    {
-        assert(idx < size_);
-        return arr_[idx];
-    }
-
-    FloatColumn *as_float()
-    {
-        return this;
-    }
-
+    IntColumn() {}
+    IntColumn(int n, ...) {}
+    int get(size_t idx) {}
+    IntColumn *as_int() {}
     /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, float val)
-    {
-        assert(idx < size_);
-        arr_[idx] = val;
-    }
-
-    size_t size()
-    {
-        return size_;
-    }
-};
-
-/*************************************************************************
- * BoolColumn::
- * Holds bool values.
- */
-class BoolColumn : public Column
-{
-public:
-    bool *arr_;
-    size_t size_;
-    size_t memory_size_;
-
-    // constructor
-    BoolColumn()
-    {
-        memory_size_ = 16;
-        arr_ = new bool[memory_size_];
-        size_ = 0;
-    }
-
-    // constructor with bools to add
-    BoolColumn(int n, ...)
-    {
-        size_ = n;
-        // set memory_size_ to next biggest power of 2
-        arr_ = new bool[memory_size_];
-        va_list v1;
-        va_start(v1, n);
-        for (size_t i = 0; i < n; i++)
-        {
-            arr_[i] = va_arg(v1, bool);
-        }
-        va_end(v1);
-    }
-
-    bool get(size_t idx)
-    {
-        assert(idx < size_);
-        return arr_[idx];
-    }
-
-    BoolColumn *as_bool()
-    {
-        return this;
-    }
-
-    /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, bool val)
-    {
-        assert(idx < size_);
-        arr_[idx] = val;
-    }
-
-    size_t size()
-    {
-        return size_;
-    }
+    void set(size_t idx, int val) {}
+    size_t size() {}
 };
 
 /*************************************************************************
@@ -229,49 +87,14 @@ public:
 class StringColumn : public Column
 {
 public:
-    String **arr_;
-    size_t size_;
-    size_t memory_size_;
-    StringColumn()
-    {
-        memory_size_ = 16;
-        arr_ = new String *[memory_size_];
-        size_ = 0;
-    }
-    StringColumn(int n, ...)
-    {
-        size_ = n;
-        // set memory_size_ to next biggest power of 2
-        arr_ = new String *[memory_size_];
-        va_list v1;
-        va_start(v1, n);
-        for (size_t i = 0; i < n; i++)
-        {
-            arr_[i] = va_arg(v1, String *);
-        }
-        va_end(v1);
-    }
-    StringColumn *as_string()
-    {
-        return this;
-    }
+    StringColumn() {}
+    StringColumn(int n, ...) {}
+    StringColumn *as_string() {}
     /** Returns the string at idx; undefined on invalid idx.*/
-    String *get(size_t idx)
-    {
-        assert(idx < size_);
-        return arr_[idx];
-    }
-    /** Acquire ownership fo the string.  Out of bound idx is undefined. */
-    void set(size_t idx, String *val)
-    {
-        assert(idx < size_);
-        delete arr_[idx];
-        arr_[idx] = val;
-    }
-    size_t size()
-    {
-        return size_;
-    }
+    String *get(size_t idx) {}
+    /** Out of bound idx is undefined. */
+    void set(size_t idx, String *val) {}
+    size_t size() {}
 };
 
 /*************************************************************************
@@ -284,154 +107,49 @@ public:
 class Schema : public Object
 {
 public:
-    String **row_names_;
-    String **col_names_;
-    char *col_types_;
-    size_t row_size_; // length
-    size_t col_size_; // width
-    size_t row_memory_;
-    size_t col_memory_;
-
     /** Copying constructor */
     Schema(Schema &from) {}
 
     /** Create an empty schema **/
-    Schema()
-    {
-        row_memory_ = 16;
-        row_names_ = new String *[row_memory_];
-        row_size_ = 0;
-        col_memory_ = 16;
-        col_names_ = new String *[col_memory_];
-        col_types_ = new char[col_memory_];
-        col_size_ = 0;
-    }
+    Schema() {}
 
     /** Create a schema from a string of types. A string that contains
     * characters other than those identifying the four type results in
     * undefined behavior. The argument is external, a nullptr argument is
     * undefined. **/
-    Schema(const char *types)
-    {
-        row_memory_ = 16;
-        row_names_ = new String *[row_memory_];
-        row_size_ = 0;
-        num_col = strlen(types);
-        // figure out how to set memory in sets of 2
-        // intialize col names and types
-        for (int i = 0; i < num_col; i++)
-        {
-            assert(types[i] == ('S' | 'I' | 'B' | 'F'));
-            col_types_[i] = types[i];
-            col_names_[i] = nullptr;
-        }
-        col_size_ = num_col;
-    }
+    Schema(const char *types) {}
 
     /** Add a column of the given type and name (can be nullptr), name
     * is external. Names are expectd to be unique, duplicates result
     * in undefined behavior. */
-    void add_column(char typ, String *name)
-    {
-        assert(col_idx(name) == -1); // name is not already a row name
-        // figure out sizing/pushbacks
-        // assuming that there is enough space
-        col_names_[col_size_] = name;
-        col_types_[col_size_] = typ;
-        col_size_ = col_size_ + 1; // increase row size
-    }
+    void add_column(char typ, String *name) {}
 
     /** Add a row with a name (possibly nullptr), name is external.  Names are
    *  expectd to be unique, duplicates result in undefined behavior. */
-    void add_row(String *name)
-    {
-        assert(row_idx(name) == -1); // name is not already a row name
-        // figure out sizing/pushbacks
-        // assuming that there is enough space
-        row_names_[row_size_] = name;
-        row_size_ = row_size_ + 1; // increase row size
-    }
+    void add_row(String *name) {}
 
     /** Return name of row at idx; nullptr indicates no name. An idx >= width
     * is undefined. */
-    String *row_name(size_t idx)
-    {
-        assert(idx < row_size_);
-        return row_names_[idx];
-    }
+    String *row_name(size_t idx) {}
 
     /** Return name of column at idx; nullptr indicates no name given.
     *  An idx >= width is undefined.*/
-    String *col_name(size_t idx)
-    {
-        assert(idx < col_size_);
-        return col_names_[idx];
-    }
+    String *col_name(size_t idx) {}
 
     /** Return type of column at idx. An idx >= width is undefined. */
-    char col_type(size_t idx)
-    {
-        assert(idx < col_size_);
-        return col_types_[idx];
-    }
+    char col_type(size_t idx) {}
 
     /** Given a column name return its index, or -1. */
-    int col_idx(const char *name)
-    {
-        String *n = new String(name);
-        int idx = col_idx(n);
-        delete n;
-        return idx;
-    }
-
-    // helper function
-    // given a column name as a string return its index or -1
-    int col_idx(String *name)
-    {
-        for (int i = 0; i < col_size_; i++)
-        {
-            if (name->equals(col_names_[i]))
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
+    int col_idx(const char *name) {}
 
     /** Given a row name return its index, or -1. */
-    int row_idx(const char *name)
-    {
-        String *n = new String(name);
-        int idx = row_idx(n);
-        delete n;
-        return idx;
-    }
-
-    // helper function
-    // given a row name in as String return its index or -1
-    int row_idx(String *name)
-    {
-        for (int i = 0; i < row_size_; i++)
-        {
-            if (name->equals(row_names_[i]))
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
+    int row_idx(const char *name) {}
 
     /** The number of columns */
-    size_t width()
-    {
-        return col_size_;
-    }
+    size_t width() {}
 
     /** The number of rows */
-    size_t length()
-    {
-        return row_size_;
-    }
+    size_t length() {}
 };
 
 /*****************************************************************************
@@ -446,10 +164,7 @@ public:
     virtual void start(size_t r) {}
 
     /** Called for fields of the argument's type with the value of the field. */
-    virtual void accept(bool b) {}
-    virtual void accept(float f) {}
-    virtual void accept(int i) {}
-    virtual void accept(String *s) {}
+    virtual void accept(bool b) virtual void accept(float f) virtual void accept(int i) virtual void accept(String *s) {}
 
     /** Called when all fields have been seen. */
     virtual void done() {}
@@ -474,7 +189,7 @@ public:
     void set(size_t col, int val) {}
     void set(size_t col, float val) {}
     void set(size_t col, bool val) {}
-    /** Acquire ownership of the string. */
+    /** The string is external. */
     void set(size_t col, String *val) {}
 
     /** Set/get the index of this row (ie. its position in the dataframe. This is
@@ -568,7 +283,7 @@ public:
     void set(size_t col, size_t row, int val) {}
     void set(size_t col, size_t row, bool val) {}
     void set(size_t col, size_t row, float val) {}
-    void set(size_t col, size_t row, string val) {}
+    void set(size_t col, size_t row, String *val) {}
 
     /** Set the fields of the given row object with values from the columns at
     * the given offset.  If the row is not form the same schema as the
@@ -594,5 +309,5 @@ public:
     DataFrame *filter(Rower &r) {}
 
     /** Print the dataframe in SoR format to standard output. */
-    print() {}
+    void print() {}
 };
