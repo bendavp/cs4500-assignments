@@ -83,7 +83,6 @@ public:
     int get(size_t idx)
     {
         assert(!outOfBounds(idx));
-        size_t adj_idx = idx - 1; // adjust given index to account for 0-indexing when searching for that specific index
         return arr_[idx / arr_size_][idx % arr_size_];
     }
 
@@ -158,7 +157,7 @@ public:
             arr_ = temp_arr_;                          // set arr_ to the new expanded array
             delete temp_arr_;
         }
-        // we only need to create a new int array in place of the nullptr
+        // we only need to create a new int array in place of the next nullptr
         else
         {
             arr_[arr_fill_] = new int[arr_size_];
