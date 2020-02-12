@@ -16,15 +16,19 @@ void println(const char *m)
     std::cout << m << "\n";
 }
 
+/*** Object has no print function; this is obsolete right now
 void println(Object *o)
 {
     std::cout << o->print() << "\n";
 }
+*/
 
+/* Object has no print function; this is obsolete right now
 void println(Object *o, size_t num)
 {
     std::cout << o->print() << " " << num << "\n";
 }
+*/
 
 void print_(const char *m)
 {
