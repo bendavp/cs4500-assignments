@@ -72,7 +72,7 @@ public:
 
     BoolColumn(int n, ...)
     {
-        va_list = v1;
+        va_list v1;
         arr_ = new BoolFastArray(n, v1);
     }
 
@@ -119,7 +119,7 @@ public:
 
     IntColumn(int n, ...)
     {
-        va_list = v1;
+        va_list v1;
         arr_ = new IntFastArray(n, v1);
     }
 
@@ -162,7 +162,7 @@ public:
 
     FloatColumn(int n, ...)
     {
-        va_list = v1;
+        va_list v1;
         arr_ = new FloatFastArray(n, v1);
     }
 
@@ -210,7 +210,7 @@ public:
 
     StringColumn(int n, ...)
     {
-        va_list = v1;
+        va_list v1;
         arr_ = new StringFastArray(n, v1);
     }
 
