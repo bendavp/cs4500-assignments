@@ -45,6 +45,7 @@ public:
     * undefined. **/
     Schema(const char *types)
     {
+        assert(types != nullptr);
         coltypes_ = new StrBuff();
         coltypes_->c(types);
         row_names_ = new StringFastArray();
@@ -60,14 +61,22 @@ public:
     * in undefined behavior. */
     void add_column(char typ, String *name)
     {
+        for (size_t i = 0; i < col_names_->size(); i++)
+        {
+            assert(!name->equals(col_names_->get(i)));
+        }
         coltypes_->c(typ);
-        col_names_->push_back(name);
+        col_names_->push_back(name->clone());
     }
 
     /** Add a row with a name (possibly nullptr), name is external.  Names are
    *  expectd to be unique, duplicates result in undefined behavior. */
     void add_row(String *name)
     {
+        for (size_t i = 0; i < col_names_->size(); i++)
+        {
+            assert(!name->equals(col_names_->get(i)));
+        }
         row_names_->push_back(name);
     }
 
@@ -75,6 +84,7 @@ public:
     * is undefined. */
     String *row_name(size_t idx)
     {
+        assert(idx < row_names_->size());
         row_names_->get(idx);
     }
 
@@ -82,6 +92,7 @@ public:
     *  An idx >= width is undefined.*/
     String *col_name(size_t idx)
     {
+        assert(idx < col_names_->size());
         col_names_->get(idx);
     }
 

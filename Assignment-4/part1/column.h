@@ -23,7 +23,7 @@ public:
     size_t arr_fill_; // current number of pointers to int-arrays stored (i.e. how full the outer array is)
 
     // constructor for empty
-    IntFastArray()
+    IntFastArray() : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -38,7 +38,7 @@ public:
     }
 
     // constructor taking in variable number of arguments
-    IntFastArray(int n, ...)
+    IntFastArray(int n, ...) : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -270,7 +270,7 @@ public:
     size_t arr_fill_; // current number of pointers to bool-arrays stored (i.e. how full the outer array is)
 
     // constructor for empty
-    BoolFastArray()
+    BoolFastArray() : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -285,7 +285,7 @@ public:
     }
 
     // constructor taking in variable number of arguments
-    BoolFastArray(int n, ...)
+    BoolFastArray(int n, ...) : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -517,7 +517,7 @@ public:
     size_t arr_fill_; // current number of pointers to float-arrays stored (i.e. how full the outer array is)
 
     // constructor for empty
-    FloatFastArray()
+    FloatFastArray() : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -532,7 +532,7 @@ public:
     }
 
     // constructor taking in variable number of arguments
-    FloatFastArray(int n, ...)
+    FloatFastArray(int n, ...) : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -764,7 +764,7 @@ public:
     size_t arr_fill_; // current number of pointers to string*-arrays stored (i.e. how full the outer array is)
 
     // constructor for empty
-    StringFastArray()
+    StringFastArray() : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -779,7 +779,7 @@ public:
     }
 
     // constructor taking in variable number of arguments
-    StringFastArray(int n, ...)
+    StringFastArray(int n, ...) : Object()
     {
         arr_size_ = 16;
         memory_ = 16;
@@ -1260,13 +1260,13 @@ public:
 
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
-    virtual void push_back(int val) {}
-    virtual void push_back(bool val) {}
-    virtual void push_back(float val) {}
-    virtual void push_back(String *val) {}
+    virtual void push_back(int val) { assert(false); }
+    virtual void push_back(bool val) { assert(false); }
+    virtual void push_back(float val) { assert(false); }
+    virtual void push_back(String *val) { assert(false); }
 
     /** Returns the number of elements in the column. */
-    virtual size_t size() {}
+    virtual size_t size() { return 0; }
 
     /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
     char get_type()
@@ -1289,7 +1289,7 @@ public:
         }
         else
         {
-            exit(1);
+            assert(false);
         }
     }
 
@@ -1299,10 +1299,10 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    virtual Object *clone() {}
+    virtual Object *clone() { return nullptr; }
 
     /** Compute the hash code (subclass responsibility) */
-    virtual size_t hash_me() {}
+    virtual size_t hash_me() { return 0; }
 };
 
 /*************************************************************************/
@@ -1333,6 +1333,7 @@ public:
 
     bool get(size_t idx)
     {
+        assert(idx < arr_->size());
         return arr_->get(idx);
     }
 
@@ -1344,6 +1345,7 @@ public:
     /** Set value at idx. An out of bound idx is undefined.  */
     void set(size_t idx, bool val)
     {
+        assert(idx < arr_->size());
         arr_->set(idx, val);
     }
 
@@ -1369,7 +1371,10 @@ public:
     }
 
     /** Compute the hash code (subclass responsibility) */
-    virtual size_t hash_me() {}
+    size_t hash_me()
+    {
+        arr_->hash_me();
+    }
 };
 
 /*************************************************************************
@@ -1399,6 +1404,7 @@ public:
 
     int get(size_t idx)
     {
+        assert(idx < arr_->size());
         return arr_->get(idx);
     }
 
@@ -1407,7 +1413,11 @@ public:
         return this;
     }
     /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, int val) {}
+    void set(size_t idx, int val)
+    {
+        assert(idx < arr_->size());
+        arr_->set(idx, val);
+    }
 
     size_t size()
     {
@@ -1417,6 +1427,23 @@ public:
     void push_back(int val)
     {
         arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        IntColumn *res = new IntColumn();
+        for (size_t i = 0; i < arr_->size(); i++)
+        {
+            res->push_back(arr_->get(i));
+        }
+        return res;
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        arr_->hash_me();
     }
 };
 
@@ -1447,6 +1474,7 @@ public:
 
     float get(size_t idx)
     {
+        assert(idx < arr_->size());
         return arr_->get(idx);
     }
 
@@ -1458,6 +1486,7 @@ public:
     /** Set value at idx. An out of bound idx is undefined.  */
     void set(size_t idx, float val)
     {
+        assert(idx < arr_->size());
         arr_->set(idx, val);
     }
 
@@ -1469,6 +1498,23 @@ public:
     void push_back(float val)
     {
         arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        FloatColumn *res = new FloatColumn();
+        for (size_t i = 0; i < arr_->size(); i++)
+        {
+            res->push_back(arr_->get(i));
+        }
+        return res;
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        arr_->hash_me();
     }
 };
 
@@ -1506,11 +1552,13 @@ public:
     /** Returns the string at idx; undefined on invalid idx.*/
     String *get(size_t idx)
     {
+        assert(idx < arr_->size());
         return arr_->get(idx);
     }
     /** Out of bound idx is undefined. */
     void set(size_t idx, String *val)
     {
+        assert(idx < arr_->size());
         arr_->set(idx, val);
     }
     size_t size()
@@ -1521,5 +1569,22 @@ public:
     void push_back(String *val)
     {
         arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        StringColumn *res = new StringColumn();
+        for (size_t i = 0; i < arr_->size(); i++)
+        {
+            res->push_back(arr_->get(i));
+        }
+        return res;
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        arr_->hash_me();
     }
 };
