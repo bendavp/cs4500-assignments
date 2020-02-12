@@ -61,21 +61,23 @@ public:
     * in undefined behavior. */
     void add_column(char typ, String *name)
     {
+        // check all newly added name is different than the current names; terminates otherwise
         for (size_t i = 0; i < col_names_->size(); i++)
         {
             assert(!name->equals(col_names_->get(i)));
         }
         coltypes_->c(typ);
-        col_names_->push_back(name->clone());
+        col_names_->push_back(name);
     }
 
     /** Add a row with a name (possibly nullptr), name is external.  Names are
    *  expectd to be unique, duplicates result in undefined behavior. */
     void add_row(String *name)
     {
-        for (size_t i = 0; i < col_names_->size(); i++)
+        // check all newly added name is different than the current names; terminates otherwise
+        for (size_t i = 0; i < row_names_->size(); i++)
         {
-            assert(!name->equals(col_names_->get(i)));
+            assert(!name->equals(row_names_->get(i)));
         }
         row_names_->push_back(name);
     }
@@ -84,7 +86,7 @@ public:
     * is undefined. */
     String *row_name(size_t idx)
     {
-        assert(idx < row_names_->size());
+        assert(idx < length());
         row_names_->get(idx);
     }
 
@@ -92,13 +94,14 @@ public:
     *  An idx >= width is undefined.*/
     String *col_name(size_t idx)
     {
-        assert(idx < col_names_->size());
+        assert(idx < width());
         col_names_->get(idx);
     }
 
     /** Return type of column at idx. An idx >= width is undefined. */
     char col_type(size_t idx)
     {
+        assert(idx < width());
         String *types_str = coltypes_->get();
         char res = types_str->at(idx);
         coltypes_->c(types_str->steal());
