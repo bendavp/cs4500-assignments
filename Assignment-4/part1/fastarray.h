@@ -775,7 +775,8 @@ public:
                 arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
             }
             // filling appropriate location with the value
-            arr_[i / arr_size_][i % arr_size_] = va_arg(v1, String *);
+            String *new_ = va_arg(v1, String *)->clone();
+            arr_[i / arr_size_][i % arr_size_] = new_;
         }
         va_end(v1);
         // fill the rest of the array with nullptr
@@ -809,7 +810,8 @@ public:
     {
         assert(!outOfBounds(idx));
         delete arr_[idx / arr_size_][idx % arr_size_];
-        arr_[idx / arr_size_][idx % arr_size_] = s;
+        String *s_ = s->clone();
+        arr_[idx / arr_size_][idx % arr_size_] = s_;
     }
 
     /**
@@ -825,7 +827,8 @@ public:
             grow(); // expands appropriately
         }
         size_t new_idx = size_; // this is the idx of the value to be added
-        arr_[new_idx / arr_size_][new_idx % arr_size_] = s;
+        String *s_ = s->clone();
+        arr_[new_idx / arr_size_][new_idx % arr_size_] = s_;
         size_ = size_ + 1;
     }
 

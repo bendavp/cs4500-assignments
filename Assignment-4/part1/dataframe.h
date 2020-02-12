@@ -11,18 +11,41 @@
 class Fielder : public Object
 {
 public:
+    size_t row_num_;
     /** Called before visiting a row, the argument is the row offset in the
     dataframe. */
-    virtual void start(size_t r) {}
+    virtual void start(size_t r)
+    {
+        row_num_ = r;
+    }
 
     /** Called for fields of the argument's type with the value of the field. */
-    virtual void accept(bool b) {}
-    virtual void accept(float f) {}
-    virtual void accept(int i) {}
-    virtual void accept(String *s) {}
+    virtual void accept(bool b)
+    {
+        print_(b);
+        print_('\t');
+    }
+    virtual void accept(float f)
+    {
+        print_(f);
+        print_('\t');
+    }
+    virtual void accept(int i)
+    {
+        print_(i);
+        print_('\t');
+    }
+    virtual void accept(String *s)
+    {
+        print_(s);
+        print_('\t');
+    }
 
     /** Called when all fields have been seen. */
-    virtual void done() {}
+    virtual void done()
+    {
+        println("");
+    }
 };
 
 /*************************************************************************
@@ -37,23 +60,42 @@ class Row : public Object
 {
 public:
     Schema *schema_;
+    int *int_arr_;
+    float *float_arr_;
+    String **str_arr_;
+    bool *bool_arr_;
     size_t idx_;
 
     /** Build a row following a schema. */
     Row(Schema &scm)
     {
-        schema = scm;
+        schema_ = scm;
+        size_t ncols = schema_->width();
+        int_arr_ = new int[ncols];
+        bool_arr_ = new bool[ncols];
+        float_arr_ = new float[ncols];
+        str_arr_ = new String *[ncols];
     }
 
     /** Setters: set the given column with the given value. Setting a column with
     * a value of the wrong type is undefined. */
     void set(size_t col, int val)
     {
+        int_arr_[col] = val;
     }
-    void set(size_t col, float val) {}
-    void set(size_t col, bool val) {}
+    void set(size_t col, float val)
+    {
+        float_arr_[col] = val;
+    }
+    void set(size_t col, bool val)
+    {
+        bool_arr_[col] = val;
+    }
     /** The string is external. */
-    void set(size_t col, String *val) {}
+    void set(size_t col, String *val)
+    {
+        str_arr_[col] = val->clone();
+    }
 
     /** Set/get the index of this row (ie. its position in the dataframe. This is
    *  only used for informational purposes, unused otherwise */
@@ -70,16 +112,32 @@ public:
     * of the requested type, the result is undefined. */
     int get_int(size_t col)
     {
+        return int_arr_[col];
     }
-    bool get_bool(size_t col) {}
-    float get_float(size_t col) {}
-    String *get_string(size_t col) {}
+    bool get_bool(size_t col)
+    {
+        return bool_arr_[col];
+    }
+    float get_float(size_t col)
+    {
+        return float_arr_[col];
+    }
+    String *get_string(size_t col)
+    {
+        return str_arr_[col]->clone();
+    }
 
     /** Number of fields in the row. */
-    size_t width() {}
+    size_t width()
+    {
+        return schema_->width();
+    }
 
     /** Type of the field at the given position. An idx >= width is  undefined. */
-    char col_type(size_t idx) {}
+    char col_type(size_t idx)
+    {
+        return schema_->col_type(idx);
+    }
 
     /** Given a Fielder, visit every field of this row. The first argument is
     * index of the row in the dataframe.
@@ -89,6 +147,26 @@ public:
         f.start(idx);
         for (int i = 0; i < schema_->width(); i++)
         {
+            if (col_type(i) == 'S')
+            {
+                f.accept(str_arr_[i]);
+            }
+            else if (col_type(i) == 'I')
+            {
+                f.accept(int_arr_[i]);
+            }
+            else if (col_type(i) == 'F')
+            {
+                f.accept(float_arr_[i]);
+            }
+            else if (col_type(i) == 'B')
+            {
+                f.accept(bool_arr_[i]);
+            }
+            else
+            {
+                exit(1);
+            }
         }
     }
 };
@@ -106,7 +184,10 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
-    virtual bool accept(Row &r) {}
+    virtual bool accept(Row &r)
+    {
+        r.visit();
+    }
 
     /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
@@ -212,11 +293,38 @@ public:
     * the given offset.  If the row is not form the same schema as the
     * dataframe, results are undefined.
     */
-    void fill_row(size_t idx, Row &row) {}
+    void fill_row(size_t idx, Row &row)
+    {
+        for (size_t i = 0; i < col_arr_->size(); i++)
+        {
+            row.set(i, col_arr_->get(i)->get(idx));
+        }
+    }
 
     /** Add a row at the end of this dataframe. The row is expected to have
    *  the right schema and be filled with values, otherwise undedined.  */
-    void add_row(Row &row) {}
+    void add_row(Row &row)
+    {
+        for (size_t i = 0; i < row.width(); i++)
+        {
+            if (row.col_type(i) == 'S')
+            {
+                col_arr_->get(i)->push_back(row.get_string(i));
+            }
+            else if (row.col_type(i) == 'F')
+            {
+                col_arr_->get(i)->push_back(row.get_float(i));
+            }
+            else if (row.col_type(i) == 'I')
+            {
+                col_arr_->get(i)->push_back(row.get_int(i));
+            }
+            else if (row.col_type(i) == 'B')
+            {
+                col_arr_->get(i)->push_back(row.get_bool(i));
+            }
+        }
+    }
 
     /** The number of rows in the dataframe. */
     size_t nrows()
