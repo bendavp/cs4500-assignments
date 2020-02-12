@@ -1,6 +1,7 @@
 //lang::Cpp
 
 #include "schema.h"
+#include "helper.h"
 
 #pragma once
 
@@ -97,8 +98,8 @@ public:
         str_arr_[col] = val->clone();
     }
 
-    /** Set/get the index of this row (ie. its position in the dataframe. This is
-   *  only used for informational purposes, unused otherwise */
+    /** Set/get the index of this row (ie. its position in the dataframe. 
+     * This is only used for informational purposes, unused otherwise */
     void set_idx(size_t idx)
     {
         idx_ = idx;
