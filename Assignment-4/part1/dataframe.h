@@ -1,7 +1,7 @@
 //lang::Cpp
 
 #include "schema.h"
-#include "helper.h"
+#include "../helper.h"
 
 #pragma once
 
@@ -23,29 +23,29 @@ public:
     /** Called for fields of the argument's type with the value of the field. */
     virtual void accept(bool b)
     {
-        print_(b);
-        print_('\t');
+        p(b);
+        p('\t');
     }
     virtual void accept(float f)
     {
-        print_(f);
-        print_('\t');
+        p(f);
+        p('\t');
     }
     virtual void accept(int i)
     {
-        print_(i);
-        print_('\t');
+        p(i);
+        p('\t');
     }
     virtual void accept(String *s)
     {
-        print_(s);
-        print_('\t');
+        p(s);
+        p('\t');
     }
 
     /** Called when all fields have been seen. */
     virtual void done()
     {
-        println("");
+        pln("");
     }
 };
 

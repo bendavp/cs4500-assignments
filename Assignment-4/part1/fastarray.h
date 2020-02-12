@@ -1,6 +1,7 @@
 //lang::CwC
 
 #include "column.h"
+#include "../string.h"
 
 #pragma once
 

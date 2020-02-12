@@ -1,6 +1,8 @@
 //lang:Cwc
 
 #include "fastarray.h"
+
+#pragma once
 /*************************************************************************
  * Schema::
  * A schema is a description of the contents of a data frame, the schema
