@@ -73,6 +73,15 @@ public:
     }
 
     /**
+     * @brief Destroy the Int Fast Array object
+     * 
+     */
+    ~IntFastArray()
+    {
+        delete[] arr_;
+    }
+
+    /**
      * @brief Returns the integer from a certain location. The math works out as if this is a linear array 
      * rather than an array of arrays. 
      * 
@@ -311,6 +320,15 @@ public:
     }
 
     /**
+     * @brief Destroy the Bool Fast Array object
+     * 
+     */
+    ~BoolFastArray()
+    {
+        delete[] arr_;
+    }
+
+    /**
      * @brief Returns the boolean from a certain location. The math works out as if this is a linear array 
      * rather than an array of arrays. 
      * 
@@ -546,6 +564,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    /**
+     * @brief Destroy the Float Fast Array object
+     * 
+     */
+    ~FloatFastArray()
+    {
+        delete[] arr_;
     }
 
     /**
@@ -788,6 +815,15 @@ public:
     }
 
     /**
+     * @brief Destroy the String Fast Array object
+     * 
+     */
+    ~StringFastArray()
+    {
+        delete[] arr_;
+    }
+
+    /**
      * @brief Returns the String* from a certain location. The math works out as if this is a linear array 
      * rather than an array of arrays. 
      * 
@@ -811,8 +847,7 @@ public:
     {
         assert(!outOfBounds(idx));
         delete arr_[idx / arr_size_][idx % arr_size_];
-        String *s_ = s->clone();
-        arr_[idx / arr_size_][idx % arr_size_] = s_;
+        arr_[idx / arr_size_][idx % arr_size_] = s;
     }
 
     /**
@@ -828,8 +863,7 @@ public:
             grow(); // expands appropriately
         }
         size_t new_idx = size_; // this is the idx of the value to be added
-        String *s_ = s->clone();
-        arr_[new_idx / arr_size_][new_idx % arr_size_] = s_;
+        arr_[new_idx / arr_size_][new_idx % arr_size_] = s;
         size_ = size_ + 1;
     }
 
@@ -1026,6 +1060,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    /**
+     * @brief Destroy the Column Fast Array object
+     * 
+     */
+    ~ColumnFastArray()
+    {
+        delete[] arr_;
     }
 
     /**
