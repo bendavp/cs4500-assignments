@@ -129,7 +129,6 @@ public:
     size_t nrows_;
     size_t ncols_;
     ColumnFastArray col_arr_;
-    RowFastArray row_arr_;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownames */
     DataFrame(DataFrame &df)
@@ -151,29 +150,63 @@ public:
 
     /** Adds a column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
-    * name is optional and external. A nullptr colum is undefined. */
-    void add_column(Column *col, String *name) {}
+    * name is optional and external. A nullptr column is undefined. */
+    void add_column(Column *col, String *name)
+    {
+        col_arr_->push_back(col);
+        schema_->add_column(col->get_type(), name);
+    }
 
     /** Return the value at the given column and row. Accessing rows or
    *  columns out of bounds, or request the wrong type is undefined.*/
-    int get_int(size_t col, size_t row) {}
-    bool get_bool(size_t col, size_t row) {}
-    float get_float(size_t col, size_t row) {}
-    String *get_string(size_t col, size_t row) {}
+    int get_int(size_t col, size_t row)
+    {
+        return col_arr_->get(col)->get(row);
+    }
+    bool get_bool(size_t col, size_t row)
+    {
+        return col_arr_->get(col)->get(row);
+    }
+    float get_float(size_t col, size_t row)
+    {
+        return col_arr_->get(col)->get(row);
+    }
+    String *get_string(size_t col, size_t row)
+    {
+        return col_arr_->get(col)->get(row);
+    }
 
     /** Return the offset of the given column name or -1 if no such col. */
-    int get_col(String &col) {}
+    int get_col(String &col)
+    {
+        return schema_->col_idx(col.c_str());
+    }
 
     /** Return the offset of the given row name or -1 if no such row. */
-    int get_row(String &col) {}
+    int get_row(String &col)
+    {
+        return schema_->row_idx(col.c_str());
+    }
 
     /** Set the value at the given column and row to the given value.
     * If the column is not  of the right type or the indices are out of
     * bound, the result is undefined. */
-    void set(size_t col, size_t row, int val) {}
-    void set(size_t col, size_t row, bool val) {}
-    void set(size_t col, size_t row, float val) {}
-    void set(size_t col, size_t row, String *val) {}
+    void set(size_t col, size_t row, int val)
+    {
+        col_arr_->get(col)->set(row, val);
+    }
+    void set(size_t col, size_t row, bool val)
+    {
+        col_arr_->get(col)->set(row, val);
+    }
+    void set(size_t col, size_t row, float val)
+    {
+        col_arr_->get(col)->set(row, val);
+    }
+    void set(size_t col, size_t row, String *val)
+    {
+        col_arr_->get(col)->set(row, val);
+    }
 
     /** Set the fields of the given row object with values from the columns at
     * the given offset.  If the row is not form the same schema as the
