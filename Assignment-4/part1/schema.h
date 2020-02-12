@@ -1,6 +1,6 @@
 //lang:Cwc
 
-#include "fastarray.h"
+#include "column.h"
 
 #pragma once
 /*************************************************************************
@@ -31,6 +31,12 @@ public:
         coltypes_ = new StrBuff();
         row_names_ = new StringFastArray();
         col_names_ = new StringFastArray();
+    }
+
+    ~Schema()
+    {
+        delete row_names_;
+        delete col_names_;
     }
 
     /** Create a schema from a string of types. A string that contains

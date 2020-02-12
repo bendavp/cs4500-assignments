@@ -68,14 +68,23 @@ public:
     size_t idx_;
 
     /** Build a row following a schema. */
-    Row(Schema &scm)
+    Row(Schema &scm) : Object()
     {
-        schema_ = scm;
+        schema_ = new Schema(scm);
         size_t ncols = schema_->width();
         int_arr_ = new int[ncols];
         bool_arr_ = new bool[ncols];
         float_arr_ = new float[ncols];
         str_arr_ = new String *[ncols];
+    }
+
+    ~Row()
+    {
+        delete schema_;
+        delete[] int_arr_;
+        delete[] float_arr_;
+        delete[] str_arr_;
+        delete[] bool_arr_;
     }
 
     /** Setters: set the given column with the given value. Setting a column with
@@ -187,10 +196,9 @@ public:
       should be kept. */
     virtual bool accept(Row &r)
     {
-        Fielder *fielder_ = new Fielder();
-        fielder_->start(r.get_idx());
+        Fielder fielder_ = Fielder();
+        fielder_.start(r.get_idx());
         r.visit(r.get_idx(), fielder_);
-        delete fielder_;
         return true;
     }
 
@@ -220,12 +228,20 @@ public:
     DataFrame(DataFrame &df)
     {
         Dataframe *new_ = new Dataframe(df.getSchema());
-        return &new_;
     }
 
     /** Create a data frame from a schema and columns. All columns are created
     * empty. */
-    DataFrame(Schema &schema) {}
+    DataFrame(Schema &schema)
+    {
+        schema_ = schema;
+    }
+
+    ~DataFrame()
+    {
+        delete schema_;
+        delete col_arr_;
+    }
 
     /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
