@@ -1,5 +1,7 @@
 //lang::Cpp
 
+#include "schema.h"
+
 #pragma once
 
 /*****************************************************************************
@@ -101,8 +103,18 @@ public:
 class DataFrame : public Object
 {
 public:
-    /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
-    DataFrame(DataFrame &df) {}
+    Schema *schema_;
+    size_t nrows_;
+    size_t ncols_;
+    ColumnFastArray col_arr_;
+    RowFastArray row_arr_;
+
+    /** Create a data frame with the same columns as the given df but with no rows or rownames */
+    DataFrame(DataFrame &df)
+    {
+        Dataframe *new_ = new Dataframe(df.getSchema());
+        return &new_;
+    }
 
     /** Create a data frame from a schema and columns. All columns are created
     * empty. */
@@ -110,7 +122,10 @@ public:
 
     /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
-    Schema &get_schema() {}
+    Schema &get_schema()
+    {
+        return &schema_;
+    }
 
     /** Adds a column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
@@ -149,10 +164,16 @@ public:
     void add_row(Row &row) {}
 
     /** The number of rows in the dataframe. */
-    size_t nrows() {}
+    size_t nrows()
+    {
+        return nrows_;
+    }
 
     /** The number of columns in the dataframe.*/
-    size_t ncols() {}
+    size_t ncols()
+    {
+        return ncols_;
+    }
 
     /** Visit rows in order */
     void map(Rower &r) {}

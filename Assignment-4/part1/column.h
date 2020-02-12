@@ -1,7 +1,8 @@
 //lang:CwC
 
-#pragma once
 #include "fastarray.h"
+
+#pragma once
 
 /**************************************************************************
  * Column ::
