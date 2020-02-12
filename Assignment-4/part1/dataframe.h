@@ -186,7 +186,11 @@ public:
       should be kept. */
     virtual bool accept(Row &r)
     {
-        r.visit();
+        Fielder *fielder_ = new Fielder();
+        fielder_->start(r.get_idx());
+        r.visit(r.get_idx(), fielder_);
+        delete fielder_;
+        return true;
     }
 
     /** Once traversal of the data frame is complete the rowers that were
@@ -339,12 +343,41 @@ public:
     }
 
     /** Visit rows in order */
-    void map(Rower &r) {}
+    void map(Rower &r)
+    {
+        Row *row_ = new Row(schema_);
+        for (size_t i = 0; i < nrows_; i++)
+        {
+            row_->set_idx(i);
+            fill_row(i, row_);
+            r.accept(row_);
+        }
+        delete row_;
+    }
 
     /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
-    DataFrame *filter(Rower &r) {}
+    DataFrame *filter(Rower &r)
+    {
+        DataFrame *df = new DataFrame(schema_);
+        Row *row_ = new Row(schema_);
+        for (size_t i = 0; i < nrows_; i++)
+        {
+            row_->set_idx(i);
+            fill_row(i, row_);
+            if (r.accept(row_))
+            {
+                df->add_row(row_);
+            }
+        }
+        delete row_;
+    }
 
     /** Print the dataframe in SoR format to standard output. */
-    void print() {}
+    void print()
+    {
+        Rower r = new Rower();
+        map(r);
+        delete r;
+    }
 };
