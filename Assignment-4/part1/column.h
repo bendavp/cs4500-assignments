@@ -1197,7 +1197,7 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    virtual Object *clone() { return nullptr; }
+    virtual Column *clone() { return nullptr; }
 
     /** Compute the hash code (subclass responsibility) */
     virtual size_t hash_me() { return 0; }
@@ -1265,7 +1265,7 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
+    BoolColumn *clone()
     {
         return new BoolColumn(*this);
     }
@@ -1337,7 +1337,7 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
+    IntColumn *clone()
     {
         return new IntColumn(*this);
     }
@@ -1410,7 +1410,7 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
+    FloatColumn *clone()
     {
         return new FloatColumn(*this);
     }
@@ -1483,7 +1483,7 @@ public:
     }
 
     /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
+    StringColumn *clone()
     {
         return new StringColumn(*this);
     }
