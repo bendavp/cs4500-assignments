@@ -30,15 +30,6 @@ void doesVaListActuallyWork()
     GT_TRUE(f->equals(fc->arr_));
     GT_TRUE(s->equals(sc->arr_));
 
-    delete i;
-    delete b;
-    delete f;
-    delete s;
-    delete ic;
-    delete bc;
-    delete fc;
-    delete sc;
-
     exit(0);
 }
 
@@ -63,11 +54,6 @@ void testGet()
     GT_EQUALS(f->get(3), 4.20);
     GT_TRUE(s->get(0)->equals(new String("hello")));
     GT_TRUE(s->get(1)->equals(new String("world")));
-
-    delete i;
-    delete b;
-    delete f;
-    delete s;
 
     exit(0);
 }
@@ -97,8 +83,8 @@ void testSet()
 
     f->set(0, 4.20);
     f->set(3, 6.9);
-    GT_EQUALS(f->get(0), 4.20);
-    GT_EQUALS(f->get(3), 6.9);
+    GT_EQUALS(f->get(0), (float)4.20);
+    GT_EQUALS(f->get(3), (float)6.9);
 
     String *h = new String("Heeellloooooo"); // no need to delete these as FastArrays own their contents
     String *w = new String("wooooorllddddd");
@@ -106,11 +92,6 @@ void testSet()
     s->set(1, w);
     GT_TRUE(s->get(0)->equals(h));
     GT_TRUE(s->get(1)->equals(w));
-
-    delete i;
-    delete b;
-    delete f;
-    delete s;
 
     exit(0);
 }
@@ -156,13 +137,8 @@ void testGrowAndPushBack()
     for (int j = 0; j < 512; j++)
     {
         s->push_back(str);
-        GT_EQUALS(f->get(j + 2), str);
+        GT_TRUE(s->get(j + 2)->equals(str));
     }
-
-    delete i;
-    delete b;
-    delete f;
-    delete s;
 
     exit(0);
 }

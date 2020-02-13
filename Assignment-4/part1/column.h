@@ -690,7 +690,7 @@ public:
      * rather than an array of arrays. 
      * 
      * @param idx the index as if this is a linear array (out of size_)
-     * @return bool the value at that index
+     * @return float the value at that index
      */
     float get(size_t idx)
     {
@@ -703,12 +703,12 @@ public:
      * rather than an array of arrays. 
      * 
      * @param idx the index as if this is a linear array (out of size_) at which the value is changed
-     * @param b the new value to be used at idx
+     * @param f the new value to be used at idx
      */
-    void set(size_t idx, bool b)
+    void set(size_t idx, float f)
     {
         assert(!outOfBounds(idx));
-        arr_[idx / arr_size_][idx % arr_size_] = b;
+        arr_[idx / arr_size_][idx % arr_size_] = f;
     }
 
     /**
