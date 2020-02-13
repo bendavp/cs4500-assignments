@@ -815,7 +815,7 @@ public:
         {
             return true;
         }
-        FloatFastArray *other = dynamic_cast<FloatFastArray *>(other);
+        FloatFastArray *other = dynamic_cast<FloatFastArray *>(o);
         if (other == nullptr)
         {
             return false;
@@ -1100,7 +1100,7 @@ public:
         {
             return true;
         }
-        StringFastArray *other = dynamic_cast<StringFastArray *>(other);
+        StringFastArray *other = dynamic_cast<StringFastArray *>(o);
         if (other == nullptr)
         {
             return false;
