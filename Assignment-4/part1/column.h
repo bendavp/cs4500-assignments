@@ -39,11 +39,21 @@ public:
 
     IntFastArray(IntFastArray &i)
     {
-        arr_ = i.arr_;
-        memory_ = i.memory_;
+        memory_ = 16;
         arr_size_ = i.arr_size_;
-        size_ = i.size_;
-        arr_fill_ = i.arr_fill_;
+        size_ = 0;
+        arr_fill_ = 0;
+        arr_ = new int *[memory_];
+        // get values from the array we're copying from and copy them here
+        for (size_t j = 0; j < i.size(); j++)
+        {
+            push_back(i.get(j));
+        }
+        // fill the remainder of the memory_ with nullptr
+        for (size_t j = arr_fill_; j < memory_; j++)
+        {
+            arr_[j] = nullptr;
+        }
     }
 
     // constructor taking in variable number of arguments
@@ -278,9 +288,9 @@ public:
     /**
      * @brief Cloning this as a new Object (that is a IntFastArray)
      * 
-     * @return Object* the cloned IntFastArray
+     * @return IntFastArray* the cloned IntFastArray
      */
-    Object *clone()
+    IntFastArray *clone()
     {
         return new IntFastArray(*this);
     }
@@ -321,11 +331,21 @@ public:
 
     BoolFastArray(BoolFastArray &b)
     {
-        arr_ = b.arr_;
-        memory_ = b.memory_;
+        memory_ = 16;
         arr_size_ = b.arr_size_;
-        size_ = b.size_;
-        arr_fill_ = b.arr_fill_;
+        size_ = 0;
+        arr_fill_ = 0;
+        arr_ = new bool *[memory_];
+        // get values from the array we're copying from and copy them here
+        for (size_t j = 0; j < b.size(); j++)
+        {
+            push_back(b.get(j));
+        }
+        // fill the remainder of the memory_ with nullptr
+        for (size_t j = arr_fill_; j < memory_; j++)
+        {
+            arr_[j] = nullptr;
+        }
     }
 
     // constructor taking in variable number of arguments
@@ -560,9 +580,9 @@ public:
     /**
      * @brief Cloning this as a new Object (that is a BoolFastArray)
      * 
-     * @return Object* the cloned BoolFastArray
+     * @return BoolFastArray* the cloned BoolFastArray
      */
-    Object *clone()
+    BoolFastArray *clone()
     {
         return new BoolFastArray(*this);
     }
@@ -669,11 +689,21 @@ public:
 
     FloatFastArray(FloatFastArray &f)
     {
-        arr_ = f.arr_;
-        memory_ = f.memory_;
+        memory_ = 16;
         arr_size_ = f.arr_size_;
-        size_ = f.size_;
-        arr_fill_ = f.arr_fill_;
+        size_ = 0;
+        arr_fill_ = 0;
+        arr_ = new float *[memory_];
+        // get values from the array we're copying from and copy them here
+        for (size_t j = 0; j < f.size(); j++)
+        {
+            push_back(f.get(j));
+        }
+        // fill the remainder of the memory_ with nullptr
+        for (size_t j = arr_fill_; j < memory_; j++)
+        {
+            arr_[j] = nullptr;
+        }
     }
 
     /**
@@ -842,9 +872,9 @@ public:
     /**
      * @brief Cloning this as a new Object (that is a FloatFastArray)
      * 
-     * @return Object* the cloned FloatFastArray
+     * @return FloatFastArray* the cloned FloatFastArray
      */
-    Object *clone()
+    FloatFastArray *clone()
     {
         return new FloatFastArray(*this);
     }
@@ -885,11 +915,22 @@ public:
 
     StringFastArray(StringFastArray &s)
     {
-        arr_ = s.arr_;
-        memory_ = s.memory_;
+        memory_ = 16;
         arr_size_ = s.arr_size_;
-        size_ = s.size_;
-        arr_fill_ = s.arr_fill_;
+        size_ = 0;
+        arr_fill_ = 0;
+        arr_ = new String **[memory_];
+        // get values from the array we're copying from and copy them here
+        for (size_t j = 0; j < s.size(); j++)
+        {
+            // detaches this array completely from the array copying from (i.e. create new string ptrs)
+            push_back(s.get(j)->clone());
+        }
+        // fill the remainder of the memory_ with nullptr
+        for (size_t j = arr_fill_; j < memory_; j++)
+        {
+            arr_[j] = nullptr;
+        }
     }
 
     // constructor taking in variable number of arguments
@@ -1127,9 +1168,9 @@ public:
     /**
      * @brief Cloning this as a new Object (that is a FloatFastArray)
      * 
-     * @return Object* the cloned FloatFastArray
+     * @return StringFastArray* the cloned FloatFastArray
      */
-    Object *clone()
+    StringFastArray *clone()
     {
         return new StringFastArray(*this);
     }
@@ -1228,7 +1269,7 @@ public:
 
     BoolColumn(BoolColumn &b)
     {
-        arr_ = b.arr_;
+        arr_ = b.arr_->clone();
     }
 
     ~BoolColumn()
@@ -1301,7 +1342,7 @@ public:
 
     IntColumn(IntColumn &i)
     {
-        arr_ = i.arr_;
+        arr_ = i.arr_->clone();
     }
 
     ~IntColumn()
@@ -1373,7 +1414,7 @@ public:
 
     FloatColumn(FloatColumn &f)
     {
-        arr_ = f.arr_;
+        arr_ = f.arr_->clone();
     }
 
     ~FloatColumn()
@@ -1447,7 +1488,7 @@ public:
 
     StringColumn(StringColumn &s)
     {
-        arr_ = s.arr_;
+        arr_ = s.arr_->clone();
     }
 
     ~StringColumn()
@@ -1530,11 +1571,22 @@ public:
 
     ColumnFastArray(ColumnFastArray &c)
     {
-        arr_ = c.arr_;
-        memory_ = c.memory_;
+        memory_ = 16;
         arr_size_ = c.arr_size_;
-        size_ = c.size_;
-        arr_fill_ = c.arr_fill_;
+        size_ = 0;
+        arr_fill_ = 0;
+        arr_ = new Column **[memory_];
+        // get values from the array we're copying from and copy them here
+        for (size_t j = 0; j < c.size(); j++)
+        {
+            // detaches this copy completely from the previous copy and creates new pointers for everything inside
+            push_back(c.get(j)->clone());
+        }
+        // fill the remainder of the memory_ with nullptr
+        for (size_t j = arr_fill_; j < memory_; j++)
+        {
+            arr_[j] = nullptr;
+        }
     }
 
     // constructor taking in variable number of arguments
