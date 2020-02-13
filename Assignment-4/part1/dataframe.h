@@ -206,7 +206,10 @@ public:
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
-    void join_delete(Rower *other) {}
+    void join_delete(Rower *other)
+    {
+        delete[] other;
+    }
 };
 
 /****************************************************************************
@@ -374,7 +377,7 @@ public:
         // check if the row has the same schema (i.e. same col type/name)
         // if the schemas are not the same then the program should terminate
         assert(schema_->width() == row.schema_->width());
-        for (size_t i = 0; i < schema_->width(); row.schema_)
+        for (size_t i = 0; i < schema_->width(); i++)
         {
             assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
             assert(schema_->col_type(i) == row.schema_->col_type(i));
@@ -398,7 +401,7 @@ public:
                 col_arr_->get(i)->push_back(row.get_bool(i));
             }
         }
-        schema_->add_row(row.schema_->row_name(row.get_idx)); // add the row to this schema
+        schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row to this schema
         nrows_ = nrows_ + 1;
     }
 
