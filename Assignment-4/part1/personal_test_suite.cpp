@@ -59,8 +59,8 @@ void testGet()
     GT_EQUALS(i->get(4), 5);
     GT_EQUALS(b->get(0), true);
     GT_EQUALS(b->get(1), false);
-    GT_TRUE(fabs(f->get(0) - 4.20) < 0.001);
-    GT_TRUE(fabs(f->get(3) - 4.20) < 0.001);
+    GT_TRUE(f->get(0) - 4.20 < 0.001 || f->get(0) - 4.20 > -.001);
+    GT_TRUE(f->get(3) - 4.20 < 0.001 || f->get(3) - 4.20 > -.001);
     GT_TRUE(s->get(0)->equals(new String("hello")));
     GT_TRUE(s->get(1)->equals(new String("world")));
 
@@ -78,7 +78,7 @@ void testSet()
     IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
     BoolFastArray *b = new BoolFastArray(2, true, false);
     FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, "hello", "world");
+    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
 
     i->set(0, 420);
     i->set(4, 69);
@@ -92,8 +92,8 @@ void testSet()
 
     f->set(0, 4.20);
     f->set(3, 6.9);
-    GT_EQUALS(f->get(0), (float)4.20);
-    GT_EQUALS(f->get(3), (float)6.9);
+    GT_TRUE(f->get(0) - 4.20 < 0.001 || f->get(0) - 4.20 > -.001);
+    GT_TRUE(f->get(3) - 6.9 < 0.001 || f->get(3) - 6.9 > -.001);
 
     String *h = new String("Heeellloooooo"); // no need to delete these as FastArrays own their contents
     String *w = new String("wooooorllddddd");
@@ -122,7 +122,7 @@ void testGrowAndPushBack()
     IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
     BoolFastArray *b = new BoolFastArray(2, true, false);
     FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, "hello", "world");
+    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
 
     for (int j = 0; j < 512; j++)
     {
@@ -139,7 +139,7 @@ void testGrowAndPushBack()
     for (int j = 0; j < 512; j++)
     {
         f->push_back(4.20);
-        GT_EQUALS(f->get(j + 4), 4.20);
+        GT_TRUE(f->get(j + 4) - 4.20 < 0.001 || f->get(j + 4) - 4.20 > -.001);
     }
 
     String *str = new String("hello world"); // FastArrays own their contents, so no need to delete this at the end
