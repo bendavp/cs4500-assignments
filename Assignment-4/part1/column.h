@@ -182,7 +182,6 @@ public:
      */
     void grow()
     {
-        p("hello   ");
         // we have filled up all of the int arrays in the memory space we have allocated completely
         // need to expand the memory of the "outer" array
         if (arr_fill_ == memory_)
@@ -191,9 +190,6 @@ public:
             memory_ = memory_ * 2;                // double the memory
             int **temp_arr_ = new int *[memory_]; // initalize new int** with the new mem size
             // copy over pointers from filled array
-            p("if");
-            p(arr_fill_);
-            p(memory_);
             for (size_t i = 0; i < arr_fill_; i++)
             {
                 temp_arr_[i] = arr_[i];
@@ -207,16 +203,12 @@ public:
             arr_fill_ = arr_fill_ + 1;                 // increase this count
             delete arr_;                               // delete the old arr_ and its pointers
             arr_ = temp_arr_;                          // set arr_ to the new expanded array
-            p("   end   ");
-            pln(arr_fill_);
         }
         // we only need to create a new int array in place of the next nullptr
         else
         {
             arr_[arr_fill_] = new int[arr_size_];
             arr_fill_ = arr_fill_ + 1;
-            p("else");
-            pln(arr_fill_);
         }
     }
 
@@ -371,6 +363,37 @@ public:
         }
     }
 
+    BoolFastArray(int n, va_list v1) : Object()
+    {
+        arr_size_ = 16;
+        memory_ = 16;
+        size_ = n;
+        // doubles memory as necessary to ensure all elements will fit with space to grow
+        while (n / arr_size_ > memory_)
+        {
+            memory_ = memory_ * 2;
+        }
+        arr_ = new bool *[memory_]; // initializing int**
+        arr_fill_ = 0;              // initialize as 0, will iterate through later
+        // adding var arg ints
+        for (size_t i = 0; i < n; i++)
+        {
+            // create new bool array/bool array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new bool[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            arr_[i / arr_size_][i % arr_size_] = va_arg(v1, int);
+        }
+        // fill the rest of the array with nullptr
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
+        }
+    }
+
     /**
      * @brief Destroy the Bool Fast Array object
      * 
@@ -462,7 +485,6 @@ public:
             arr_fill_ = arr_fill_ + 1;                  // increase this count
             delete arr_;                                // delete the old arr_ and its pointers
             arr_ = temp_arr_;                           // set arr_ to the new expanded array
-            delete temp_arr_;
         }
         // we only need to create a new int array in place of the next nullptr
         else
@@ -511,7 +533,7 @@ public:
         {
             return true;
         }
-        BoolFastArray *other = dynamic_cast<BoolFastArray *>(other);
+        BoolFastArray *other = dynamic_cast<BoolFastArray *>(o);
         if (other == nullptr)
         {
             return false;
@@ -607,6 +629,37 @@ public:
             arr_[i / arr_size_][i % arr_size_] = va_arg(v1, float);
         }
         va_end(v1);
+        // fill the rest of the array with nullptr
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
+        }
+    }
+
+    FloatFastArray(int n, va_list v1) : Object()
+    {
+        arr_size_ = 16;
+        memory_ = 16;
+        size_ = n;
+        // doubles memory as necessary to ensure all elements will fit with space to grow
+        while (n / arr_size_ > memory_)
+        {
+            memory_ = memory_ * 2;
+        }
+        arr_ = new float *[memory_]; // initializing float**
+        arr_fill_ = 0;               // initialize as 0, will iterate through later
+        // adding var arg ints
+        for (size_t i = 0; i < n; i++)
+        {
+            // create new float array/float array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new float[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            arr_[i / arr_size_][i % arr_size_] = va_arg(v1, float);
+        }
         // fill the rest of the array with nullptr
         for (size_t i = arr_fill_; i < memory_; i++)
         {
@@ -714,7 +767,6 @@ public:
             arr_fill_ = arr_fill_ + 1;                   // increase this count
             delete arr_;                                 // delete the old arr_ and its pointers
             arr_ = temp_arr_;                            // set arr_ to the new expanded array
-            delete temp_arr_;
         }
         // we only need to create a new float array in place of the next nullptr
         else
@@ -754,8 +806,8 @@ public:
      * @brief Returns whether this is equal (in terms of elements/values) compared to the given Object o.
      * 
      * @param o - object this is being compared to
-     * @return true - if o is an IntFastArray and all elements are within o and this are the same
-     * @return false - if o is not an IntFastArray or if elements in o and this are not the same
+     * @return true - if o is an FloatFastArray and all elements are within o and this are the same
+     * @return false - if o is not an FloatFastArray or if elements in o and this are not the same
      */
     bool equals(Object *o)
     {
@@ -876,6 +928,38 @@ public:
         }
     }
 
+    StringFastArray(int n, va_list v1)
+    {
+        arr_size_ = 16;
+        memory_ = 16;
+        size_ = n;
+        // doubles memory as necessary to ensure all elements will fit with space to grow
+        while (n / arr_size_ > memory_)
+        {
+            memory_ = memory_ * 2;
+        }
+        arr_ = new String **[memory_]; // initializing string***
+        arr_fill_ = 0;                 // initialize as 0, will iterate through later
+        // adding var arg ints
+        for (size_t i = 0; i < n; i++)
+        {
+            // create new string array/string array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new String *[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            String *new_ = va_arg(v1, String *);
+            arr_[i / arr_size_][i % arr_size_] = new_;
+        }
+        // fill the rest of the array with nullptr
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
+        }
+    }
+
     /**
      * @brief Destroy the String Fast Array object
      * 
@@ -968,7 +1052,6 @@ public:
             arr_fill_ = arr_fill_ + 1;                      // increase this count
             delete arr_;                                    // delete the old arr_ and its pointers
             arr_ = temp_arr_;                               // set arr_ to the new expanded array
-            delete temp_arr_;
         }
         // we only need to create a new string* array in place of the next nullptr
         else
@@ -1138,7 +1221,9 @@ public:
     BoolColumn(int n, ...) : Column()
     {
         va_list v1;
+        va_start(v1, n);
         arr_ = new BoolFastArray(n, v1);
+        va_end(v1);
     }
 
     BoolColumn(BoolColumn &b)
@@ -1281,7 +1366,9 @@ public:
     FloatColumn(int n, ...) : Column()
     {
         va_list v1;
+        va_start(v1, n);
         arr_ = new FloatFastArray(n, v1);
+        va_end(v1);
     }
 
     FloatColumn(FloatColumn &f)
@@ -1353,6 +1440,7 @@ public:
     StringColumn(int n, ...) : Column()
     {
         va_list v1;
+        va_start(v1, n);
         arr_ = new StringFastArray(n, v1);
     }
 
@@ -1483,6 +1571,37 @@ public:
         }
     }
 
+    ColumnFastArray(int n, va_list v1) : Object()
+    {
+        arr_size_ = 16;
+        memory_ = 16;
+        size_ = n;
+        // doubles memory as necessary to ensure all elements will fit with space to grow
+        while (n / arr_size_ > memory_)
+        {
+            memory_ = memory_ * 2;
+        }
+        arr_ = new Column **[memory_]; // initializing Column***
+        arr_fill_ = 0;                 // initialize as 0, will iterate through later
+        // adding var arg ints
+        for (size_t i = 0; i < n; i++)
+        {
+            // create new Column array/Column array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new Column *[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            arr_[i / arr_size_][i % arr_size_] = va_arg(v1, Column *);
+        }
+        // fill the rest of the array with nullptr
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
+        }
+    }
+
     /**
      * @brief Destroy the Column Fast Array object
      * 
@@ -1575,7 +1694,6 @@ public:
             arr_fill_ = arr_fill_ + 1;                      // increase this count
             delete arr_;                                    // delete the old arr_ and its pointers
             arr_ = temp_arr_;                               // set arr_ to the new expanded array
-            delete temp_arr_;
         }
         // we only need to create a new Column* array in place of the next nullptr
         else
@@ -1615,14 +1733,14 @@ public:
      * @brief Returns whether this is equal (in terms of elements/values) compared to the given Object o.
      * 
      * @param o - object this is being compared to
-     * @return true - if o is an StringFastArray and all elements are within o and this are the same
-     * @return false - if o is not an StringFastArray or if elements in o and this are not the same
+     * @return true - if o is an ColumnFastArray and all elements are within o and this are the same
+     * @return false - if o is not an ColumnFastArray or if elements in o and this are not the same
      */
     bool equals(Object *o)
     {
         if (o == this)
             return true;
-        ColumnFastArray *other = dynamic_cast<ColumnFastArray *>(other);
+        ColumnFastArray *other = dynamic_cast<ColumnFastArray *>(o);
         if (other == nullptr)
         {
             return false;
