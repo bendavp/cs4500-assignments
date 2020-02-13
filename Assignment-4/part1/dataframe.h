@@ -208,7 +208,7 @@ public:
       is reponsible for cleaning up memory. */
     void join_delete(Rower *other)
     {
-        delete[] other;
+        delete other;
     }
 };
 
