@@ -61,6 +61,7 @@ public:
         arr_fill_ = 0;             // initialize as 0, will iterate through later
         // adding var arg ints
         va_list v1;
+        va_start(v1, n);
         for (size_t i = 0; i < n; i++)
         {
             // create new int array/int array pointer as necessary
@@ -73,6 +74,37 @@ public:
             arr_[i / arr_size_][i % arr_size_] = va_arg(v1, int);
         }
         va_end(v1);
+        // fill the rest of the array with nullptr
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
+        }
+    }
+
+    IntFastArray(int n, va_list v1) : Object()
+    {
+        arr_size_ = 16;
+        memory_ = 16;
+        size_ = n;
+        // doubles memory as necessary to ensure all elements will fit with space to grow
+        while (n / arr_size_ > memory_)
+        {
+            memory_ = memory_ * 2;
+        }
+        arr_ = new int *[memory_]; // initializing int**
+        arr_fill_ = 0;             // initialize as 0, will iterate through later
+        // adding var arg ints
+        for (size_t i = 0; i < n; i++)
+        {
+            // create new int array/int array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new int[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            arr_[i / arr_size_][i % arr_size_] = va_arg(v1, int);
+        }
         // fill the rest of the array with nullptr
         for (size_t i = arr_fill_; i < memory_; i++)
         {
@@ -150,6 +182,7 @@ public:
      */
     void grow()
     {
+        p("hello   ");
         // we have filled up all of the int arrays in the memory space we have allocated completely
         // need to expand the memory of the "outer" array
         if (arr_fill_ == memory_)
@@ -158,6 +191,9 @@ public:
             memory_ = memory_ * 2;                // double the memory
             int **temp_arr_ = new int *[memory_]; // initalize new int** with the new mem size
             // copy over pointers from filled array
+            p("if");
+            p(arr_fill_);
+            p(memory_);
             for (size_t i = 0; i < arr_fill_; i++)
             {
                 temp_arr_[i] = arr_[i];
@@ -171,13 +207,16 @@ public:
             arr_fill_ = arr_fill_ + 1;                 // increase this count
             delete arr_;                               // delete the old arr_ and its pointers
             arr_ = temp_arr_;                          // set arr_ to the new expanded array
-            delete temp_arr_;
+            p("   end   ");
+            pln(arr_fill_);
         }
         // we only need to create a new int array in place of the next nullptr
         else
         {
             arr_[arr_fill_] = new int[arr_size_];
             arr_fill_ = arr_fill_ + 1;
+            p("else");
+            pln(arr_fill_);
         }
     }
 
@@ -220,7 +259,7 @@ public:
         {
             return true;
         }
-        IntFastArray *other = dynamic_cast<IntFastArray *>(other);
+        IntFastArray *other = dynamic_cast<IntFastArray *>(o);
         if (other == nullptr)
         {
             return false;
@@ -312,6 +351,7 @@ public:
         arr_fill_ = 0;              // initialize as 0, will iterate through later
         // adding var arg ints
         va_list v1;
+        va_start(v1, n);
         for (size_t i = 0; i < n; i++)
         {
             // create new bool array/bool array pointer as necessary
@@ -554,6 +594,7 @@ public:
         arr_fill_ = 0;               // initialize as 0, will iterate through later
         // adding var arg ints
         va_list v1;
+        va_start(v1, n);
         for (size_t i = 0; i < n; i++)
         {
             // create new float array/float array pointer as necessary
@@ -814,6 +855,7 @@ public:
         arr_fill_ = 0;                 // initialize as 0, will iterate through later
         // adding var arg ints
         va_list v1;
+        va_start(v1, n);
         for (size_t i = 0; i < n; i++)
         {
             // create new string array/string array pointer as necessary
@@ -823,7 +865,7 @@ public:
                 arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
             }
             // filling appropriate location with the value
-            String *new_ = va_arg(v1, String *)->clone();
+            String *new_ = va_arg(v1, String *);
             arr_[i / arr_size_][i % arr_size_] = new_;
         }
         va_end(v1);
@@ -1167,7 +1209,9 @@ public:
     IntColumn(int n, ...) : Column()
     {
         va_list v1;
+        va_start(v1, n);
         arr_ = new IntFastArray(n, v1);
+        va_end(v1);
     }
 
     IntColumn(IntColumn &i)
@@ -1419,6 +1463,7 @@ public:
         arr_fill_ = 0;                 // initialize as 0, will iterate through later
         // adding var arg ints
         va_list v1;
+        va_start(v1, n);
         for (size_t i = 0; i < n; i++)
         {
             // create new Column array/Column array pointer as necessary
