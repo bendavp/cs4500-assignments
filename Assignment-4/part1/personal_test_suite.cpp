@@ -139,7 +139,7 @@ void testGrowAndPushBack()
     for (int j = 0; j < 512; j++)
     {
         f->push_back(4.20);
-        GT_TRUE(f->get(j + 4) - 4.20 < 0.001 || f->get(j + 4) - 4.20 > -.001);
+        GT_TRUE(f->get(j + 4) - 4.20 < 0.001 && f->get(j + 4) - 4.20 > -.001);
     }
 
     String *str = new String("hello world"); // FastArrays own their contents, so no need to delete this at the end
