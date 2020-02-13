@@ -17,7 +17,7 @@
  */
 void testIntColumnGet1()
 {
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     for (int j = 0; j < 17; j++)
     {
         CS4500_ASSERT_TRUE(i->get(j) == j);
@@ -37,7 +37,7 @@ TEST(W1, int1)
  */
 void testIntColumnSet2()
 {
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     // set 1 value in i to something else and check if that one value changed correctly
     i->set(8, 8888);
     CS4500_ASSERT_TRUE(i->get(8) == 8888);
@@ -77,7 +77,7 @@ void testIntColumnPushBack3()
     delete i_;
 
     // checking nonempty array
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     for (size_t j = 0; j < 10000000; j++)
     {
         i->push_back(j * 3);
@@ -110,7 +110,7 @@ void testIntColumnSize4()
     CS4500_ASSERT_TRUE(i_->size() == 10000000);
     delete i_;
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     CS4500_ASSERT_TRUE(i->size() == 17);
     // adding to nonempty column and checking to see if size is as expected after each add and at the end
     for (size_t j = 0; j < 10000000; j++)
@@ -144,7 +144,7 @@ void testIntColumnAsType5()
     CS4500_ASSERT_TRUE(i_->as_float() == nullptr);
     CS4500_ASSERT_TRUE(i_->as_string() == nullptr);
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     CS4500_ASSERT_TRUE(i == i->as_int());
     CS4500_ASSERT_TRUE(i->as_bool() == nullptr);
     CS4500_ASSERT_TRUE(i->as_float() == nullptr);
@@ -169,7 +169,7 @@ void testIntColumnGetType6()
     Column *i_ = new IntColumn();
     CS4500_ASSERT_TRUE(i_->get_type() == 'I');
     // checking nonempty column
-    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    IntColumn *i = new IntColumn(17, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
     CS4500_ASSERT_TRUE(i->get_type() == 'I');
     delete i;
     delete i_;

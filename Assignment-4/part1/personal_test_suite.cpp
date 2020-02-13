@@ -59,8 +59,8 @@ void testGet()
     GT_EQUALS(i->get(4), 5);
     GT_EQUALS(b->get(0), true);
     GT_EQUALS(b->get(1), false);
-    GT_TRUE(f->get(0) - 4.20 < 0.001 || f->get(0) - 4.20 > -.001);
-    GT_TRUE(f->get(3) - 4.20 < 0.001 || f->get(3) - 4.20 > -.001);
+    GT_TRUE(f->get(0) - 4.20 < 0.001 && f->get(0) - 4.20 > -.001);
+    GT_TRUE(f->get(3) - 4.20 < 0.001 && f->get(3) - 4.20 > -.001);
     GT_TRUE(s->get(0)->equals(new String("hello")));
     GT_TRUE(s->get(1)->equals(new String("world")));
 
@@ -92,8 +92,8 @@ void testSet()
 
     f->set(0, 4.20);
     f->set(3, 6.9);
-    GT_TRUE(f->get(0) - 4.20 < 0.001 || f->get(0) - 4.20 > -.001);
-    GT_TRUE(f->get(3) - 6.9 < 0.001 || f->get(3) - 6.9 > -.001);
+    GT_TRUE(f->get(0) - 4.20 < 0.001 && f->get(0) - 4.20 > -.001);
+    GT_TRUE(f->get(3) - 6.9 < 0.001 && f->get(3) - 6.9 > -.001);
 
     String *h = new String("Heeellloooooo"); // no need to delete these as FastArrays own their contents
     String *w = new String("wooooorllddddd");
