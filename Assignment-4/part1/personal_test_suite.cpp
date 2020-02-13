@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "column.h"
+#include <math.h>
 
 #define GT_TRUE(a) ASSERT_EQ((a), true)
 #define GT_FALSE(a) ASSERT_EQ((a), false)
@@ -18,18 +19,26 @@ void doesVaListActuallyWork()
     IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
     BoolFastArray *b = new BoolFastArray(2, true, false);
     FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, "hello", "world");
+    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
 
     IntColumn *ic = new IntColumn(5, 1, 2, 3, 4, 5);
     BoolColumn *bc = new BoolColumn(2, true, false);
     FloatColumn *fc = new FloatColumn(4, 4.20, 4.20, 4.20, 4.20);
-    StringColumn *sc = new StringColumn(2, "hello", "world");
+    StringColumn *sc = new StringColumn(2, new String("hello"), new String("world"));
 
     GT_TRUE(i->equals(ic->arr_));
     GT_TRUE(b->equals(bc->arr_));
     GT_TRUE(f->equals(fc->arr_));
     GT_TRUE(s->equals(sc->arr_));
 
+    delete i;
+    delete b;
+    delete f;
+    delete s;
+    delete ic;
+    delete bc;
+    delete fc;
+    delete sc;
     exit(0);
 }
 
@@ -44,14 +53,14 @@ void testGet()
     IntFastArray *i = new IntFastArray(5, 1, 2, 3, 4, 5);
     BoolFastArray *b = new BoolFastArray(2, true, false);
     FloatFastArray *f = new FloatFastArray(4, 4.20, 4.20, 4.20, 4.20);
-    StringFastArray *s = new StringFastArray(2, "hello", "world");
+    StringFastArray *s = new StringFastArray(2, new String("hello"), new String("world"));
 
     GT_EQUALS(i->get(0), 1);
     GT_EQUALS(i->get(4), 5);
     GT_EQUALS(b->get(0), true);
     GT_EQUALS(b->get(1), false);
-    GT_EQUALS(f->get(0), 4.20);
-    GT_EQUALS(f->get(3), 4.20);
+    GT_TRUE(fabs(f->get(0) - 4.20) < 0.001);
+    GT_TRUE(fabs(f->get(3) - 4.20) < 0.001);
     GT_TRUE(s->get(0)->equals(new String("hello")));
     GT_TRUE(s->get(1)->equals(new String("world")));
 
