@@ -61,10 +61,13 @@ public:
     * in undefined behavior. */
     void add_column(char typ, String *name)
     {
-        // check all newly added name is different than the current names; terminates otherwise
-        for (size_t i = 0; i < col_names_->size(); i++)
+        if (name != nullptr)
         {
-            assert(!name->equals(col_names_->get(i)));
+            // check all newly added name is different than the current names; terminates otherwise
+            for (size_t i = 0; i < col_names_->size(); i++)
+            {
+                assert(!name->equals(col_names_->get(i)));
+            }
         }
         coltypes_->c(typ);
         col_names_->push_back(name);
@@ -74,10 +77,13 @@ public:
    *  expectd to be unique, duplicates result in undefined behavior. */
     void add_row(String *name)
     {
-        // check all newly added name is different than the current names; terminates otherwise
-        for (size_t i = 0; i < row_names_->size(); i++)
+        if (name != nullptr)
         {
-            assert(!name->equals(row_names_->get(i)));
+            // check all newly added name is different than the current names; terminates otherwise
+            for (size_t i = 0; i < row_names_->size(); i++)
+            {
+                assert(!name->equals(row_names_->get(i)));
+            }
         }
         row_names_->push_back(name);
     }
@@ -87,7 +93,7 @@ public:
     String *row_name(size_t idx)
     {
         assert(idx < length());
-        row_names_->get(idx);
+        return row_names_->get(idx);
     }
 
     /** Return name of column at idx; nullptr indicates no name given.
@@ -95,7 +101,7 @@ public:
     String *col_name(size_t idx)
     {
         assert(idx < width());
-        col_names_->get(idx);
+        return col_names_->get(idx);
     }
 
     /** Return type of column at idx. An idx >= width is undefined. */
@@ -146,12 +152,12 @@ public:
     /** The number of columns */
     size_t width()
     {
-        col_names_->size();
+        return col_names_->size();
     }
 
     /** The number of rows */
     size_t length()
     {
-        row_names_->size();
+        return row_names_->size();
     }
 };

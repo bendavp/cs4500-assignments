@@ -338,7 +338,7 @@ public:
         // check if the row has the same schema (i.e. same col type/name)
         // if the schemas are not the same then the program should terminate
         assert(schema_->width() == row.schema_->width());
-        for (size_t i = 0; i < schema_->width(); row.schema_)
+        for (size_t i = 0; i < schema_->width(); i++)
         {
             assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
             assert(schema_->col_type(i) == row.schema_->col_type(i));

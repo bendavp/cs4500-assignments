@@ -37,6 +37,15 @@ public:
         }
     }
 
+    IntFastArray(IntFastArray &i)
+    {
+        arr_ = i.arr_;
+        memory_ = i.memory_;
+        arr_size_ = i.arr_size_;
+        size_ = i.size_;
+        arr_fill_ = i.arr_fill_;
+    }
+
     // constructor taking in variable number of arguments
     IntFastArray(int n, ...) : Object()
     {
@@ -242,12 +251,7 @@ public:
      */
     Object *clone()
     {
-        IntFastArray *new_ = new IntFastArray();
-        for (size_t i = 0; i < size_; i++)
-        {
-            new_->push_back(this->get(i));
-        }
-        return new_;
+        return new IntFastArray(*this);
     }
 };
 
@@ -282,6 +286,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    BoolFastArray(BoolFastArray &b)
+    {
+        arr_ = b.arr_;
+        memory_ = b.memory_;
+        arr_size_ = b.arr_size_;
+        size_ = b.size_;
+        arr_fill_ = b.arr_fill_;
     }
 
     // constructor taking in variable number of arguments
@@ -489,12 +502,7 @@ public:
      */
     Object *clone()
     {
-        BoolFastArray *new_ = new BoolFastArray();
-        for (size_t i = 0; i < size_; i++)
-        {
-            new_->push_back(this->get(i));
-        }
-        return new_;
+        return new BoolFastArray(*this);
     }
 };
 
@@ -563,6 +571,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    FloatFastArray(FloatFastArray &f)
+    {
+        arr_ = f.arr_;
+        memory_ = f.memory_;
+        arr_size_ = f.arr_size_;
+        size_ = f.size_;
+        arr_fill_ = f.arr_fill_;
     }
 
     /**
@@ -736,12 +753,7 @@ public:
      */
     Object *clone()
     {
-        FloatFastArray *new_ = new FloatFastArray();
-        for (size_t i = 0; i < size_; i++)
-        {
-            new_->push_back(this->get(i));
-        }
-        return new_;
+        return new FloatFastArray(*this);
     }
 };
 
@@ -776,6 +788,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    StringFastArray(StringFastArray &s)
+    {
+        arr_ = s.arr_;
+        memory_ = s.memory_;
+        arr_size_ = s.arr_size_;
+        size_ = s.size_;
+        arr_fill_ = s.arr_fill_;
     }
 
     // constructor taking in variable number of arguments
@@ -985,12 +1006,359 @@ public:
      */
     Object *clone()
     {
-        StringFastArray *new_ = new StringFastArray();
-        for (size_t i = 0; i < size_; i++)
+        return new StringFastArray(*this);
+    }
+};
+
+class IntColumn;
+class BoolColumn;
+class FloatColumn;
+class StringColumn;
+
+/**************************************************************************
+ * Column ::
+ * Represents one column of a data frame which holds values of a single type.
+ * This abstract class defines methods overriden in subclasses. There is
+ * one subclass per element type. Columns are mutable, equality is pointer
+ * equality. */
+class Column : public Object
+{
+public:
+    /** Type converters: Return same column under its actual type, or
+   *  nullptr if of the wrong type.  */
+    virtual IntColumn *as_int() { return nullptr; }
+    virtual BoolColumn *as_bool() { return nullptr; }
+    virtual FloatColumn *as_float() { return nullptr; }
+    virtual StringColumn *as_string() { return nullptr; }
+
+    /** Type appropriate push_back methods. Calling the wrong method is
+    * undefined behavior. **/
+    virtual void push_back(int val) { assert(false); }
+    virtual void push_back(bool val) { assert(false); }
+    virtual void push_back(float val) { assert(false); }
+    virtual void push_back(String *val) { assert(false); }
+
+    /** Returns the number of elements in the column. */
+    virtual size_t size() { return 0; }
+
+    /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
+    char get_type()
+    {
+        if (this->as_int() != nullptr)
         {
-            new_->push_back(this->get(i));
+            return 'I';
         }
-        return new_;
+        else if (this->as_bool() != nullptr)
+        {
+            return 'B';
+        }
+        else if (this->as_float() != nullptr)
+        {
+            return 'F';
+        }
+        else if (this->as_string() != nullptr)
+        {
+            return 'S';
+        }
+        else
+        {
+            assert(false);
+        }
+    }
+
+    bool equals(Object *other)
+    {
+        return other == this;
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    virtual Object *clone() { return nullptr; }
+
+    /** Compute the hash code (subclass responsibility) */
+    virtual size_t hash_me() { return 0; }
+};
+
+/*************************************************************************/
+/**
+ * BoolColumn::
+ * Holds int values.
+ */
+class BoolColumn : public Column
+{
+public:
+    BoolFastArray *arr_;
+
+    BoolColumn() : Column()
+    {
+        arr_ = new BoolFastArray();
+    }
+
+    BoolColumn(int n, ...) : Column()
+    {
+        va_list v1;
+        arr_ = new BoolFastArray(n, v1);
+    }
+
+    BoolColumn(BoolColumn &b)
+    {
+        arr_ = b.arr_;
+    }
+
+    ~BoolColumn()
+    {
+        delete arr_;
+    }
+
+    bool get(size_t idx)
+    {
+        assert(idx < arr_->size());
+        return arr_->get(idx);
+    }
+
+    BoolColumn *as_bool()
+    {
+        return this;
+    }
+
+    /** Set value at idx. An out of bound idx is undefined.  */
+    void set(size_t idx, bool val)
+    {
+        assert(idx < arr_->size());
+        arr_->set(idx, val);
+    }
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(bool val)
+    {
+        arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        return new BoolColumn(*this);
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        return arr_->hash_me();
+    }
+};
+
+/*************************************************************************
+ * IntColumn::
+ * Holds int values.
+ */
+class IntColumn : public Column
+{
+public:
+    IntFastArray *arr_;
+
+    IntColumn() : Column()
+    {
+        arr_ = new IntFastArray();
+    }
+
+    IntColumn(int n, ...) : Column()
+    {
+        va_list v1;
+        arr_ = new IntFastArray(n, v1);
+    }
+
+    IntColumn(IntColumn &i)
+    {
+        arr_ = i.arr_;
+    }
+
+    ~IntColumn()
+    {
+        delete arr_;
+    }
+
+    int get(size_t idx)
+    {
+        assert(idx < arr_->size());
+        return arr_->get(idx);
+    }
+
+    IntColumn *as_int()
+    {
+        return this;
+    }
+    /** Set value at idx. An out of bound idx is undefined.  */
+    void set(size_t idx, int val)
+    {
+        assert(idx < arr_->size());
+        arr_->set(idx, val);
+    }
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(int val)
+    {
+        arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        return new IntColumn(*this);
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        return arr_->hash_me();
+    }
+};
+
+/*************************************************************************
+ * FloatColumn::
+ * Holds float values.
+ */
+class FloatColumn : public Column
+{
+public:
+    FloatFastArray *arr_;
+
+    FloatColumn() : Column()
+    {
+        arr_ = new FloatFastArray();
+    }
+
+    FloatColumn(int n, ...) : Column()
+    {
+        va_list v1;
+        arr_ = new FloatFastArray(n, v1);
+    }
+
+    FloatColumn(FloatColumn &f)
+    {
+        arr_ = f.arr_;
+    }
+
+    ~FloatColumn()
+    {
+        delete arr_;
+    }
+
+    float get(size_t idx)
+    {
+        assert(idx < arr_->size());
+        return arr_->get(idx);
+    }
+
+    FloatColumn *as_float()
+    {
+        return this;
+    }
+
+    /** Set value at idx. An out of bound idx is undefined.  */
+    void set(size_t idx, float val)
+    {
+        assert(idx < arr_->size());
+        arr_->set(idx, val);
+    }
+
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(float val)
+    {
+        arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        return new FloatColumn(*this);
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        return arr_->hash_me();
+    }
+};
+
+/*************************************************************************
+ * StringColumn::
+ * Holds string pointers. The strings are external.  Nullptr is a valid
+ * value.
+ */
+class StringColumn : public Column
+{
+public:
+    StringFastArray *arr_;
+
+    StringColumn() : Column()
+    {
+        arr_ = new StringFastArray();
+    }
+
+    StringColumn(int n, ...) : Column()
+    {
+        va_list v1;
+        arr_ = new StringFastArray(n, v1);
+    }
+
+    StringColumn(StringColumn &s)
+    {
+        arr_ = s.arr_;
+    }
+
+    ~StringColumn()
+    {
+        delete arr_;
+    }
+
+    StringColumn *as_string()
+    {
+        return this;
+    }
+
+    /** Returns the string at idx; undefined on invalid idx.*/
+    String *get(size_t idx)
+    {
+        assert(idx < arr_->size());
+        return arr_->get(idx);
+    }
+    /** Out of bound idx is undefined. */
+    void set(size_t idx, String *val)
+    {
+        assert(idx < arr_->size());
+        arr_->set(idx, val);
+    }
+    size_t size()
+    {
+        return arr_->size();
+    }
+
+    void push_back(String *val)
+    {
+        arr_->push_back(val);
+    }
+
+    /** Return a copy of the object; nullptr is considered an error */
+    Object *clone()
+    {
+        return new StringColumn(*this);
+    }
+
+    /** Compute the hash code (subclass responsibility) */
+    size_t hash_me()
+    {
+        return arr_->hash_me();
     }
 };
 
@@ -1025,6 +1393,15 @@ public:
         {
             arr_[i] = nullptr;
         }
+    }
+
+    ColumnFastArray(ColumnFastArray &c)
+    {
+        arr_ = c.arr_;
+        memory_ = c.memory_;
+        arr_size_ = c.arr_size_;
+        size_ = c.size_;
+        arr_fill_ = c.arr_fill_;
     }
 
     // constructor taking in variable number of arguments
@@ -1199,9 +1576,7 @@ public:
     bool equals(Object *o)
     {
         if (o == this)
-        {
             return true;
-        }
         ColumnFastArray *other = dynamic_cast<ColumnFastArray *>(other);
         if (other == nullptr)
         {
@@ -1231,360 +1606,8 @@ public:
      * 
      * @return Object* the cloned ColumnFastArray
      */
-    Object *clone()
+    virtual Object *clone()
     {
-        ColumnFastArray *new_ = new ColumnFastArray();
-        for (size_t i = 0; i < size_; i++)
-        {
-            new_->push_back(this->get(i));
-        }
-        return new_;
-    }
-};
-
-/**************************************************************************
- * Column ::
- * Represents one column of a data frame which holds values of a single type.
- * This abstract class defines methods overriden in subclasses. There is
- * one subclass per element type. Columns are mutable, equality is pointer
- * equality. */
-class Column : public Object
-{
-public:
-    /** Type converters: Return same column under its actual type, or
-   *  nullptr if of the wrong type.  */
-    virtual IntColumn *as_int() { return nullptr; }
-    virtual BoolColumn *as_bool() { return nullptr; }
-    virtual FloatColumn *as_float() { return nullptr; }
-    virtual StringColumn *as_string() { return nullptr; }
-
-    /** Type appropriate push_back methods. Calling the wrong method is
-    * undefined behavior. **/
-    virtual void push_back(int val) { assert(false); }
-    virtual void push_back(bool val) { assert(false); }
-    virtual void push_back(float val) { assert(false); }
-    virtual void push_back(String *val) { assert(false); }
-
-    /** Returns the number of elements in the column. */
-    virtual size_t size() { return 0; }
-
-    /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
-    char get_type()
-    {
-        if (this->as_int() != nullptr)
-        {
-            return 'I';
-        }
-        else if (this->as_bool() != nullptr)
-        {
-            return 'B';
-        }
-        else if (this->as_float() != nullptr)
-        {
-            return 'F';
-        }
-        else if (this->as_string() != nullptr)
-        {
-            return 'S';
-        }
-        else
-        {
-            assert(false);
-        }
-    }
-
-    bool equals(Object *other)
-    {
-        return other == this;
-    }
-
-    /** Return a copy of the object; nullptr is considered an error */
-    virtual Object *clone() { return nullptr; }
-
-    /** Compute the hash code (subclass responsibility) */
-    virtual size_t hash_me() { return 0; }
-};
-
-/*************************************************************************/
-/**
- * BoolColumn::
- * Holds int values.
- */
-class BoolColumn : public Column
-{
-public:
-    BoolFastArray *arr_;
-
-    BoolColumn() : Column()
-    {
-        arr_ = new BoolFastArray();
-    }
-
-    BoolColumn(int n, ...) : Column()
-    {
-        va_list v1;
-        arr_ = new BoolFastArray(n, v1);
-    }
-
-    ~BoolColumn()
-    {
-        delete arr_;
-    }
-
-    bool get(size_t idx)
-    {
-        assert(idx < arr_->size());
-        return arr_->get(idx);
-    }
-
-    BoolColumn *as_bool()
-    {
-        return this;
-    }
-
-    /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, bool val)
-    {
-        assert(idx < arr_->size());
-        arr_->set(idx, val);
-    }
-
-    size_t size()
-    {
-        return arr_->size();
-    }
-
-    void push_back(bool val)
-    {
-        arr_->push_back(val);
-    }
-
-    /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
-    {
-        BoolColumn *res = new BoolColumn();
-        for (size_t i = 0; i < arr_->size(); i++)
-        {
-            res->push_back(arr_->get(i));
-        }
-        return res;
-    }
-
-    /** Compute the hash code (subclass responsibility) */
-    size_t hash_me()
-    {
-        arr_->hash_me();
-    }
-};
-
-/*************************************************************************
- * IntColumn::
- * Holds int values.
- */
-class IntColumn : public Column
-{
-public:
-    IntFastArray *arr_;
-
-    IntColumn() : Column()
-    {
-        arr_ = new IntFastArray();
-    }
-
-    IntColumn(int n, ...) : Column()
-    {
-        va_list v1;
-        arr_ = new IntFastArray(n, v1);
-    }
-
-    ~IntColumn()
-    {
-        delete arr_;
-    }
-
-    int get(size_t idx)
-    {
-        assert(idx < arr_->size());
-        return arr_->get(idx);
-    }
-
-    IntColumn *as_int()
-    {
-        return this;
-    }
-    /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, int val)
-    {
-        assert(idx < arr_->size());
-        arr_->set(idx, val);
-    }
-
-    size_t size()
-    {
-        return arr_->size();
-    }
-
-    void push_back(int val)
-    {
-        arr_->push_back(val);
-    }
-
-    /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
-    {
-        IntColumn *res = new IntColumn();
-        for (size_t i = 0; i < arr_->size(); i++)
-        {
-            res->push_back(arr_->get(i));
-        }
-        return res;
-    }
-
-    /** Compute the hash code (subclass responsibility) */
-    size_t hash_me()
-    {
-        arr_->hash_me();
-    }
-};
-
-/*************************************************************************
- * FloatColumn::
- * Holds float values.
- */
-class FloatColumn : public Column
-{
-public:
-    FloatFastArray *arr_;
-
-    FloatColumn() : Column()
-    {
-        arr_ = new FloatFastArray();
-    }
-
-    FloatColumn(int n, ...) : Column()
-    {
-        va_list v1;
-        arr_ = new FloatFastArray(n, v1);
-    }
-
-    ~FloatColumn()
-    {
-        delete arr_;
-    }
-
-    float get(size_t idx)
-    {
-        assert(idx < arr_->size());
-        return arr_->get(idx);
-    }
-
-    FloatColumn *as_float()
-    {
-        return this;
-    }
-
-    /** Set value at idx. An out of bound idx is undefined.  */
-    void set(size_t idx, float val)
-    {
-        assert(idx < arr_->size());
-        arr_->set(idx, val);
-    }
-
-    size_t size()
-    {
-        return arr_->size();
-    }
-
-    void push_back(float val)
-    {
-        arr_->push_back(val);
-    }
-
-    /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
-    {
-        FloatColumn *res = new FloatColumn();
-        for (size_t i = 0; i < arr_->size(); i++)
-        {
-            res->push_back(arr_->get(i));
-        }
-        return res;
-    }
-
-    /** Compute the hash code (subclass responsibility) */
-    size_t hash_me()
-    {
-        arr_->hash_me();
-    }
-};
-
-/*************************************************************************
- * StringColumn::
- * Holds string pointers. The strings are external.  Nullptr is a valid
- * value.
- */
-class StringColumn : public Column
-{
-public:
-    StringFastArray *arr_;
-
-    StringColumn() : Column()
-    {
-        arr_ = new StringFastArray();
-    }
-
-    StringColumn(int n, ...) : Column()
-    {
-        va_list v1;
-        arr_ = new StringFastArray(n, v1);
-    }
-
-    ~StringColumn()
-    {
-        delete arr_;
-    }
-
-    StringColumn *as_string()
-    {
-        return this;
-    }
-
-    /** Returns the string at idx; undefined on invalid idx.*/
-    String *get(size_t idx)
-    {
-        assert(idx < arr_->size());
-        return arr_->get(idx);
-    }
-    /** Out of bound idx is undefined. */
-    void set(size_t idx, String *val)
-    {
-        assert(idx < arr_->size());
-        arr_->set(idx, val);
-    }
-    size_t size()
-    {
-        return arr_->size();
-    }
-
-    void push_back(String *val)
-    {
-        arr_->push_back(val);
-    }
-
-    /** Return a copy of the object; nullptr is considered an error */
-    Object *clone()
-    {
-        StringColumn *res = new StringColumn();
-        for (size_t i = 0; i < arr_->size(); i++)
-        {
-            res->push_back(arr_->get(i));
-        }
-        return res;
-    }
-
-    /** Compute the hash code (subclass responsibility) */
-    size_t hash_me()
-    {
-        arr_->hash_me();
+        return new ColumnFastArray(*this);
     }
 };
