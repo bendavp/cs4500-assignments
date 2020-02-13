@@ -23,28 +23,30 @@
  */
 void testAcceptNonemptyRow()
 {
-    Schema s = Schema("IISFB");  // nonempty schema
-    DataFrame df = Dataframe(s); // make df based on nonempty schema
-    Row r(df.get_schema());      // making a row based off the schema
+    Schema *s = new Schema("IISFB");   // nonempty schema
+    DataFrame *df = new DataFrame(*s); // make df based on nonempty schema
+    Row r = Row(df->get_schema());     // making a row based off the schema
     // filling df with rows
     for (size_t i = 0; i < 1000; i++)
     {
         r.set(0, (int)i);
         r.set(1, (int)i + 1);
-        r.set(2, "string hello");
-        r.set(3, (float)i + 0.22);
+        r.set(2, new String("string hello"));
+        r.set(3, (float)(i + 0.22));
         r.set(4, i % 2 == 1);
-        df.add_row(r);
+        df->add_row(r);
     }
     Rower rower_ = Rower(); // creating rower object
     // iterating through the rows and checking that the rower accepts each row given to it
-    for (size_t i = 0; i < df.nrows(); i++)
+    for (size_t i = 0; i < df->nrows(); i++)
     {
-        Row *r_ = new Row(df.get_schema());
-        df.fill_row(i, r_);
+        Row *r_ = new Row(df->get_schema());
+        df->fill_row(i, *r_);
         CS4500_ASSERT_TRUE(rower_.accept(*r_));
         delete r_;
     }
+    delete s;
+    delete df;
     exit(0);
 }
 
@@ -59,14 +61,15 @@ TEST(W1, testAcceptNonemptyRow)
  */
 void testAcceptEmptyRow()
 {
-    Schema = Schema s(); // empty schema
-    Row r = Row(s);      // making a row from empty schema
+    Schema *s = new Schema(); // empty schema
+    Row r = Row(*s);          // making a row from empty schema
     Rower rower_ = Rower();
     CS4500_ASSERT_TRUE(rower_.accept(r));
+    delete s;
     exit(0);
 }
 
-TEST(W1, testAcceptNonemptyRow)
+TEST(W1, testAcceptEmptyRow)
 {
     CS4500_ASSERT_EXIT_ZERO(testAcceptEmptyRow);
 }
@@ -77,26 +80,28 @@ TEST(W1, testAcceptNonemptyRow)
  */
 void testAcceptEmptyRow2()
 {
-    Schema = Schema s(); // empty schema
+    Schema *s = new Schema(); // empty schema
     // adding rows to schema
     for (size_t i = 0; i < 1000; i++)
     {
-        s.addRow(nullptr);
+        s->add_row(nullptr);
     }
-    DataFrame df = DataFrame(s); // dataframe which has 1000 rows and no columns
-    Rower rower_ = Rower();      // creating rower object
+    DataFrame *df = new DataFrame(*s); // dataframe which has 1000 rows and no columns
+    Rower rower_ = Rower();            // creating rower object
     // iterating through the rows and checking that the rower accepts each row given to it
-    for (size_t i = 0; i < df.nrows(); i++)
+    for (size_t i = 0; i < df->nrows(); i++)
     {
-        Row *r_ = new Row(df.get_schema());
-        df.fill_row(i, r_);
+        Row *r_ = new Row(df->get_schema());
+        df->fill_row(i, *r_);
         CS4500_ASSERT_TRUE(rower_.accept(*r_));
         delete r_;
     }
+    delete s;
+    delete df;
     exit(0);
 }
 
-TEST(W1, testAcceptNonemptyRow)
+TEST(W1, testAcceptEmptyRow2)
 {
     CS4500_ASSERT_EXIT_ZERO(testAcceptEmptyRow2);
 }
