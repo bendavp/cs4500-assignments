@@ -1442,6 +1442,7 @@ public:
         va_list v1;
         va_start(v1, n);
         arr_ = new StringFastArray(n, v1);
+        va_end(v1);
     }
 
     StringColumn(StringColumn &s)
