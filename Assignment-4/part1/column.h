@@ -927,21 +927,23 @@ public:
 
     StringFastArray(StringFastArray &s)
     {
-        memory_ = 16;
+        memory_ = s.memory_;
         arr_size_ = s.arr_size_;
-        size_ = 0;
+        size_ = s.size();
         arr_fill_ = 0;
-        arr_ = new String **[memory_];
-        // get values from the array we're copying from and copy them here
-        for (size_t j = 0; j < s.size(); j++)
+        arr_ = new String **[memory_]; // initializing string***
+        arr_fill_ = 0;                 // initialize as 0, will iterate through later
+        for (size_t i = 0; i < size_; i++)
         {
-            // detaches this array completely from the array copying from (i.e. create new string ptrs)
-            push_back(s.get(j)->clone());
-        }
-        // fill the remainder of the memory_ with nullptr
-        for (size_t j = arr_fill_; j < memory_; j++)
-        {
-            arr_[j] = nullptr;
+            // create new string array/string array pointer as necessary
+            if (i % arr_size_ == 0)
+            {
+                arr_[i / arr_size_] = new String *[arr_size_];
+                arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
+            }
+            // filling appropriate location with the value
+            String *new_ = s.get(i)->clone();
+            arr_[i / arr_size_][i % arr_size_] = new_;
         }
     }
 
