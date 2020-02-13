@@ -25,26 +25,18 @@ dataframe.h
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/dataframe.h
 
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/column.h
-fastarray.h
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/fastarray.h
+../string.h
+/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/string.h
 
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/dataframe.h
 schema.h
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/schema.h
 ../helper.h
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/helper.h
-column.h
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/column.h
-
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/fastarray.h
-column.h
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/column.h
-../string.h
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/string.h
 
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/schema.h
-fastarray.h
-/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/fastarray.h
+column.h
+/Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/part1/column.h
 
 /Users/bendavp/Documents/cs4500/cs4500-group/Assignment-4/string.h
 cstring
