@@ -222,6 +222,8 @@ public:
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
     virtual void join_delete(Rower *other) {}
+
+    virtual Rower *clone() {}
 };
 
 class RowPrinter : public Rower
@@ -322,6 +324,10 @@ public:
         if (ncols_ == 0)
         {
             nrows_ = col->size(); // if there were no columns, then set the row size to this column
+            for (size_t i = 0; i < nrows_; i++)
+            {
+                schema_->add_row(nullptr);
+            }
         }
         col_arr_->push_back(col->clone());
         schema_->add_column(col->get_type(), name->clone());
