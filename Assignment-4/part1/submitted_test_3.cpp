@@ -1,4 +1,4 @@
-// row
+// langCwC
 
 #include <gtest/gtest.h>
 #include "dataframe.h"
@@ -11,101 +11,48 @@
     ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*");
 
 /**
- * @brief Checking to see if we can accurately get the elements from an FloatColumn
+ * @brief Testing adding row by seeing if the dataframe's schema and other values have changed as expected. 
+ * Also tests if the strings are external. 
  * 
  */
-void testFloatColumnGet1()
+void testDataframeAddingRows()
 {
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
-    for (size_t j = 0; j < 17; j++)
+    // adding row to a nonempty schema
+    Schema *s = new Schema("IISFB");            // nonempty schema
+    DataFrame *df = new DataFrame(*s);          // make df based on nonempty schema
+    Row *r = new Row(df->get_schema());         // making a row based off the schema
+    String *toSet = new String("string hello"); // this string
+    // filling df with rows
+    for (size_t i = 0; i < 1000; i++)
     {
-        float expected = float(j) + 1.22;
-        CS4500_ASSERT_TRUE(i->get(j) - expected < 0.001);
-        //CS4500_ASSERT_TRUE(i->get(j) - expected > -0.001);
+        r->set(0, (int)i);
+        r->set(1, (int)i + 1);
+        r->set(2, toSet); // string should be external
+        r->set(3, (float)(i + 0.22));
+        r->set(4, i % 2 == 1);
+        df->add_row(*r);
     }
-    delete i;
+    CS4500_ASSERT_TRUE(df->get_schema().length() == 1000);
+    CS4500_ASSERT_TRUE(df->get_schema().width() == 5);
+    CS4500_ASSERT_TRUE(df->nrows() == 1000);
+    CS4500_ASSERT_TRUE(df->ncols() == 5);
+
+    // check to see if the columns values are as expected
+    delete toSet; // should be able to delete this string without affecting whats in the dataframe
+    String *expected = new String("string hello");
+    for (int i = 0; i < 1000; i++)
+    {
+        CS4500_ASSERT_TRUE(df->get_int(0, i) == i);
+        CS4500_ASSERT_TRUE(df->get_int(1, i) == (i + 1));
+        CS4500_ASSERT_TRUE(df->get_string(2, i)->equals(expected));
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 0.22) < 0.001);
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 0.22) > -0.001);
+        CS4500_ASSERT_TRUE(df->get_bool(1, i) == (i % 2 == 1));
+    }
     exit(0);
 }
 
-TEST(W1, Float1)
-{
-    CS4500_ASSERT_EXIT_ZERO(testFloatColumnGet1);
-}
-
-/**
- * @brief Testing set function via setting the values then getting them to check if we set the value correctly as each location.
- * 
- */
-void testFloatColumnSet2()
-{
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
-    // set 1 value in i to something else and check if that one value changed correctly
-    i->set(8, 8.88);
-    CS4500_ASSERT_TRUE(i->get(8) - 8.88 < 0.001 && i->get(8) - 8.88 > -0.001);
-    // set all values in i to something else and check
-    for (size_t j = 0; j < 17; j++)
-    {
-        i->set(j, (float)j + 2.22);
-    }
-    for (size_t j = 0; j < 17; j++)
-    {
-        float expected = float(j) + 2.22;
-        CS4500_ASSERT_TRUE((i->get(j) - expected) < 0.001);
-        CS4500_ASSERT_TRUE((i->get(j) - expected) > -0.001);
-    }
-    delete i;
-    exit(0);
-}
-
-TEST(W1, Float2)
-{
-    CS4500_ASSERT_EXIT_ZERO(testFloatColumnSet2);
-}
-
-/**
- * @brief Testing that push_back() function works as expected for empty and nonempty Columns. Check after each push back that the added element is
- * where and what is expected.
- * 
- */
-void testFloatColumnPushBack3()
-{
-    // checking empty column
-    FloatColumn *i_ = new FloatColumn();
-    // adding to empty column and checking to see if added element is where and what we expect
-    for (size_t j = 0; j < 10000000; j++)
-    {
-        float expected = float(j) + 2.42;
-        i_->push_back(expected);
-        CS4500_ASSERT_TRUE((i_->get(j) - expected) < 0.001);
-        CS4500_ASSERT_TRUE((i_->get(j) - expected) > -0.001);
-    }
-    delete i_;
-
-    // checking nonempty array
-    FloatColumn *i = new FloatColumn(17, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22, 9.22, 10.22, 11.22, 12.22, 13.22, 14.22, 15.22, 16.22, 17.22);
-    for (size_t j = 0; j < 10000000; j++)
-    {
-        float expected = float(j) + 2.44;
-        i->push_back(expected);
-        //CS4500_ASSERT_TRUE((i->get(j + 17) - expected) < 0.001);
-        //CS4500_ASSERT_TRUE((i->get(j + 17) - expected) > -0.001);
-    }
-    // check that the beginning is unchanged by pushback
-    for (size_t j = 0; j < 17; j++)
-    {
-        float expected = float(j) + 1.22;
-        //CS4500_ASSERT_TRUE((i->get(j) - expected) < 0.001);
-        //CS4500_ASSERT_TRUE((i->get(j) - expected) > -0.001);
-    }
-    delete i;
-
-    exit(0);
-}
-
-TEST(W1, Float3)
-{
-    CS4500_ASSERT_EXIT_ZERO(testFloatColumnPushBack3);
-}
+TEST(test3, dfAddRows) { CS4500_ASSERT_EXIT_ZERO(testDataframeAddingRows); }
 
 int main(int argc, char **argv)
 {
