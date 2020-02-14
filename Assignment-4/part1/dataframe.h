@@ -340,7 +340,18 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            if (schema_->col_name(i) == nullptr)
+            {
+                assert(row.schema_->col_name(i) == nullptr);
+            }
+            else if (row.schema_->col_name(i) == nullptr)
+            {
+                assert(schema_->col_name(i) == nullptr);
+            }
+            else
+            {
+                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         row.set_idx(idx);
@@ -379,7 +390,18 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            if (schema_->col_name(i) == nullptr)
+            {
+                assert(row.schema_->col_name(i) == nullptr);
+            }
+            else if (row.schema_->col_name(i) == nullptr)
+            {
+                assert(schema_->col_name(i) == nullptr);
+            }
+            else
+            {
+                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         for (size_t i = 0; i < row.width(); i++)
@@ -434,11 +456,11 @@ public:
     * returned true from its accept method. */
     DataFrame *filter(Rower &r)
     {
-        DataFrame *df = new DataFrame(*schema_);
+        DataFrame *df = new DataFrame(*this);
 
         for (size_t i = 0; i < nrows_; i++)
         {
-            Row row_ = Row(*schema_);
+            Row row_ = Row(df->get_schema());
             row_.set_idx(i);
             fill_row(i, row_);
             if (r.accept(row_))
