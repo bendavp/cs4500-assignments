@@ -12,6 +12,26 @@
 class Fielder : public Object
 {
 public:
+    /** Called before visiting a row, the argument is the row offset in the
+    dataframe. */
+    virtual void start(size_t r) {}
+
+    /** Called for fields of the argument's type with the value of the field. */
+    virtual void accept(bool b) {}
+
+    virtual void accept(float f) {}
+
+    virtual void accept(int i) {}
+
+    virtual void accept(String *s) {}
+
+    /** Called when all fields have been seen. */
+    virtual void done() {}
+};
+
+class Printer : public Fielder
+{
+public:
     size_t row_num_;
     /** Called before visiting a row, the argument is the row offset in the
     dataframe. */
@@ -195,11 +215,27 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
+    virtual bool accept(Row &r) {}
+
+    /** Once traversal of the data frame is complete the rowers that were
+      split off will be joined.  There will be one join per split. The
+      original object will be the last to be called join on. The join method
+      is reponsible for cleaning up memory. */
+    virtual void join_delete(Rower *other) {}
+};
+
+class RowPrinter : public Rower
+{
+public:
+    /** This method is called once per row. The row object is on loan and
+      should not be retained as it is likely going to be reused in the next
+      call. The return value is used in filters to indicate that a row
+      should be kept. */
     virtual bool accept(Row &r)
     {
-        Fielder fielder_ = Fielder();
-        fielder_.start(r.get_idx());
-        r.visit(r.get_idx(), fielder_);
+        Printer printer_ = Printer();
+        printer_.start(r.get_idx());
+        r.visit(r.get_idx(), printer_);
         return true;
     }
 
@@ -513,7 +549,7 @@ public:
     /** Print the dataframe in SoR format to standard output. */
     void print()
     {
-        Rower r = Rower();
+        RowPrinter r = RowPrinter();
         map(r);
     }
 };
