@@ -279,9 +279,17 @@ public:
     void add_column(Column *col, String *name)
     {
         assert(col != nullptr);
-        assert(col->size() == nrows_); // checking that size of column is the same
+        if (ncols_ > 0)
+        {
+            assert(col->size() == nrows_); // checking that size of column is the same
+        }
+        if (ncols_ == 0)
+        {
+            nrows_ = col->size(); // if there were no columns, then set the row size to this column
+        }
         col_arr_->push_back(col->clone());
         schema_->add_column(col->get_type(), name->clone());
+        ncols_ = ncols_ + 1; // update ncol size
     }
 
     /** Return the value at the given column and row. Accessing rows or
