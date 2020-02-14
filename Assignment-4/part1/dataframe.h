@@ -499,7 +499,7 @@ public:
                 col_arr_->get(i)->push_back(row.get_bool(i));
             }
         }
-        row.set_idx(nrows());
+        row.set_idx(nrows() - 1);
         if (row.schema_->length() > row.get_idx())
         {
             schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row's name to this schema

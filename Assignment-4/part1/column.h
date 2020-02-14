@@ -1038,7 +1038,7 @@ public:
     String *get(size_t idx)
     {
         assert(!outOfBounds(idx));
-        return arr_[idx / arr_size_][idx % arr_size_];
+        return arr_[idx / arr_size_][idx % arr_size_]->clone();
     }
 
     /**
@@ -1520,6 +1520,7 @@ public:
     }
 
     /** Returns the string at idx; undefined on invalid idx.*/
+    // returns copy of the string not the same pointer since the String* belongs to column
     String *get(size_t idx)
     {
         assert(idx < arr_->size());
