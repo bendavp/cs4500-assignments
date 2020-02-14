@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "column.h"
+#include "dataframe.h"
 #include <math.h>
 
 #define GT_TRUE(a) ASSERT_EQ((a), true)
@@ -153,6 +153,294 @@ void testGrowAndPushBack()
 }
 
 TEST(a4, p4) { ASSERT_EXIT_ZERO(testGrowAndPushBack); }
+
+void testAddColumn()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    GT_TRUE(s->coltypes_->equals(s_str));
+    s->add_column('S', new String("Lies"));
+    String *s_str_new = new String("FIBSS");
+
+    GT_EQUALS(s->width(), 5);
+    GT_TRUE(s->coltypes_->equals(s_str_new));
+    GT_TRUE(s->col_name(4)->equals(new String("Lies")));
+
+    exit(0);
+}
+
+TEST(t6, addCol) { ASSERT_EXIT_ZERO(testAddColumn); }
+
+void testAddEmptyNameColumn()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    GT_TRUE(s->coltypes_->equals(s_str));
+    s->add_column('S', nullptr);
+    String *s_str_new = new String("FIBSS");
+
+    GT_EQUALS(s->width(), 5);
+    GT_TRUE(s->coltypes_->equals(s_str_new));
+    GT_TRUE(s->col_name(4) == nullptr);
+
+    exit(0);
+}
+
+TEST(t6, addNoName) { ASSERT_EXIT_ZERO(testAddEmptyNameColumn); }
+
+void testAddColToEmptySchemaNoName()
+{
+    Schema *s = new Schema();
+
+    s->add_column('S', nullptr);
+
+    GT_EQUALS(s->width(), 1);
+    GT_TRUE(s->coltypes_->equals(new String("S")));
+    GT_TRUE(s->col_name(0) == nullptr);
+
+    exit(0);
+}
+
+TEST(t6, addColEmptyNoName) { ASSERT_EXIT_ZERO(testAddColToEmptySchemaNoName); }
+
+void testAddColToEmptySchema()
+{
+    Schema *s = new Schema();
+
+    s->add_column('S', new String("Lies"));
+
+    GT_EQUALS(s->width(), 1);
+    GT_TRUE(s->coltypes_->equals(new String("S")));
+    GT_TRUE(s->col_name(0)->equals(new String("Lies")));
+
+    exit(0);
+}
+
+TEST(t6, addColEmpty) { ASSERT_EXIT_ZERO(testAddColToEmptySchema); }
+
+void testAddRowToEmptySchema()
+{
+    Schema *s = new Schema();
+    s->add_row(new String("easepease"));
+    GT_TRUE(s->length() == 1);
+    GT_TRUE(s->row_name(0)->equals(new String("easepease")));
+
+    exit(0);
+}
+
+TEST(t6, addRowEmptySchema) { ASSERT_EXIT_ZERO(testAddRowToEmptySchema); }
+
+void testAddNullRowToEmptySchema()
+{
+    Schema *s = new Schema();
+    s->add_row(nullptr);
+    GT_TRUE(s->row_name(0) == nullptr);
+
+    exit(0);
+}
+
+TEST(t6, addNullRowEmptySchema) { ASSERT_EXIT_ZERO(testAddNullRowToEmptySchema); }
+
+void testAddRowToSchema()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    s->add_row(new String("easepease"));
+
+    GT_TRUE(s->row_name(0)->equals(new String("easepease")));
+
+    exit(0);
+}
+
+TEST(t6, addRowSchema) { ASSERT_EXIT_ZERO(testAddRowToSchema); }
+
+void testAddNullRowToSchema()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    s->add_row(nullptr);
+
+    GT_TRUE(s->row_name(0) == nullptr);
+
+    exit(0);
+}
+
+TEST(t6, addNullRowToSchema) { ASSERT_EXIT_ZERO(testAddNullRowToSchema); }
+
+void testGetColIdxEmptySchema()
+{
+    Schema *s = new Schema();
+
+    s->add_column('B', new String("b"));
+    s->add_column('I', new String("i"));
+    s->add_column('F', new String("f"));
+    s->add_column('S', new String("s"));
+
+    GT_EQUALS(s->width(), 4);
+    GT_EQUALS(s->col_idx("b"), 0);
+    GT_EQUALS(s->col_idx("i"), 1);
+    GT_EQUALS(s->col_idx("f"), 2);
+    GT_EQUALS(s->col_idx("s"), 3);
+
+    exit(0);
+}
+
+TEST(t6, getColIdxEmpty) { ASSERT_EXIT_ZERO(testGetColIdxEmptySchema); }
+
+void testGetColIdx()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    s->add_column('B', new String("b"));
+    s->add_column('I', new String("i"));
+    s->add_column('F', new String("f"));
+    s->add_column('S', new String("s"));
+
+    GT_EQUALS(s->width(), 8);
+    GT_EQUALS(s->col_idx("b"), 4);
+    GT_EQUALS(s->col_idx("i"), 5);
+    GT_EQUALS(s->col_idx("f"), 6);
+    GT_EQUALS(s->col_idx("s"), 7);
+
+    exit(0);
+}
+
+TEST(t6, getColIdx) { ASSERT_EXIT_ZERO(testGetColIdx); }
+
+void testGetRowIdxEmptySchema()
+{
+    Schema *s = new Schema();
+
+    s->add_row(new String("b"));
+    s->add_row(new String("i"));
+    s->add_row(new String("f"));
+    s->add_row(new String("s"));
+
+    GT_EQUALS(s->length(), 4);
+    GT_EQUALS(s->row_idx("b"), 0);
+    GT_EQUALS(s->row_idx("i"), 1);
+    GT_EQUALS(s->row_idx("f"), 2);
+    GT_EQUALS(s->row_idx("s"), 3);
+
+    exit(0);
+}
+
+TEST(t6, getRowIdxEmpty) { ASSERT_EXIT_ZERO(testGetRowIdxEmptySchema); }
+
+void testGetRowIdx()
+{
+    String *s_str = new String("FIBS");
+    Schema *s = new Schema(s_str->c_str());
+
+    s->add_row(new String("b"));
+    s->add_row(new String("i"));
+    s->add_row(new String("f"));
+    s->add_row(new String("s"));
+
+    GT_EQUALS(s->length(), 4);
+    GT_EQUALS(s->row_idx("b"), 0);
+    GT_EQUALS(s->row_idx("i"), 1);
+    GT_EQUALS(s->row_idx("f"), 2);
+    GT_EQUALS(s->row_idx("s"), 3);
+
+    exit(0);
+}
+
+TEST(t6, getRowIdx) { ASSERT_EXIT_ZERO(testGetRowIdx); }
+
+/**
+ * @brief tests Rower's accept() function on rows populated via a nonempty dataframe/schema.
+ * 
+ */
+void testAcceptNonemptyRow()
+{
+    Schema *s = new Schema("IISFB");    // nonempty schema
+    DataFrame *df = new DataFrame(*s);  // make df based on nonempty schema
+    Row *r = new Row(df->get_schema()); // making a row based off the schema
+    // filling df with rows
+    for (size_t i = 0; i < 1000; i++)
+    {
+        r->set(0, (int)i);
+        r->set(1, (int)i + 1);
+        r->set(2, new String("string hello"));
+        r->set(3, (float)(i + 0.22));
+        r->set(4, i % 2 == 1);
+        df2->add_row(*r);
+        std::cout << "fixed" << '\n';
+    }
+    std::cout << "here" << '\n';
+    Rower rower_ = Rower(); // creating rower object
+    // iterating through the rows and checking that the rower accepts each row given to it
+    Row *r_ = new Row(df->get_schema());
+    for (size_t i = 0; i < df->nrows(); i++)
+    {
+        r_ = new Row(df->get_schema());
+        df->fill_row(i, *r_);
+        GT_TRUE(rower_.accept(*r_));
+        delete r_;
+    }
+    exit(0);
+}
+
+TEST(t1, testAcceptNonemptyRow)
+{
+    ASSERT_EXIT_ZERO(testAcceptNonemptyRow);
+}
+
+/**
+ * @brief tests Rower's accept() function on a row created via an empty Schema
+ * 
+ */
+void testAcceptEmptyRow()
+{
+    Schema *s = new Schema(); // empty schema
+    Row r = Row(*s);          // making a row from empty schema
+    Rower rower_ = Rower();
+    GT_TRUE(rower_.accept(r));
+    delete s;
+    exit(0);
+}
+
+TEST(t1, testAcceptEmptyRow)
+{
+    ASSERT_EXIT_ZERO(testAcceptEmptyRow);
+}
+
+/**
+ * @brief tests Rower's accept() function on a row created from an dataframe based on Schema that has no columns but many rows
+ * 
+ */
+void testAcceptEmptyRow2()
+{
+    Schema *s = new Schema(); // empty schema
+    // adding rows to schema
+    for (size_t i = 0; i < 1000; i++)
+    {
+        s->add_row(nullptr);
+    }
+    DataFrame *df = new DataFrame(*s); // dataframe which has 1000 rows and no columns
+    Rower rower_ = Rower();            // creating rower object
+    // iterating through the rows and checking that the rower accepts each row given to it
+    Row *r_ = new Row(df->get_schema());
+    for (size_t i = 0; i < df->nrows(); i++)
+    {
+        r_ = new Row(df->get_schema());
+        df->fill_row(i, *r_);
+        GT_TRUE(rower_.accept(*r_));
+        //delete r_;
+    }
+    exit(0);
+}
+
+TEST(t1, testAcceptEmptyRow2)
+{
+    ASSERT_EXIT_ZERO(testAcceptEmptyRow2);
+}
 
 /**
  * @brief Runs all Google Tests in this file
