@@ -25,5 +25,12 @@ public:
     /** Subclass responsibility, the body of the run method */
     virtual void run()
     {
+        for (int i = start_; i < end_; i++)
+        {
+            Row row_ = Row(df_->get_schema());
+            row_.set_idx(i);
+            df_->fill_row(i, row_);
+            rower_->accept(row_);
+        }
     }
 };

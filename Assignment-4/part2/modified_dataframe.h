@@ -18,35 +18,25 @@ public:
     dataframe. */
     virtual void start(size_t r)
     {
-        row_num_ = r;
     }
 
     /** Called for fields of the argument's type with the value of the field. */
     virtual void accept(bool b)
     {
-        p(b);
-        p('\t');
     }
     virtual void accept(float f)
     {
-        p(f);
-        p('\t');
     }
     virtual void accept(int i)
     {
-        p(i);
-        p('\t');
     }
     virtual void accept(String *s)
     {
-        p(s);
-        p('\t');
     }
 
     /** Called when all fields have been seen. */
     virtual void done()
     {
-        pln("");
     }
 };
 
@@ -201,10 +191,6 @@ public:
       should be kept. */
     virtual bool accept(Row &r)
     {
-        Fielder fielder_ = Fielder();
-        fielder_.start(r.get_idx());
-        r.visit(r.get_idx(), fielder_);
-        return true;
     }
 
     /** Once traversal of the data frame is complete the rowers that were
@@ -213,8 +199,9 @@ public:
       is reponsible for cleaning up memory. */
     virtual void join_delete(Rower *other)
     {
-        delete other;
     }
+
+    virtual Rower *clone() {}
 };
 
 /****************************************************************************
@@ -439,13 +426,17 @@ public:
     void pmap(Rower &r)
     {
         RowThread **thread_list_ = new RowThread *[2];
+        Rower **rower_list_ = new Rower *[2];
         // populate rows and threads and start each thread
-        for (int i = 0; i < nrows_; i++)
+        for (int i = 0; i < 2; i++)
         {
-            RowThread *row_thread_1_ = new RowThread(this, r, 0, nrows_ / 2);
-            RowThread *row_thread_2_ = new RowThread(this, r->clone(), nrows_ / 2, nrows_);
-            row_thread_->start();
-            thread_list_[i] = row_thread_;
+            rower_list_[i] = r.clone();
+            thread_list_[i] = new RowThread(this, rower_list_[0], 0, nrows_ / 2);
+            thread_list_[i]->start();
+        }
+        for (int i = 1; i < 2; i++)
+        {
+            rower_list_[0]->join_delete(rower_list_[i]);
         }
     }
 
