@@ -428,7 +428,7 @@ void testGetRowIdx()
 TEST(t6, getRowIdx) { ASSERT_EXIT_ZERO(testGetRowIdx); }
 
 /********************************************************************************************************************
- * testing Rower
+ * testing an implementation Rower iterating over Rows
  * 
  **/
 
@@ -453,14 +453,14 @@ void testAcceptNonemptyRow()
         df->add_row(*r);
     }
     delete r;
-    Rower rower_ = Rower(); // creating rower object
+    RowPrinter printer_ = RowPrinter(); // creating rower object
     // iterating through the rows and checking that the rower accepts each row given to it
     Row *r_ = new Row(df->get_schema());
     for (size_t i = 0; i < df->nrows(); i++)
     {
         Row *r_ = new Row(df->get_schema());
         df->fill_row(i, *r_);
-        GT_TRUE(rower_.accept(*r_));
+        GT_TRUE(printer_.accept(*r_));
         delete r_;
     }
     exit(0);
@@ -479,7 +479,7 @@ void testAcceptEmptyRow()
 {
     Schema *s = new Schema(); // empty schema
     Row r = Row(*s);          // making a row from empty schema
-    Rower rower_ = Rower();
+    RowPrinter rower_ = RowPrinter();
     GT_TRUE(rower_.accept(r));
     delete s;
     exit(0);
@@ -503,7 +503,7 @@ void testAcceptEmptyRow2()
         s->add_row(nullptr);
     }
     DataFrame *df = new DataFrame(*s); // dataframe which has 1000 rows and no columns
-    Rower rower_ = Rower();            // creating rower object
+    RowPrinter rower_ = RowPrinter();  // creating rower object
     // iterating through the rows and checking that the rower accepts each row given to it
     Row *r_ = new Row(df->get_schema());
     for (size_t i = 0; i < df->nrows(); i++)
@@ -1188,10 +1188,12 @@ void testStringColumnGet1()
     String *s17 = new String("s");
     String *all = new String("helloworldrejects");
     StringColumn *i = new StringColumn(17, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17);
+    char *c;
+    String *expected_;
     for (size_t j = 0; j < 17; j++)
     {
-        char *c = new char(all->at(j));
-        String *expected_ = new String(c);
+        c = new char(all->at(j));
+        expected_ = new String(c);
         CS4500_ASSERT_TRUE(i->get(j)->equals(expected_));
         delete expected_;
         delete c;
@@ -1237,18 +1239,20 @@ void testStringColumnSet2()
     i->set(8, new String("blah"));
     CS4500_ASSERT_TRUE(i->get(8)->equals(new_));
     // set all values in i to something else and check
+    char *c;
+    String *expected_;
     for (size_t j = 0; j < 17; j++)
     {
-        char *c = new char(all2->at(j));
-        String *expected_ = new String(c);
+        c = new char(all2->at(j));
+        expected_ = new String(c);
         i->set(j, expected_->clone());
         delete c;
         delete expected_;
     }
     for (size_t j = 0; j < 17; j++)
     {
-        char *c = new char(all2->at(j));
-        String *expected_ = new String(c);
+        c = new char(all2->at(j));
+        expected_ = new String(c);
         CS4500_ASSERT_TRUE(i->get(j)->equals(expected_));
         delete c;
         delete expected_;
@@ -1276,11 +1280,13 @@ void testStringColumnPushBack3()
     size_t size_ = all->size();
     // checking empty column
     StringColumn *i_ = new StringColumn();
+    char *c;
+    String *expected;
     // adding to empty column and checking to see if added element is where and what we expect
     for (size_t j = 0; j < 10000000; j++)
     {
-        char *c = new char(all->at(j % size_));
-        String *expected = new String(c);
+        c = new char(all->at(j % size_));
+        expected = new String(c);
         i_->push_back(expected->clone());
         CS4500_ASSERT_TRUE(i_->get(j)->equals(expected));
         delete c;
@@ -1318,8 +1324,8 @@ void testStringColumnPushBack3()
     // check that the beginning is unchanged by pushback
     for (size_t j = 0; j < 17; j++)
     {
-        char *c = new char(all2->at(j));
-        String *expected = new String(c);
+        c = new char(all2->at(j));
+        expected = new String(c);
         CS4500_ASSERT_TRUE(i->get(j)->equals(expected));
         delete c;
         delete expected;
@@ -1484,13 +1490,13 @@ void testStringColumnClone7()
     String *all = new String("blahhityblahhityblah");
     size_t size_ = all->size();
     StringColumn *i = new StringColumn();
+    char *c;
+    String *expected;
     for (size_t j = 0; j < 10000; j++)
     {
-        char *c = new char(all->at(j % size_));
-        String *expected = new String(c);
+        c = new char(all->at(j % size_));
+        expected = new String(c);
         i->push_back(expected->clone());
-        delete c;
-        delete expected;
     }
     StringColumn *i_ = i->clone();
     CS4500_ASSERT_TRUE(i->size() == i_->size());
@@ -1503,14 +1509,10 @@ void testStringColumnClone7()
     // check that the clone retains information/elements after original is deleted
     for (size_t j = 0; j < 10000; j++)
     {
-        char *c = new char(all->at(j % size_));
-        String *expected = new String(c);
+        c = new char(all->at(j % size_));
+        expected = new String(c);
         CS4500_ASSERT_TRUE(i_->get(j)->equals(expected));
-        delete c;
-        delete expected;
     }
-    delete i_;
-    delete all;
     exit(0);
 }
 
