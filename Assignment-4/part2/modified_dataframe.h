@@ -2,7 +2,7 @@
 
 #include "schema.h"
 #include "../helper.h"
-#include "rowthread.h"
+#include "thread.h"
 
 #pragma once
 
@@ -13,30 +13,60 @@
 class Fielder : public Object
 {
 public:
+    /** Called before visiting a row, the argument is the row offset in the
+    dataframe. */
+    virtual void start(size_t r) {}
+
+    /** Called for fields of the argument's type with the value of the field. */
+    virtual void accept(bool b) {}
+
+    virtual void accept(float f) {}
+
+    virtual void accept(int i) {}
+
+    virtual void accept(String *s) {}
+
+    /** Called when all fields have been seen. */
+    virtual void done() {}
+};
+
+class Printer : public Fielder
+{
+public:
     size_t row_num_;
     /** Called before visiting a row, the argument is the row offset in the
     dataframe. */
     virtual void start(size_t r)
     {
+        row_num_ = r;
     }
 
     /** Called for fields of the argument's type with the value of the field. */
     virtual void accept(bool b)
     {
+        p(b);
+        p('\t');
     }
     virtual void accept(float f)
     {
+        p(f);
+        p('\t');
     }
     virtual void accept(int i)
     {
+        p(i);
+        p('\t');
     }
     virtual void accept(String *s)
     {
+        p(s->c_str());
+        p('\t');
     }
 
     /** Called when all fields have been seen. */
     virtual void done()
     {
+        pln("");
     }
 };
 
@@ -113,22 +143,18 @@ public:
     * of the requested type, the result is undefined. */
     int get_int(size_t col)
     {
-        assert(col_type(col) == 'I');
         return int_arr_[col];
     }
     bool get_bool(size_t col)
     {
-        assert(col_type(col) == 'B');
         return bool_arr_[col];
     }
     float get_float(size_t col)
     {
-        assert(col_type(col) == 'F');
         return float_arr_[col];
     }
     String *get_string(size_t col)
     {
-        assert(col_type(col) == 'S');
         return str_arr_[col]->clone();
     }
 
@@ -173,6 +199,7 @@ public:
                 exit(1);
             }
         }
+        f.done();
     }
 };
 
@@ -191,17 +218,77 @@ public:
       should be kept. */
     virtual bool accept(Row &r)
     {
+        return true;
     }
 
     /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
-    virtual void join_delete(Rower *other)
+    virtual void join_delete(Rower *other) {}
+
+    virtual Rower *clone()
     {
+        return this;
+    }
+};
+
+class RowPrinter : public Rower
+{
+public:
+    /** This method is called once per row. The row object is on loan and
+      should not be retained as it is likely going to be reused in the next
+      call. The return value is used in filters to indicate that a row
+      should be kept. */
+    bool accept(Row &r)
+    {
+        Printer printer_ = Printer();
+        printer_.start(r.get_idx());
+        r.visit(r.get_idx(), printer_);
+        return true;
     }
 
-    virtual Rower *clone() {}
+    /** Once traversal of the data frame is complete the rowers that were
+      split off will be joined.  There will be one join per split. The
+      original object will be the last to be called join on. The join method
+      is reponsible for cleaning up memory. */
+    void join_delete(Rower *other)
+    {
+        delete other;
+    }
+};
+
+class DataFrame;
+
+/** A Thread wraps the thread operations in the standard library.
+ *  author: vitekj@me.com */
+class RowThread : public Thread
+{
+public:
+    DataFrame *df_;
+    Rower *rower_;
+    size_t start_;
+    size_t end_;
+
+    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
+    {
+        df_ = df;
+        rower_ = r;
+        start_ = start;
+        end_ = end;
+    }
+
+    /** Subclass responsibility, the body of the run method */
+    virtual void run()
+    {
+        for (int i = start_; i < end_; i++)
+        {
+            Row row_ = Row(df_->get_schema());
+            row_.set_idx(i);
+            df_->fill_row(i, row_);
+            rower_->accept(row_);
+        }
+    }
 };
 
 /****************************************************************************
@@ -220,26 +307,31 @@ public:
     ColumnFastArray *col_arr_;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownames */
-    DataFrame(DataFrame &df)
-    {
-        schema_ = new Schema();
-        Schema old_schema_ = df.get_schema(); // get the schema from df
-        // getting just the col/col types from the old_schema_
-        for (size_t i = 0; i < old_schema_.width(); i++)
-        {
-            schema_->add_column(old_schema_.col_type(i), old_schema_.col_name(i));
-        }
-        nrows_ = 0;
-        ncols_ = schema_->width();
-    }
+    DataFrame(DataFrame &df) : DataFrame(*df.schema_) {}
 
     /** Create a data frame from a schema and columns. All columns are created
     * empty. */
     DataFrame(Schema &schema)
     {
-        schema_ = new Schema(schema);
-        nrows_ = schema_->width();
-        ncols_ = schema_->length();
+        schema_ = new Schema();
+        schema_->coltypes_ = schema.coltypes_;
+        schema_->col_names_ = schema.col_names_;
+        nrows_ = 0;
+        ncols_ = schema_->width();
+        col_arr_ = new ColumnFastArray();
+        for (size_t i = 0; i < ncols_; i++)
+        {
+            if (schema_->col_type(i) == 'S')
+                col_arr_->push_back(new StringColumn());
+            else if (schema_->col_type(i) == 'B')
+                col_arr_->push_back(new BoolColumn());
+            else if (schema_->col_type(i) == 'F')
+                col_arr_->push_back(new FloatColumn());
+            else if (schema_->col_type(i) == 'I')
+                col_arr_->push_back(new IntColumn());
+            else
+                exit(1);
+        }
     }
 
     /**
@@ -248,7 +340,7 @@ public:
      */
     ~DataFrame()
     {
-        delete[] schema_;
+        delete schema_;
         delete[] col_arr_;
     }
 
@@ -264,28 +356,45 @@ public:
     * name is optional and external. A nullptr column is undefined. */
     void add_column(Column *col, String *name)
     {
-        assert(col->size() == nrows_); // checking that size of column is the same
-        col_arr_->push_back(col);
-        schema_->add_column(col->get_type(), name);
+        assert(col != nullptr);
+        if (ncols_ > 0)
+        {
+            assert(col->size() == nrows_); // checking that size of column is the same
+        }
+        if (ncols_ == 0)
+        {
+            nrows_ = col->size(); // if there were no columns, then set the row size to this column
+        }
+        col_arr_->push_back(col->clone());
+        schema_->add_column(col->get_type(), name->clone());
+        ncols_ = ncols_ + 1; // update ncol size
     }
 
     /** Return the value at the given column and row. Accessing rows or
    *  columns out of bounds, or request the wrong type is undefined.*/
     int get_int(size_t col, size_t row)
     {
+        assert(schema_->col_type(col) == 'I');
+        assert(row < nrows_);
         // gets the Column -> makes it an IntColumn -> gets the value from the Int Column
         return col_arr_->get(col)->as_int()->get(row);
     }
     bool get_bool(size_t col, size_t row)
     {
+        assert(schema_->col_type(col) == 'B');
+        assert(row < nrows_);
         return col_arr_->get(col)->as_bool()->get(row);
     }
     float get_float(size_t col, size_t row)
     {
+        assert(schema_->col_type(col) == 'F');
+        assert(row < nrows_);
         return col_arr_->get(col)->as_float()->get(row);
     }
     String *get_string(size_t col, size_t row)
     {
+        assert(schema_->col_type(col) == 'S');
+        assert(row < nrows_);
         return col_arr_->get(col)->as_string()->get(row);
     }
 
@@ -306,18 +415,26 @@ public:
     * bound, the result is undefined. */
     void set(size_t col, size_t row, int val)
     {
+        assert(schema_->col_type(col) == 'I');
+        assert(row < nrows_);
         col_arr_->get(col)->as_int()->set(row, val);
     }
     void set(size_t col, size_t row, bool val)
     {
+        assert(schema_->col_type(col) == 'B');
+        assert(row < nrows_);
         col_arr_->get(col)->as_bool()->set(row, val);
     }
     void set(size_t col, size_t row, float val)
     {
+        assert(schema_->col_type(col) == 'F');
+        assert(row < nrows_);
         col_arr_->get(col)->as_float()->set(row, val);
     }
     void set(size_t col, size_t row, String *val)
     {
+        assert(schema_->col_type(col) == 'S');
+        assert(row < nrows_);
         col_arr_->get(col)->as_string()->set(row, val);
     }
 
@@ -332,7 +449,18 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            if (schema_->col_name(i) == nullptr)
+            {
+                assert(row.schema_->col_name(i) == nullptr);
+            }
+            else if (row.schema_->col_name(i) == nullptr)
+            {
+                assert(schema_->col_name(i) == nullptr);
+            }
+            else
+            {
+                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         row.set_idx(idx);
@@ -371,7 +499,18 @@ public:
         assert(schema_->width() == row.schema_->width());
         for (size_t i = 0; i < schema_->width(); i++)
         {
-            assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            if (schema_->col_name(i) == nullptr)
+            {
+                assert(row.schema_->col_name(i) == nullptr);
+            }
+            else if (row.schema_->col_name(i) == nullptr)
+            {
+                assert(schema_->col_name(i) == nullptr);
+            }
+            else
+            {
+                assert(schema_->col_name(i)->equals(row.schema_->col_name(i)));
+            }
             assert(schema_->col_type(i) == row.schema_->col_type(i));
         }
         for (size_t i = 0; i < row.width(); i++)
@@ -393,7 +532,15 @@ public:
                 col_arr_->get(i)->push_back(row.get_bool(i));
             }
         }
-        schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row to this schema
+        row.set_idx(nrows());
+        if (row.schema_->length() > row.get_idx())
+        {
+            schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row's name to this schema
+        }
+        else
+        {
+            schema_->add_row(nullptr);
+        }
         nrows_ = nrows_ + 1;
     }
 
@@ -412,6 +559,7 @@ public:
     /** Visit rows in order */
     void map(Rower &r)
     {
+
         for (size_t i = 0; i < nrows_; i++)
         {
             Row row_ = Row(*schema_);
@@ -425,18 +573,47 @@ public:
   * used at the end to merge the results. */
     void pmap(Rower &r)
     {
-        RowThread **thread_list_ = new RowThread *[2];
-        Rower **rower_list_ = new Rower *[2];
-        // populate rows and threads and start each thread
-        for (int i = 0; i < 2; i++)
+        if (nrows_ < 1000)
         {
-            rower_list_[i] = r.clone();
-            thread_list_[i] = new RowThread(this, rower_list_[0], 0, nrows_ / 2);
-            thread_list_[i]->start();
+            map(r);
         }
-        for (int i = 1; i < 2; i++)
+        else
         {
-            rower_list_[0]->join_delete(rower_list_[i]);
+
+            int numThreads = 2;
+
+            RowThread **thread_list_ = new RowThread *[numThreads];
+            Rower **rower_list_ = new Rower *[numThreads];
+            size_t *start_indices_ = new size_t[numThreads];
+            size_t *end_indices_ = new size_t[numThreads];
+
+            for (int i = 0; i < numThreads; i++)
+            {
+                start_indices_[i] = nrows_ * i / numThreads;
+            }
+            for (int i = 1; i < numThreads + 1; i++)
+            {
+                end_indices_[i - 1] = nrows_ * i / numThreads;
+            }
+
+            // populate rows and threads and start each thread
+            for (int i = 0; i < numThreads; i++)
+            {
+                // maybe save one clone?
+                rower_list_[i] = r.clone();
+                thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
+                thread_list_[i]->start();
+            }
+
+            for (int i = 1; i < numThreads; i++)
+            {
+                thread_list_[i]->join();
+            }
+
+            for (int i = numThreads - 2; i >= 0; i--)
+            {
+                rower_list_[i]->join_delete(rower_list_[i + 1]);
+            }
         }
     }
 
@@ -444,11 +621,11 @@ public:
     * returned true from its accept method. */
     DataFrame *filter(Rower &r)
     {
-        DataFrame *df = new DataFrame(*schema_);
+        DataFrame *df = new DataFrame(*this);
 
         for (size_t i = 0; i < nrows_; i++)
         {
-            Row row_ = Row(*schema_);
+            Row row_ = Row(df->get_schema());
             row_.set_idx(i);
             fill_row(i, row_);
             if (r.accept(row_))
@@ -462,7 +639,7 @@ public:
     /** Print the dataframe in SoR format to standard output. */
     void print()
     {
-        Rower r = Rower();
+        RowPrinter r = RowPrinter();
         map(r);
     }
 };
