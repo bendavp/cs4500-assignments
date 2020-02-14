@@ -1513,6 +1513,8 @@ void testStringColumnClone7()
         expected = new String(c);
         CS4500_ASSERT_TRUE(i_->get(j)->equals(expected));
     }
+    delete c;
+    delete expected;
     exit(0);
 }
 
@@ -1520,6 +1522,188 @@ TEST(t2, String7)
 {
     CS4500_ASSERT_EXIT_ZERO(testStringColumnClone7);
 }
+
+/*****************************************************************************************************************
+ * testing dataframes
+ **/
+
+/**
+ * @brief Getting the schema from a Dataframe. Testing if it has the expected row/columns as well as the 
+ * elements.
+ * 
+ */
+void testGetSchema1()
+{
+    // empty schema, no cols/rows
+    Schema *s = new Schema();
+    DataFrame *df = new DataFrame(*s);
+    Schema got = df->get_schema();
+    CS4500_ASSERT_TRUE(got.length() == s->length());
+    CS4500_ASSERT_TRUE(got.width() == s->width());
+
+    // nonempty schema, with only cols
+    Schema *s2 = new Schema("IFIBS");
+    DataFrame *df2 = new DataFrame(*s2);
+    Schema got2 = df2->get_schema();
+    CS4500_ASSERT_TRUE(got2.length() == s2->length());
+    CS4500_ASSERT_TRUE(got2.width() == s2->width());
+    for (size_t i = 0; i < got2.width(); i++)
+    {
+        CS4500_ASSERT_TRUE(got2.col_type(i) == s2->col_type(i));
+    }
+    exit(0);
+}
+
+TEST(dataframe, test1) { CS4500_ASSERT_EXIT_ZERO(testGetSchema1); }
+
+/**
+ * @brief Testing adding a column and then testing the dataframe's schema has changed as expected. 
+ * Due to how this test is structured, we also can also use this test to test nrows() and ncols() functions. 
+ * 
+ */
+void testAddColumn2()
+{
+    // empty schema, no cols/rows
+    Schema *s = new Schema();
+    DataFrame *df = new DataFrame(*s);
+    CS4500_ASSERT_TRUE(df->nrows() == 0);
+    CS4500_ASSERT_TRUE(df->ncols() == 0);
+    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
+    df->add_column(c, new String("name"));
+    CS4500_ASSERT_TRUE(df->get_schema().width() == 1);
+    CS4500_ASSERT_TRUE(df->get_schema().length() == 8);
+    CS4500_ASSERT_TRUE(df->get_schema().col_name(0)->equals(new String("name")));
+    CS4500_ASSERT_TRUE(df->get_schema().col_type(0) == 'I');
+    CS4500_ASSERT_TRUE(df->nrows() == 8);
+    CS4500_ASSERT_TRUE(df->ncols() == 1);
+    // now adding another column to nonempty dfs
+    Column *cc = new BoolColumn(8, true, false, true, false, true, false, true, false);
+    df->add_column(cc, new String("2nd col"));
+    CS4500_ASSERT_TRUE(df->get_schema().width() == 2);
+    CS4500_ASSERT_TRUE(df->get_schema().length() == 8);
+    CS4500_ASSERT_TRUE(df->get_schema().col_name(1)->equals(new String("2nd col")));
+    CS4500_ASSERT_TRUE(df->get_schema().col_type(1) == 'B');
+    CS4500_ASSERT_TRUE(df->nrows() == 8);
+    CS4500_ASSERT_TRUE(df->ncols() == 2);
+    exit(0);
+}
+
+TEST(dataframe, test2) { CS4500_ASSERT_EXIT_ZERO(testAddColumn2); }
+
+/**
+ * @brief Testing adding row by seeing if the dataframe's schema and other values have changed as expected. 
+ * 
+ */
+void testAddRow3()
+{
+    // adding row to a nonempty schema
+    Schema *s = new Schema("IISFB");    // nonempty schema
+    DataFrame *df = new DataFrame(*s);  // make df based on nonempty schema
+    Row *r = new Row(df->get_schema()); // making a row based off the schema
+    // filling df with rows
+    for (size_t i = 0; i < 1000; i++)
+    {
+        r->set(0, (int)i);
+        r->set(1, (int)i + 1);
+        r->set(2, new String("string hello"));
+        r->set(3, (float)(i + 0.22));
+        r->set(4, i % 2 == 1);
+        df->add_row(*r);
+    }
+    CS4500_ASSERT_TRUE(df->get_schema().length() == 1000);
+    CS4500_ASSERT_TRUE(df->get_schema().width() == 5);
+    CS4500_ASSERT_TRUE(df->nrows() == 1000);
+    CS4500_ASSERT_TRUE(df->ncols() == 5);
+    exit(0);
+}
+
+TEST(dataframe, test3) { CS4500_ASSERT_EXIT_ZERO(testAddRow3); }
+
+/**
+ * @brief Checking that in a nonempty 
+ * 
+ */
+void testGet4()
+{
+    // empty schema, no cols/rows
+    Schema *s = new Schema();
+    DataFrame *df = new DataFrame(*s);
+    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
+    df->add_column(c, new String("name"));
+    // now adding another column to nonempty dfs
+    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
+    df->add_column(c2, new String("2nd col"));
+    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
+    df->add_column(c3, new String("3rd"));
+    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
+    df->add_column(c4, new String("4th"));
+    CS4500_ASSERT_TRUE(df->get_schema().coltypes_->equals((new String("IBFS"))));
+    String *expected;
+    char *ch;
+    String *all = new String("helloworld");
+    for (int i = 0; i < 8; i++)
+    {
+        CS4500_ASSERT_TRUE(df->get_int(0, i) == (i + 1));
+        CS4500_ASSERT_TRUE(df->get_bool(1, i) == (i % 2 == 0));
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 1.22) < 0.001);
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 1.22) > -0.001);
+        ch = new char(all->at(i));
+        expected = new String(ch);
+        CS4500_ASSERT_TRUE(df->get_string(3, i)->equals(expected));
+    }
+    delete expected;
+    delete ch;
+    exit(0);
+}
+
+TEST(dataframe, test4) { CS4500_ASSERT_EXIT_ZERO(testGet4); }
+
+/**
+ * @brief Setting the different cells and then checking if we can get the expected value.
+ * 
+ */
+void testSet5()
+{
+    // empty schema, no cols/rows
+    Schema *s = new Schema();
+    DataFrame *df = new DataFrame(*s);
+    Column *c = new IntColumn(8, 1, 2, 3, 4, 5, 6, 7, 8);
+    df->add_column(c, new String("name"));
+    // now adding another column to nonempty dfs
+    Column *c2 = new BoolColumn(8, true, false, true, false, true, false, true, false);
+    df->add_column(c2, new String("2nd col"));
+    Column *c3 = new FloatColumn(8, 1.22, 2.22, 3.22, 4.22, 5.22, 6.22, 7.22, 8.22);
+    df->add_column(c3, new String("3rd"));
+    Column *c4 = new StringColumn(8, new String("h"), new String("e"), new String("l"), new String("l"), new String("o"), new String("w"), new String("o"), new String("r"));
+    df->add_column(c4, new String("4th"));
+    CS4500_ASSERT_TRUE(df->get_schema().coltypes_->equals((new String("IBFS"))));
+    char *ch;
+    String *all = new String("helloworld");
+    String *toAdd;
+    for (int i = 0; i < 8; i++)
+    {
+        df->set(0, i, (int)i * 2);
+        df->set(1, i, i % 2 == 1);
+        df->set(2, i, (float)(i + 2.22));
+        ch = new char(all->at(i + 1));
+        toAdd = new String(ch);
+        df->set(3, i, toAdd);
+    }
+    String *expected;
+    for (int i = 0; i < 8; i++)
+    {
+        CS4500_ASSERT_TRUE(df->get_int(0, i) == (i * 2));
+        CS4500_ASSERT_TRUE(df->get_bool(1, i) == (i % 2 == 1));
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 2.22) < 0.001);
+        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 2.22) > -0.001);
+        ch = new char(all->at(i + 1));
+        expected = new String(ch);
+        CS4500_ASSERT_TRUE(df->get_string(3, i)->equals(expected));
+    }
+    exit(0);
+}
+
+TEST(dataframe, test5) { CS4500_ASSERT_EXIT_ZERO(testSet5); }
 
 /**
  * @brief Runs all Google Tests in this file
