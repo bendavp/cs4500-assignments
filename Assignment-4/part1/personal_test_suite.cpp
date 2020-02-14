@@ -428,12 +428,12 @@ void testGetRowIdx()
 TEST(t6, getRowIdx) { ASSERT_EXIT_ZERO(testGetRowIdx); }
 
 /********************************************************************************************************************
- * testing Rower
+ * testing an implementation Rower iterating over Rows
  * 
  **/
 
 /**
- * @brief tests Row's accept() function on rows populated via a nonempty dataframe/schema.
+ * @brief tests Rower's accept() function on rows populated via a nonempty dataframe/schema.
  * 
  */
 void testAcceptNonemptyRow()
