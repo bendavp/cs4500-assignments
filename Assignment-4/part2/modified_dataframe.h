@@ -2,6 +2,7 @@
 
 #include "schema.h"
 #include "../helper.h"
+#include "rowthread.h"
 
 #pragma once
 
@@ -122,18 +123,22 @@ public:
     * of the requested type, the result is undefined. */
     int get_int(size_t col)
     {
+        assert(col_type(col) == 'I');
         return int_arr_[col];
     }
     bool get_bool(size_t col)
     {
+        assert(col_type(col) == 'B');
         return bool_arr_[col];
     }
     float get_float(size_t col)
     {
+        assert(col_type(col) == 'F');
         return float_arr_[col];
     }
     String *get_string(size_t col)
     {
+        assert(col_type(col) == 'S');
         return str_arr_[col]->clone();
     }
 
@@ -206,7 +211,7 @@ public:
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
-    void join_delete(Rower *other)
+    virtual void join_delete(Rower *other)
     {
         delete other;
     }
@@ -228,31 +233,26 @@ public:
     ColumnFastArray *col_arr_;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownames */
-    DataFrame(DataFrame &df) : DataFrame(*df.schema_) {}
+    DataFrame(DataFrame &df)
+    {
+        schema_ = new Schema();
+        Schema old_schema_ = df.get_schema(); // get the schema from df
+        // getting just the col/col types from the old_schema_
+        for (size_t i = 0; i < old_schema_.width(); i++)
+        {
+            schema_->add_column(old_schema_.col_type(i), old_schema_.col_name(i));
+        }
+        nrows_ = 0;
+        ncols_ = schema_->width();
+    }
 
     /** Create a data frame from a schema and columns. All columns are created
     * empty. */
     DataFrame(Schema &schema)
     {
-        schema_ = new Schema();
-        schema_->coltypes_ = schema.coltypes_;
-        schema_->col_names_ = schema.col_names_;
-        nrows_ = 0;
-        ncols_ = schema_->width();
-        col_arr_ = new ColumnFastArray();
-        for (size_t i = 0; i < ncols_; i++)
-        {
-            if (schema_->col_type(i) == 'S')
-                col_arr_->push_back(new StringColumn());
-            else if (schema_->col_type(i) == 'B')
-                col_arr_->push_back(new BoolColumn());
-            else if (schema_->col_type(i) == 'F')
-                col_arr_->push_back(new FloatColumn());
-            else if (schema_->col_type(i) == 'I')
-                col_arr_->push_back(new IntColumn());
-            else
-                exit(1);
-        }
+        schema_ = new Schema(schema);
+        nrows_ = schema_->width();
+        ncols_ = schema_->length();
     }
 
     /**
@@ -261,7 +261,7 @@ public:
      */
     ~DataFrame()
     {
-        delete schema_;
+        delete[] schema_;
         delete[] col_arr_;
     }
 
@@ -277,37 +277,28 @@ public:
     * name is optional and external. A nullptr column is undefined. */
     void add_column(Column *col, String *name)
     {
-        assert(col != nullptr);
         assert(col->size() == nrows_); // checking that size of column is the same
-        col_arr_->push_back(col->clone());
-        schema_->add_column(col->get_type(), name->clone());
+        col_arr_->push_back(col);
+        schema_->add_column(col->get_type(), name);
     }
 
     /** Return the value at the given column and row. Accessing rows or
    *  columns out of bounds, or request the wrong type is undefined.*/
     int get_int(size_t col, size_t row)
     {
-        assert(schema_->col_type(col) == 'I');
-        assert(row < nrows_);
         // gets the Column -> makes it an IntColumn -> gets the value from the Int Column
         return col_arr_->get(col)->as_int()->get(row);
     }
     bool get_bool(size_t col, size_t row)
     {
-        assert(schema_->col_type(col) == 'B');
-        assert(row < nrows_);
         return col_arr_->get(col)->as_bool()->get(row);
     }
     float get_float(size_t col, size_t row)
     {
-        assert(schema_->col_type(col) == 'F');
-        assert(row < nrows_);
         return col_arr_->get(col)->as_float()->get(row);
     }
     String *get_string(size_t col, size_t row)
     {
-        assert(schema_->col_type(col) == 'S');
-        assert(row < nrows_);
         return col_arr_->get(col)->as_string()->get(row);
     }
 
@@ -328,26 +319,18 @@ public:
     * bound, the result is undefined. */
     void set(size_t col, size_t row, int val)
     {
-        assert(schema_->col_type(col) == 'I');
-        assert(row < nrows_);
         col_arr_->get(col)->as_int()->set(row, val);
     }
     void set(size_t col, size_t row, bool val)
     {
-        assert(schema_->col_type(col) == 'B');
-        assert(row < nrows_);
         col_arr_->get(col)->as_bool()->set(row, val);
     }
     void set(size_t col, size_t row, float val)
     {
-        assert(schema_->col_type(col) == 'F');
-        assert(row < nrows_);
         col_arr_->get(col)->as_float()->set(row, val);
     }
     void set(size_t col, size_t row, String *val)
     {
-        assert(schema_->col_type(col) == 'S');
-        assert(row < nrows_);
         col_arr_->get(col)->as_string()->set(row, val);
     }
 
@@ -442,13 +425,27 @@ public:
     /** Visit rows in order */
     void map(Rower &r)
     {
-
         for (size_t i = 0; i < nrows_; i++)
         {
             Row row_ = Row(*schema_);
             row_.set_idx(i);
             fill_row(i, row_);
             r.accept(row_);
+        }
+    }
+
+    /** This method clones the Rower and executes the map in parallel. Join is
+  * used at the end to merge the results. */
+    void pmap(Rower &r)
+    {
+        RowThread **thread_list_ = new RowThread *[2];
+        // populate rows and threads and start each thread
+        for (int i = 0; i < nrows_; i++)
+        {
+            RowThread *row_thread_1_ = new RowThread(this, r, 0, nrows_ / 2);
+            RowThread *row_thread_2_ = new RowThread(this, r->clone(), nrows_ / 2, nrows_);
+            row_thread_->start();
+            thread_list_[i] = row_thread_;
         }
     }
 
