@@ -370,9 +370,10 @@ void testAcceptNonemptyRow()
         r->set(2, new String("string hello"));
         r->set(3, (float)(i + 0.22));
         r->set(4, i % 2 == 1);
-        df->add_row(*r);
-        delete r;
+        df2->add_row(*r);
+        std::cout << "fixed" << '\n';
     }
+    std::cout << "here" << '\n';
     Rower rower_ = Rower(); // creating rower object
     // iterating through the rows and checking that the rower accepts each row given to it
     Row *r_ = new Row(df->get_schema());
@@ -383,7 +384,6 @@ void testAcceptNonemptyRow()
         GT_TRUE(rower_.accept(*r_));
         delete r_;
     }
-    delete df;
     exit(0);
 }
 
@@ -434,7 +434,6 @@ void testAcceptEmptyRow2()
         GT_TRUE(rower_.accept(*r_));
         //delete r_;
     }
-    delete df;
     exit(0);
 }
 
