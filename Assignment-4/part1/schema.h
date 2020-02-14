@@ -13,7 +13,7 @@
 class Schema : public Object
 {
 public:
-    StrBuff *coltypes_;
+    String *coltypes_;
     StringFastArray *row_names_;
     StringFastArray *col_names_;
 
@@ -28,15 +28,9 @@ public:
     /** Create an empty schema **/
     Schema()
     {
-        coltypes_ = new StrBuff();
+        coltypes_ = new String("");
         row_names_ = new StringFastArray();
         col_names_ = new StringFastArray();
-    }
-
-    ~Schema()
-    {
-        delete row_names_;
-        delete col_names_;
     }
 
     /** Create a schema from a string of types. A string that contains
@@ -46,14 +40,19 @@ public:
     Schema(const char *types)
     {
         assert(types != nullptr);
-        coltypes_ = new StrBuff();
-        coltypes_->c(types);
+        coltypes_ = new String(types);
         row_names_ = new StringFastArray();
         col_names_ = new StringFastArray();
         for (int i = 0; i < strlen(types); i++)
         {
             col_names_->push_back(nullptr);
         }
+    }
+
+    ~Schema()
+    {
+        delete row_names_;
+        delete col_names_;
     }
 
     /** Add a column of the given type and name (can be nullptr), name
@@ -66,10 +65,15 @@ public:
             // check all newly added name is different than the current names; terminates otherwise
             for (size_t i = 0; i < col_names_->size(); i++)
             {
-                assert(!name->equals(col_names_->get(i)));
+                if (col_names_->get(i) != nullptr)
+                {
+                    assert(!name->equals(col_names_->get(i)));
+                }
             }
         }
-        coltypes_->c(typ);
+        char *c = new char(typ);
+        coltypes_ = StrBuff().c(coltypes_->c_str()).c(c).get();
+        delete c;
         col_names_->push_back(name);
     }
 
@@ -79,11 +83,14 @@ public:
     {
         if (name != nullptr)
         {
-            // check all newly added name is different than the current names; terminates otherwise
             for (size_t i = 0; i < row_names_->size(); i++)
             {
-                assert(!name->equals(row_names_->get(i)));
+                if (row_names_->get(i) != nullptr)
+                {
+                    assert(!name->equals(row_names_->get(i)));
+                }
             }
+            // check all newly added name is different than the current names; terminates otherwise
         }
         row_names_->push_back(name);
     }
@@ -108,11 +115,7 @@ public:
     char col_type(size_t idx)
     {
         assert(idx < width());
-        String *types_str = coltypes_->get();
-        char res = types_str->at(idx);
-        coltypes_->c(types_str->steal());
-        delete types_str;
-        return res;
+        return coltypes_->at(idx);
     }
 
     /** Given a column name return its index, or -1. */
