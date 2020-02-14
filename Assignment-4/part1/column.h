@@ -648,13 +648,7 @@ public:
             }
             // filling appropriate location with the value
             val = va_arg(v1, double);
-            pln(val);
             arr_[i / arr_size_][i % arr_size_] = val;
-            // p("     uncasted  ");
-            // p((va_arg(v1, double));
-            // p("     casted  ");
-            // p((float)va_arg(v1, double));
-            // pln("     ");
 
             // arr_[i / arr_size_][i % arr_size_] = va_arg(v1, float);
         }
@@ -930,9 +924,8 @@ public:
         memory_ = s.memory_;
         arr_size_ = s.arr_size_;
         size_ = s.size();
-        arr_fill_ = 0;
-        arr_ = new String **[memory_]; // initializing string***
         arr_fill_ = 0;                 // initialize as 0, will iterate through later
+        arr_ = new String **[memory_]; // initializing string***
         for (size_t i = 0; i < size_; i++)
         {
             // create new string array/string array pointer as necessary
@@ -942,8 +935,19 @@ public:
                 arr_fill_ = arr_fill_ + 1; // we are using up +1 array so increment this count
             }
             // filling appropriate location with the value
-            String *new_ = s.get(i)->clone();
-            arr_[i / arr_size_][i % arr_size_] = new_;
+            if (s.get(i) == nullptr)
+            {
+                arr_[i / arr_size_][i % arr_size_] = nullptr;
+            }
+            else
+            {
+                String *new_ = s.get(i)->clone();
+                arr_[i / arr_size_][i % arr_size_] = new_;
+            }
+        }
+        for (size_t i = arr_fill_; i < memory_; i++)
+        {
+            arr_[i] = nullptr;
         }
     }
 

@@ -38,7 +38,7 @@ public:
     }
     virtual void accept(String *s)
     {
-        p(s);
+        p(s->c_str());
         p('\t');
     }
 
@@ -178,6 +178,7 @@ public:
                 exit(1);
             }
         }
+        f.done();
     }
 };
 
@@ -445,7 +446,15 @@ public:
                 col_arr_->get(i)->push_back(row.get_bool(i));
             }
         }
-        schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row to this schema
+        row.set_idx(nrows());
+        if (row.schema_->length() > row.get_idx())
+        {
+            schema_->add_row(row.schema_->row_name(row.get_idx())); // add the row's name to this schema
+        }
+        else
+        {
+            schema_->add_row(nullptr);
+        }
         nrows_ = nrows_ + 1;
     }
 

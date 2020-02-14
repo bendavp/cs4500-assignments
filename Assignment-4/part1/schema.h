@@ -20,9 +20,9 @@ public:
     /** Copying constructor */
     Schema(Schema &from)
     {
-        coltypes_ = from.coltypes_;
-        row_names_ = from.row_names_;
-        col_names_ = from.col_names_;
+        coltypes_ = from.coltypes_->clone();
+        row_names_ = from.row_names_->clone();
+        col_names_ = from.col_names_->clone();
     }
 
     /** Create an empty schema **/
