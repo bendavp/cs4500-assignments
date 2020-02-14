@@ -62,13 +62,49 @@ b->push_back(0); // b->get(2) == false
 f->push_back(4.20); // f->get(4) == 4.20
 
 String *str = new String("hello world"); 
-s->push_back(str);
+s->push_back(str); // str->get(2) = "hello world"
 ```
 
+<h3> FastArray Use Cases </h3>
+As mentioned above, our Columns implement our FastArray which abstracts most of the heavy lifting for the get, set, puch_back, size functions. To make this clear, most of our use-cases for FastArray look very familar to our use-cases for Columns. 
+
+To make things easier for the user, we have also implemened indexing as if this were a linear array. 
+
+```{C++}
+// Initializing FastArrays
+IntFastArray *i = new IntFastArray();
+BoolFastArray *b = new BoolFastArray(2, true, false);
+StringFastArray *s = new StringFastArray(1, new String("hello world"));
+FloatFastArray *f = new FloatFastArray(4, 3.22, 2.22, 1.22, 0.22);
+
+// Getting a value
+i->get(1000) // will return an error, the index is out of bounds and the execution will terminate
+b->get(0) // returns true
+s->get(0) // return "hello world" as a clone of the original string; this is so that FastArray (and thus column array) maintain ownership of the string*
+f->get(3) // returns 0.22
+
+// Setting a value
+i->set(0, 5) // will return an error, the index is out of bounds and the execution will terminate
+b->set(0, false) // sets the value at index 0 to be false
+s->set(0, new String("blah")) // sets the string* to "blah"; the old String* is deleted since StringFastArray owns the string
+f->set(2, 8.88) // sets value at index 0 to be 8.88
+
+// Pushing new values onto the FastArrays
+i->push_back(123); // i->get(0) == 123
+
+b->push_back(0); // b->get(3) == false
+
+f->push_back(4.20); // f->get(4) == 4.20
+
+String *str = new String("hello world"); 
+s->push_back(str); // s->get(2) == "hello world"
+```
+
+
 <h3> Creating a Schema and adding Columns to it </h3>
+```{C++}
 String *s_str = new String("FIBS");
 Schema *s = new Schema(s_str->c_str()); // Schema represents a DataFrame with column types Float, Int, Bool, and String
 
-s->add_column('S', new String("Lies")); // Schema now represents a DataFrame with column types Float, Int, Bool, String, and String
-                                        // with the last column having the name "Lies"
+s->add_column('S', new String("Lies")); // Schema now represents a DataFrame with column types Float, Int, Bool, String, and String. The last column has the name "Lies"
 ```
