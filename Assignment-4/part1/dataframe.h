@@ -215,16 +215,18 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
-    virtual bool accept(Row &r)
-    {
-        return true;
-    }
+    virtual bool accept(Row &r) {}
 
     /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
     virtual void join_delete(Rower *other) {}
+
+    virtual Rower *clone()
+    {
+        return this;
+    }
 };
 
 class RowPrinter : public Rower
@@ -234,7 +236,7 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
-    bool accept(Row &r)
+    virtual bool accept(Row &r)
     {
         Printer printer_ = Printer();
         printer_.start(r.get_idx());
@@ -325,6 +327,10 @@ public:
         if (ncols_ == 0)
         {
             nrows_ = col->size(); // if there were no columns, then set the row size to this column
+            for (size_t i = 0; i < nrows_; i++)
+            {
+                schema_->add_row(nullptr);
+            }
         }
         col_arr_->push_back(col->clone());
         schema_->add_column(col->get_type(), name->clone());
