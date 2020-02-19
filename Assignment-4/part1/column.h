@@ -1038,7 +1038,7 @@ public:
     String *get(size_t idx)
     {
         assert(!outOfBounds(idx));
-        return arr_[idx / arr_size_][idx % arr_size_]->clone();
+        return arr_[idx / arr_size_][idx % arr_size_];
     }
 
     /**

@@ -23,22 +23,30 @@ void testSchemaAddingColumns()
     GT_EQUALS(s->width(), 5);
     GT_TRUE(s->coltypes_->equals(s5));
     GT_TRUE(s->col_name(4)->equals(new String("Lies")));
+    GT_TRUE(s->col_idx("Lies") == 4);
     delete s5;
 
     s->add_column('I', new String("int col"));
     String *s6 = new String("FIBSSI");
     GT_EQUALS(s->width(), 6);
     GT_TRUE(s->coltypes_->equals(s6));
+    GT_TRUE(s->col_name(5)->equals(new String("int col")));
+    GT_TRUE(s->col_idx("int col") == 5);
+    delete s6;
 
-    s->add_column('F', new String(nullptr));
+    s->add_column('F', nullptr);
     GT_EQUALS(s->width(), 7);
     String *s7 = new String("FIBSSIF");
     GT_TRUE(s->coltypes_->equals(s7));
+    GT_TRUE(s->col_name(6) == nullptr);
+    delete s7;
 
     s->add_column('B', new String("no name"));
     GT_EQUALS(s->width(), 8);
-    String *s8 = new String("FIBSSIB");
+    String *s8 = new String("FIBSSIFB");
     GT_TRUE(s->coltypes_->equals(s8));
+    GT_TRUE(s->col_idx("no name") == 7);
+    delete s8;
 
     exit(0);
 }

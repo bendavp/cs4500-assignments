@@ -45,9 +45,9 @@ void testDataframeAddingRows()
         CS4500_ASSERT_TRUE(df->get_int(0, i) == i);
         CS4500_ASSERT_TRUE(df->get_int(1, i) == (i + 1));
         CS4500_ASSERT_TRUE(df->get_string(2, i)->equals(expected));
-        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 0.22) < 0.001);
-        CS4500_ASSERT_TRUE(df->get_float(2, i) - ((float)i + 0.22) > -0.001);
-        CS4500_ASSERT_TRUE(df->get_bool(1, i) == (i % 2 == 1));
+        CS4500_ASSERT_TRUE(df->get_float(3, i) - ((float)i + 0.22) < 0.001);
+        CS4500_ASSERT_TRUE(df->get_float(3, i) - ((float)i + 0.22) > -0.001);
+        CS4500_ASSERT_TRUE(df->get_bool(4, i) == (i % 2 == 1));
     }
     exit(0);
 }
