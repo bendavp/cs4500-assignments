@@ -80,7 +80,7 @@ FloatFastArray *f = new FloatFastArray(4, 3.22, 2.22, 1.22, 0.22);
 // Getting a value
 i->get(1000) // will return an error, the index is out of bounds and the execution will terminate
 b->get(0) // returns true
-s->get(0) // return "hello world" as a clone of the original string; this is so that FastArray (and thus column array) maintain ownership of the string*
+s->get(0) // return "hello world"
 f->get(3) // returns 0.22
 
 // Setting a value
