@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../string.h"
+#include "string.h"
 
 /**
  * @brief A class that represents an array of pointers to arrays of integers. This allows us to grow the array 

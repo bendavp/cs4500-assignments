@@ -98,7 +98,7 @@ void testPmapSmallDf()
     exit(0);
 }
 
-TEST(a4, t1) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
+TEST(a41, t1) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
 
 void testMapSmallDf()
 {
@@ -109,7 +109,7 @@ void testMapSmallDf()
     exit(0);
 }
 
-TEST(a4, t2) { ASSERT_EXIT_ZERO(testMapSmallDf); }
+TEST(a41, t2) { ASSERT_EXIT_ZERO(testMapSmallDf); }
 
 void testPmapLargeDf()
 {
@@ -120,7 +120,7 @@ void testPmapLargeDf()
     exit(0);
 }
 
-TEST(a4, t1) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
+TEST(a41, t3) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
 
 void testMapLargeDf()
 {
@@ -131,7 +131,7 @@ void testMapLargeDf()
     exit(0);
 }
 
-TEST(a4, t2) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
+TEST(a41, t4) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
 
 int main(int argc, char **argv)
 {

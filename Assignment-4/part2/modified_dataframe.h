@@ -265,11 +265,11 @@ class DataFrame;
 class RowThread : public Thread
 {
 public:
-    DataFrame *df_;
+    Row **row_arr_;
     Rower *rower_;
-    size_t start_;
-    size_t end_;
+    size_t row_num_;
 
+    /*
     RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
     {
         df_ = df;
@@ -277,16 +277,21 @@ public:
         start_ = start;
         end_ = end;
     }
+    */
+
+    RowThread(Rower *r, Row **row_arr, size_t row_num)
+    {
+        row_arr_ = row_arr;
+        rower_ = r;
+        row_num_ = row_num;
+    }
 
     /** Subclass responsibility, the body of the run method */
     virtual void run()
     {
-        for (int i = start_; i < end_; i++)
+        for (int i = 0; i < row_num_; i++)
         {
-            Row row_ = Row(df_->get_schema());
-            row_.set_idx(i);
-            df_->fill_row(i, row_);
-            rower_->accept(row_);
+            rower_->accept(*row_arr_[i]);
         }
     }
 };
@@ -570,7 +575,7 @@ public:
     }
 
     /** This method clones the Rower and executes the map in parallel. Join is
-  * used at the end to merge the results. */
+    * used at the end to merge the results. */
     void pmap(Rower &r)
     {
         if (nrows_ < 1000)
@@ -579,7 +584,6 @@ public:
         }
         else
         {
-
             int numThreads = 2;
 
             RowThread **thread_list_ = new RowThread *[numThreads];
@@ -596,12 +600,27 @@ public:
                 end_indices_[i - 1] = nrows_ * i / numThreads;
             }
 
+            Row ***rows = new Row **[nrows()];
+            size_t idx = 0;
+            for (int i = 0; i < numThreads; i++)
+            {
+                for (int j = 0; j < nrows() / numThreads; j++)
+                {
+                    Row row_ = Row(get_schema());
+                    row_.set_idx(idx);
+                    fill_row(idx, row_);
+                    rows[i][j] = &row_;
+                    idx = idx + 1;
+                }
+            }
+
             // populate rows and threads and start each thread
             for (int i = 0; i < numThreads; i++)
             {
                 // maybe save one clone?
                 rower_list_[i] = r.clone();
-                thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
+                thread_list_[i] = new RowThread(rower_list_[i], rows[i], nrows() / numThreads);
+                // thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
                 thread_list_[i]->start();
             }
 
