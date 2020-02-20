@@ -256,6 +256,7 @@ public:
     }
 };
 
+/*
 class AddAllInts : public Rower
 {
 public:
@@ -310,6 +311,8 @@ public:
         return total;
     }
 };
+*/
+
 /****************************************************************************
  * RowThread::
  * 

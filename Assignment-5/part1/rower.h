@@ -71,12 +71,14 @@ class FibonnacciRower : public Rower
 {
 public:
     int total = 0;
+    size_t total_rows = 0;
 
     bool accept(Row &r)
     {
         FibCalc fibcalc_ = FibCalc();
         fibcalc_.start(r.get_idx());
         r.visit(r.get_idx(), fibcalc_);
+        total_rows = total_rows + 1;
         return true;
     }
 
@@ -84,12 +86,19 @@ public:
     {
         FibonnacciRower *r = static_cast<FibonnacciRower *>(other);
         total += r->total;
+        total_rows = total_rows + r->total_rows;
         delete other;
     }
 
     Rower *clone()
     {
         return new FibonnacciRower();
+    }
+
+    void reset()
+    {
+        total_rows = 0;
+        total = 0;
     }
 };
 
@@ -137,6 +146,7 @@ class AddAllInts : public Rower
 {
 public:
     int total = 0;
+    size_t total_rows = 0;
 
     bool accept(Row &r)
     {
@@ -145,6 +155,7 @@ public:
         r.visit(r.get_idx(), addints_);
         total += addints_.total;
         addints_.done();
+        total_rows = total_rows + 1;
         return true;
     }
 
@@ -152,7 +163,14 @@ public:
     {
         AddAllInts *r = static_cast<AddAllInts *>(other);
         total += r->total;
+        total_rows += total_rows + r->total_rows;
         delete other;
+    }
+
+    void reset()
+    {
+        total_rows = 0;
+        total = 0;
     }
 
     Rower *clone()
