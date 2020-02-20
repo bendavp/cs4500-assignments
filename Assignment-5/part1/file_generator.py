@@ -21,11 +21,11 @@ seed(1)
 with open(outFile, "w") as f:
     for x in range(numRows):
         colsToAdd = []
-        colsToAdd.append(str(randint(0,20))) # int col 1
-        colsToAdd.append(str(randint(0,20))) # int col 2
-        colsToAdd.append(str(randint(0,20))) # int col 3
-        colsToAdd.append(str(random() * 20)) # float 4
-        colsToAdd.append(str(random() * 20)) # float 5
+        colsToAdd.append(str(randint(0,200))) # int col 1
+        colsToAdd.append(str(randint(0,200))) # int col 2
+        colsToAdd.append(str(randint(0,200))) # int col 3
+        colsToAdd.append(str(random() * 200)) # float 4
+        colsToAdd.append(str(random() * 200)) # float 5
         colsToAdd.append(str(randint(0,1))) # bool 6
         colsToAdd.append(str(randint(0,1))) # bool 7
         colsToAdd.append(''.join(choice(letters) for i in range(randint(3,20)))) # string 8
