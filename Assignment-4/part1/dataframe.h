@@ -1,7 +1,7 @@
 //lang::Cpp
 
 #include "schema.h"
-#include "../helper.h"
+#include "helper.h"
 
 #pragma once
 
