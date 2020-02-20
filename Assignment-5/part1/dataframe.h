@@ -263,13 +263,25 @@ public:
 // forward declaration so RowThread can "use" DataFrame's fill_row()
 class DataFrame;
 
-class RowThread
+class RowThread : public Thread
 {
 public:
-    RowThread(DataFrame *df, Rower *r, size_t start, size_t end);
+    Rower *rower_;
+    size_t row_num_;
+    DataFrame *df_;
+    size_t start_;
+    size_t end_;
+
+    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
+    {
+        df_ = df;
+        rower_ = r;
+        start_ = start;
+        end_ = end;
+    }
 
     /** Subclass responsibility, the body of the run method */
-    virtual void run();
+    void run();
 };
 
 /****************************************************************************
@@ -629,31 +641,12 @@ public:
     }
 };
 
-class RowThread : public Thread
+void RowThead::run()
 {
-public:
-    Rower *rower_;
-    size_t row_num_;
-    DataFrame *df_;
-    size_t start_;
-    size_t end_;
-
-    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
+    Row r = Row(df_->get_schema());
+    for (size_t i = start_; i < end_; i++)
     {
-        df_ = df;
-        rower_ = r;
-        start_ = start;
-        end_ = end;
+        df_->fill_row(i, r);
+        rower_->accept(r);
     }
-
-    /** Subclass responsibility, the body of the run method */
-    virtual void run()
-    {
-        Row r = Row(df_->get_schema());
-        for (size_t i = start_; i < end_; i++)
-        {
-            df_->fill_row(i, r);
-            rower_->accept(r);
-        }
-    }
-};
+}
