@@ -215,7 +215,10 @@ public:
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
-    virtual bool accept(Row &r) {}
+    virtual bool accept(Row &r)
+    {
+        std::cout << "rower base" << '\n';
+    }
 
     /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
@@ -251,6 +254,63 @@ public:
     void join_delete(Rower *other)
     {
         delete other;
+    }
+};
+
+class AddAllInts : public Rower
+{
+public:
+    int total = 0;
+
+    bool accept(Row &r)
+    {
+        int val1 = r.get_int(0);
+        int val2 = r.get_int(1);
+        int val3 = r.get_int(2);
+        total = calcFib(val1) + calcFib(val2) + calcFib(val3);
+        std::cout << calcFib(val1) << '\n';
+        return true;
+    }
+
+    void join_delete(Rower *other)
+    {
+        AddAllInts *r = static_cast<AddAllInts *>(other);
+        total += r->total;
+        delete r;
+        delete other;
+    }
+
+    Rower *clone()
+    {
+        return new AddAllInts();
+    }
+
+    int calcFib(int i)
+    {
+        std::cout << "inside" << '\n';
+        int first = 0;
+        int second = 1;
+        int total = 0;
+        if (i == 0)
+        {
+            total = first;
+        }
+        else if (i == 2)
+        {
+            total = second;
+        }
+        else
+        {
+            int next;
+            for (int j = 2; j < i; j++)
+            {
+                next = first + second;
+                first = second;
+                second = next;
+            }
+            total = next;
+        }
+        return total;
     }
 };
 /****************************************************************************
@@ -350,13 +410,14 @@ public:
     void add_column(Column *col, String *name)
     {
         assert(col != nullptr);
-        if (ncols_ > 0 && nrows_ > 0)
+        if (ncols_ > 0)
         {
             assert(col->size() == nrows_); // checking that size of column is the same
         }
         if (ncols_ == 0)
         {
             nrows_ = col->size(); // if there were no columns, then set the row size to this column
+            std::cout << "nrows " << nrows_ << '\n';
             for (size_t i = 0; i < nrows_; i++)
             {
                 schema_->add_row(nullptr);
@@ -556,13 +617,15 @@ public:
     /** Visit rows in order */
     void map(Rower &r)
     {
-
+        std::cout << "hello";
         for (size_t i = 0; i < nrows_; i++)
         {
             Row row_ = Row(*schema_);
             row_.set_idx(i);
             fill_row(i, row_);
+            std::cout << "hello" << i << '\n';
             r.accept(row_);
+            std::cout << "hello" << i << '\n';
         }
     }
 
