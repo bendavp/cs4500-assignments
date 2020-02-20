@@ -5,14 +5,21 @@ from random import randint
 from random import seed
 from random import choice
 import string
+import sys
 
-outFile = "datafile.txt"
+# takes 2 inputs
+# first input = "file_name.txt"
+# second input = number of rows
+# details about the file that can be changed
+outFile = sys.argv[1]
+numRows = int(sys.argv[2])
+
+# for generating ints/floats/bools/strings
 letters = string.ascii_letters
-
 seed(1)
 
 with open(outFile, "w") as f:
-    for x in range(1278600):
+    for x in range(numRows):
         colsToAdd = []
         colsToAdd.append(str(randint(0,10000))) # int col 1
         colsToAdd.append(str(randint(0,10000))) # int col 2
