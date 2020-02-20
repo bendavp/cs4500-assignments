@@ -1,7 +1,6 @@
 //lang::Cpp
 
 #include "schema.h"
-#include "helper.h"
 #include "thread.h"
 
 #pragma once
@@ -262,42 +261,15 @@ public:
  */
 
 // forward declaration so RowThread can "use" DataFrame's fill_row()
-class DataFrame : public Object
+class DataFrame;
+
+class RowThread
 {
 public:
-    void fill_row(size_t idx, Row r){};
-    Schema &get_schema(){};
-};
-
-/** A Thread wraps the thread operations in the standard library.
- *  author: vitekj@me.com */
-class RowThread : public Thread
-{
-public:
-    Rower *rower_;
-    size_t row_num_;
-    DataFrame *df_;
-    size_t start_;
-    size_t end_;
-
-    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
-    {
-        df_ = df;
-        rower_ = r;
-        start_ = start;
-        end_ = end;
-    }
+    RowThread(DataFrame *df, Rower *r, size_t start, size_t end);
 
     /** Subclass responsibility, the body of the run method */
-    virtual void run()
-    {
-        Row r = Row(df_->get_schema());
-        for (size_t i = start_; i < end_; i++)
-        {
-            df_->fill_row(i, r);
-            rower_->accept(r);
-        }
-    }
+    virtual void run();
 };
 
 /****************************************************************************
@@ -654,5 +626,34 @@ public:
     {
         RowPrinter r = RowPrinter();
         map(r);
+    }
+};
+
+class RowThread : public Thread
+{
+public:
+    Rower *rower_;
+    size_t row_num_;
+    DataFrame *df_;
+    size_t start_;
+    size_t end_;
+
+    RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
+    {
+        df_ = df;
+        rower_ = r;
+        start_ = start;
+        end_ = end;
+    }
+
+    /** Subclass responsibility, the body of the run method */
+    virtual void run()
+    {
+        Row r = Row(df_->get_schema());
+        for (size_t i = start_; i < end_; i++)
+        {
+            df_->fill_row(i, r);
+            rower_->accept(r);
+        }
     }
 };
