@@ -616,10 +616,9 @@ public:
     /** Visit rows in order */
     void map(Rower &r)
     {
+        Row row_ = Row(get_schema());
         for (size_t i = 0; i < nrows_; i++)
         {
-            Row row_ = Row(*schema_);
-            row_.set_idx(i);
             fill_row(i, row_);
             r.accept(row_);
         }
