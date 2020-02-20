@@ -570,47 +570,40 @@ public:
     * used at the end to merge the results. */
     void pmap(Rower &r)
     {
-        if (nrows_ < 1000)
+        int numThreads = 2;
+
+        RowThread **thread_list_ = new RowThread *[numThreads];
+        Rower **rower_list_ = new Rower *[numThreads];
+
+        size_t *start_indices_ = new size_t[numThreads];
+        size_t *end_indices_ = new size_t[numThreads];
+
+        for (int i = 0; i < numThreads; i++)
         {
-            map(r);
+            start_indices_[i] = nrows_ * i / numThreads;
         }
-        else
+        for (int i = 1; i < numThreads + 1; i++)
         {
-            int numThreads = 2;
+            end_indices_[i - 1] = nrows_ * i / numThreads;
+        }
 
-            RowThread **thread_list_ = new RowThread *[numThreads];
-            Rower **rower_list_ = new Rower *[numThreads];
+        // populate rows and threads and start each thread
+        for (int i = 0; i < numThreads; i++)
+        {
+            // maybe save one clone?
+            rower_list_[i] = r.clone();
+            thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
+            thread_list_[i]->start();
+        }
 
-            size_t *start_indices_ = new size_t[numThreads];
-            size_t *end_indices_ = new size_t[numThreads];
+        for (int i = 0; i < numThreads; i++)
+        {
+            thread_list_[i]->join();
+        }
 
-            for (int i = 0; i < numThreads; i++)
-            {
-                start_indices_[i] = nrows_ * i / numThreads;
-            }
-            for (int i = 1; i < numThreads + 1; i++)
-            {
-                end_indices_[i - 1] = nrows_ * i / numThreads;
-            }
-
-            // populate rows and threads and start each thread
-            for (int i = 0; i < numThreads; i++)
-            {
-                // maybe save one clone?
-                rower_list_[i] = r.clone();
-                thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
-                thread_list_[i]->start();
-            }
-
-            for (int i = 0; i < numThreads; i++)
-            {
-                thread_list_[i]->join();
-            }
-
-            for (int i = numThreads - 2; i >= 0; i--)
-            {
-                rower_list_[i]->join_delete(rower_list_[i + 1]);
-            }
+        for (int i = numThreads - 2; i >= 0; i--)
+        {
+            rower_list_[i]->join_delete(rower_list_[i + 1]);
         }
     }
 
