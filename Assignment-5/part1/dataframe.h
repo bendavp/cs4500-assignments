@@ -350,7 +350,7 @@ public:
     void add_column(Column *col, String *name)
     {
         assert(col != nullptr);
-        if (ncols_ > 0)
+        if (ncols_ > 0 && nrows_ > 0)
         {
             assert(col->size() == nrows_); // checking that size of column is the same
         }

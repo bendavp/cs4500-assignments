@@ -1,16 +1,6 @@
-#include <gtest/gtest.h>
-#include "modified_dataframe.h"
+#include "../dataframe.h"
 
-#define GT_TRUE(a) ASSERT_EQ((a), true)
-#define GT_FALSE(a) ASSERT_EQ((a), false)
-#define GT_EQUALS(a, b) ASSERT_EQ(a, b)
-#define ASSERT_EXIT_ZERO(a) \
-    ASSERT_EXIT(a(), ::testing::ExitedWithCode(0), ".*")
-
-Schema scm("IFBII"); // the schema
-DataFrame df(scm);   // the data frame
-
-class IntAdder : public Object
+class IntAdder : public Fielder
 {
 public:
     size_t row_num_;
@@ -73,68 +63,106 @@ public:
     }
 };
 
-DataFrame *init()
+void testPmapLargeDf()
 {
+    Schema scm("IIIIIIIIII");           // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
+
     IntColumn *i_ = new IntColumn();
     for (size_t j = 0; j < 10000000; j++)
     {
         i_->push_back(j);
     }
 
-    Schema *s = new Schema();
-    DataFrame *df = new DataFrame(*s);
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 10; i++)
     {
         df->add_column(i_, StrBuff().c(i).get());
     }
-}
 
-void testPmapSmallDf()
-{
-    DataFrame *df = init();
     Rower rower_ = AddAllInts();
     df->pmap(rower_);
 
-    exit(0);
-}
-
-TEST(a41, t1) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
-
-void testMapSmallDf()
-{
-    DataFrame *df = init();
-    Rower rower_ = AddAllInts();
-    df->map(rower_);
+    //delete df;
 
     exit(0);
 }
 
-TEST(a41, t2) { ASSERT_EXIT_ZERO(testMapSmallDf); }
-
-void testPmapLargeDf()
-{
-    DataFrame *df = init();
-    Rower rower_ = AddAllInts();
-    df->pmap(rower_);
-
-    exit(0);
-}
-
-TEST(a41, t3) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
+TEST(a40, t2) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
 
 void testMapLargeDf()
 {
-    DataFrame *df = init();
+    Schema scm("IFBII");                // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
+
+    IntColumn *i_ = new IntColumn();
+    for (size_t j = 0; j < 10000000; j++)
+    {
+        i_->push_back(j);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        df->add_column(i_, StrBuff().c(i).get());
+    }
+
     Rower rower_ = AddAllInts();
     df->map(rower_);
+
+    //delete df;
 
     exit(0);
 }
 
-TEST(a41, t4) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
+TEST(a41, t2) { ASSERT_EXIT_ZERO(testMapLargeDf); }
 
-int main(int argc, char **argv)
+void testPmapSmallDf()
 {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    Schema scm("IFBII");                // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
+
+    IntColumn *i_ = new IntColumn();
+    for (size_t j = 0; j < 10; j++)
+    {
+        i_->push_back(j);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        df->add_column(i_, StrBuff().c(i).get());
+    }
+
+    Rower rower_ = AddAllInts();
+    df->pmap(rower_);
+
+    //delete df;
+
+    exit(0);
 }
+
+TEST(a41, t3) { ASSERT_EXIT_ZERO(testPmapSmallDf); }
+
+void testMapSmallDf()
+{
+    Schema scm("IFBII");                // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
+
+    IntColumn *i_ = new IntColumn();
+    for (size_t j = 0; j < 10; j++)
+    {
+        i_->push_back(j);
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        df->add_column(i_, StrBuff().c(i).get());
+    }
+
+    Rower rower_ = AddAllInts();
+    df->map(rower_);
+
+    //delete df;
+
+    exit(0);
+}
+
+TEST(a41, t4) { ASSERT_EXIT_ZERO(testMapSmallDf); }

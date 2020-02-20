@@ -5,8 +5,8 @@ install:
 	cd test && cmake .
 
 # Run all the tests
-test:
-	-cd test && make --no-print-directory && ./runTests
+run-tests:
+	-cd ./test/ && make --no-print-directory && ./runTests
 
 # Clean it up
 clean:
