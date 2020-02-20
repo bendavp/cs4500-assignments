@@ -23,7 +23,27 @@ public:
     }
     virtual void accept(int i)
     {
-        row_total += i;
+        int first = 0;
+        int second = 1;
+        if (i == 0)
+        {
+            row_total = first;
+        }
+        else if (i == 2)
+        {
+            row_total = second;
+        }
+        else
+        {
+            int next;
+            for (int j = 2; j < i; j++)
+            {
+                next = first + second;
+                first = second;
+                second = next;
+            }
+            row_total = next;
+        }
     }
     virtual void accept(String *s)
     {
@@ -44,8 +64,11 @@ public:
 
     bool accept(Row &r)
     {
-        IntAdder i = IntAdder();
-        total = i.row_total;
+        int val1 = r.get_int(0);
+        int val2 = r.get_int(1);
+        int val3 = r.get_int(2);
+        total = calcFib(val1) + calcFib(val2) + calcFib(val3);
+        std::cout << calcFib(val1) << "\n";
         return true;
     }
 
@@ -60,6 +83,33 @@ public:
     Rower *clone()
     {
         return new AddAllInts();
+    }
+
+    int calcFib(int i)
+    {
+        int first = 0;
+        int second = 1;
+        int total = 0;
+        if (i == 0)
+        {
+            total = first;
+        }
+        else if (i == 2)
+        {
+            total = second;
+        }
+        else
+        {
+            int next;
+            for (int j = 2; j < i; j++)
+            {
+                next = first + second;
+                first = second;
+                second = next;
+            }
+            total = next;
+        }
+        return total;
     }
 };
 
