@@ -55,57 +55,57 @@ public:
     }
 };
 
-// void testPmapLargeDf()
-// {
-//     Schema scm("");                     // the schema
-//     DataFrame *df = new DataFrame(scm); // the data frame
+void testPmapLargeDf()
+{
+    Schema scm("");                     // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
 
-//     IntColumn *i_ = new IntColumn();
-//     for (size_t j = 0; j < 10000000; j++)
-//     {
-//         i_->push_back(j);
-//     }
+    IntColumn *i_ = new IntColumn();
+    for (size_t j = 0; j < 10000000; j++)
+    {
+        i_->push_back(j);
+    }
 
-//     for (int i = 0; i < 10; i++)
-//     {
-//         df->add_column(i_, StrBuff().c(i).get());
-//     }
+    for (int i = 0; i < 10; i++)
+    {
+        df->add_column(i_, StrBuff().c(i).get());
+    }
 
-//     AddAllInts rower_ = AddAllInts();
-//     df->pmap(rower_);
+    AddAllInts rower_ = AddAllInts();
+    df->pmap(rower_);
 
-//     //delete df;
+    //delete df;
 
-//     exit(0);
-// }
+    exit(0);
+}
 
-// TEST(a40, t2) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
+TEST(a40, t2) { ASSERT_EXIT_ZERO(testPmapLargeDf); }
 
-// void testMapLargeDf()
-// {
-//     Schema scm("");                     // the schema
-//     DataFrame *df = new DataFrame(scm); // the data frame
+void testMapLargeDf()
+{
+    Schema scm("");                     // the schema
+    DataFrame *df = new DataFrame(scm); // the data frame
 
-//     IntColumn *i_ = new IntColumn();
-//     for (size_t j = 0; j < 10000000; j++)
-//     {
-//         i_->push_back(j);
-//     }
+    IntColumn *i_ = new IntColumn();
+    for (size_t j = 0; j < 10000000; j++)
+    {
+        i_->push_back(j);
+    }
 
-//     for (int i = 0; i < 10; i++)
-//     {
-//         df->add_column(i_, StrBuff().c(i).get());
-//     }
+    for (int i = 0; i < 10; i++)
+    {
+        df->add_column(i_, StrBuff().c(i).get());
+    }
 
-//     AddAllInts rower_ = AddAllInts();
-//     df->map(rower_);
+    AddAllInts rower_ = AddAllInts();
+    df->map(rower_);
 
-//     //delete df;
+    //delete df;
 
-//     exit(0);
-// }
+    exit(0);
+}
 
-// TEST(a41, t2) { ASSERT_EXIT_ZERO(testMapLargeDf); }
+TEST(a41, t2) { ASSERT_EXIT_ZERO(testMapLargeDf); }
 
 void testPmapSmallDf()
 {
