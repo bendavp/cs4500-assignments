@@ -641,7 +641,7 @@ public:
     }
 };
 
-void RowThead::run()
+void RowThread::run()
 {
     Row r = Row(df_->get_schema());
     for (size_t i = start_; i < end_; i++)
