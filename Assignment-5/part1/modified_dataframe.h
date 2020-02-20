@@ -265,11 +265,12 @@ class DataFrame;
 class RowThread : public Thread
 {
 public:
-    Row **row_arr_;
     Rower *rower_;
     size_t row_num_;
+    DataFrame *df_;
+    size_t start_;
+    size_t end_;
 
-    /*
     RowThread(DataFrame *df, Rower *r, size_t start, size_t end) : Thread()
     {
         df_ = df;
@@ -277,21 +278,24 @@ public:
         start_ = start;
         end_ = end;
     }
-    */
 
+    /*
     RowThread(Rower *r, Row **row_arr, size_t row_num)
     {
         row_arr_ = row_arr;
         rower_ = r;
         row_num_ = row_num;
     }
+    */
 
     /** Subclass responsibility, the body of the run method */
     virtual void run()
     {
-        for (int i = 0; i < row_num_; i++)
+        Row r = Row(df_->get_schema());
+        for (size_t i = start_; i < end_; i++)
         {
-            rower_->accept(*row_arr_[i]);
+            df_->fill_row(i, r);
+            rower_->accept(r);
         }
     }
 };
@@ -588,7 +592,7 @@ public:
 
             RowThread **thread_list_ = new RowThread *[numThreads];
             Rower **rower_list_ = new Rower *[numThreads];
-            /**
+
             size_t *start_indices_ = new size_t[numThreads];
             size_t *end_indices_ = new size_t[numThreads];
 
@@ -600,8 +604,8 @@ public:
             {
                 end_indices_[i - 1] = nrows_ * i / numThreads;
             }
-            **/
 
+            /*
             Row ***rows = new Row **[nrows()];
             size_t idx = 0;
             for (int i = 0; i < numThreads; i++)
@@ -615,14 +619,14 @@ public:
                     idx = idx + 1;
                 }
             }
+            */
 
             // populate rows and threads and start each thread
             for (int i = 0; i < numThreads; i++)
             {
                 // maybe save one clone?
                 rower_list_[i] = r.clone();
-                thread_list_[i] = new RowThread(rower_list_[i], rows[i], nrows() / numThreads);
-                // thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
+                thread_list_[i] = new RowThread(this, rower_list_[i], start_indices_[i], end_indices_[i]);
                 thread_list_[i]->start();
             }
 
