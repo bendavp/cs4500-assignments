@@ -13,16 +13,13 @@
  */
 int main()
 {
-    char *line_buf = NULL;                 // buffer to store line contents, initialy NULL since we haven't read a line yet
-    size_t line_buf_size = 0;              // size of line buffer, initially zero since we haven't read a line yet
-    size_t line_size;                      // initialize size of line (i.e. number of chars)
-    FILE *fp = fopen("testfile.txt", "r"); // open datafile.txt
-    std::cout << "hello1"
-              << "\n";
+    char *line_buf = NULL;                              // buffer to store line contents, initialy NULL since we haven't read a line yet
+    size_t line_buf_size = 0;                           // size of line buffer, initially zero since we haven't read a line yet
+    size_t line_size;                                   // initialize size of line (i.e. number of chars)
+    FILE *fp = fopen("testfile.txt", "r");              // open datafile.txt
     line_size = getline(&line_buf, &line_buf_size, fp); // get first line of the file, set line_size to its size
     char *token = std::strtok(line_buf, "\t");          // set token to tokenize line
-    std::cout << "hello2"
-              << "\n";
+
     // declare all columns here, i.e.
     //IntColumn *column1 = new IntColumn();
     //IntColumn *column2 = new IntColumn();
