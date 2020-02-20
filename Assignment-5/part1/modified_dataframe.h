@@ -258,7 +258,11 @@ public:
     }
 };
 
-class DataFrame;
+// forward declaration so RowThread can "use" DataFrame's fill_row()
+class DataFrame
+{
+    void fill_row(size_t idx, Row r){};
+};
 
 /** A Thread wraps the thread operations in the standard library.
  *  author: vitekj@me.com */
@@ -278,15 +282,6 @@ public:
         start_ = start;
         end_ = end;
     }
-
-    /*
-    RowThread(Rower *r, Row **row_arr, size_t row_num)
-    {
-        row_arr_ = row_arr;
-        rower_ = r;
-        row_num_ = row_num;
-    }
-    */
 
     /** Subclass responsibility, the body of the run method */
     virtual void run()
