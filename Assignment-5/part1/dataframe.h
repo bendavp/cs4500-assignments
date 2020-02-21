@@ -2,6 +2,7 @@
 
 #include "schema.h"
 #include "thread.h"
+#include <stdarg.h>
 
 #pragma once
 
