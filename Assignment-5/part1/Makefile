@@ -12,3 +12,18 @@ run-tests:
 clean:
 	find ./test/* ! -name "CMakeLists.txt" ! -name "CMakeLists.txt.in" ! -name "test*" -exec rm -rf "{}" +;
 	rm -rf a.out*
+	rm bench
+	rm datafile.txt
+
+#setup benchmark
+setup-bench:
+	chmod u+x file_generator.py
+	./file_generator.py "datafile.txt" 1278600
+	g++ -std=c++11 bench.cpp -o bench
+
+#run benchmark
+run-bench:
+	./bench datafile.txt > output1.txt
+	./bench datafile.txt > output2.txt
+	./bench datafile.txt > output3.txt
+
