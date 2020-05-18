@@ -6,4 +6,4 @@
 - [Benjamin Kosiborod](https://github.com/bendavp) (myself)
 
 ### Description:
-A collection of all assignments leading up to the final project for CS 4500: Software Development with professor [Jan Vitek](https://janvitek.org/). A description for all of the assignments in this repository can be found [here](http://janvitek.org/events/NEU/4500/s20/projects2.html).
+A collection of all assignments leading up to the final project for CS 4500: Software Development with professor [Jan Vitek](http://janvitek.org/). A description for all of the assignments in this repository can be found [here](http://janvitek.org/events/NEU/4500/s20/projects2.html).
